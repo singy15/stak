@@ -1,0 +1,24 @@
+
+<!DOCTYPE html>
+<html>
+<title>Stak - <%= @view_title %></title>
+<head>
+  <%= erb :include %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <!-- Sidebar -->
+  <%= erb :part_sidebar %>
+  <!-- Page Content -->
+  <div id="pageContent" style="margin-left:150px">
+    <div class="w3-container w3-teal">
+      <h1><%= @view_title %></h1>
+    </div>
+    <div class="w3-container">
+      <h2><%= @view_subtitle %></h2>
+      <%= @view_content %>
+    </div>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+
+.icon-checked {
+  background: transparent url("/img/checked.png") no-repeat scroll center center;
+}
+
+.input-register {
+  width: 100px;
+}
+
+.input-table {
+  float: left;
+}
+
+.input-table th {
+  text-align : left;
+  vertical-align: top;
+}
+
+input {
+  height : 24px;
+  width : 120px;
+}
+
+select {
+  height : 24px;
+  width : 120px;
+}

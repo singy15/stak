@@ -1,0 +1,890 @@
+
+
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<title>Basic initialization</title>
+
+<script src="/lib/gantt/codebase/dhtmlxgantt.js?v=20180227"></script>
+<link rel="stylesheet" href="/lib/gantt/codebase/skins/dhtmlxgantt_meadow.css?v=20180227">
+<script src="/lib/gantt/codebase/ext/dhtmlxgantt_marker.js"></script>
+
+<style type="text/css">
+   .weekend{ background: #888888!important; color:white !important;}
+   .gantt_add {display:none;}
+   .gantt_grid_head_cell.gantt_grid_head_add.gantt_last_cell {
+     display:none;
+   }
+   .gantt_tree_icon.gantt_folder_open {
+     background-image:url("/img/stack.png")
+   }
+   .gantt_tree_icon.gantt_folder_closed {
+     background-image:url("/img/stack.png")
+   }
+   .gantt_tree_icon.gantt_file {
+     background-image:url("/img/task.png")
+   }
+   .gantt_marker .gantt_marker_content {
+     font-size : x-small;
+     line-height : 5px;
+   }
+   .gantt_marker {
+     background-color : rgba(255, 0, 0, 0.2)
+   }
+   .task_actual{
+     background:#ffc0cb;
+     border-color:#db7093;
+   }
+	 .task_actual .gantt_task_progress{
+	 	 background:#f08080;
+	 }
+   .task_project{
+     background:#d4dfff;
+     border-color:#647bbc;
+   }
+	 .task_project .gantt_task_progress{
+	 	 background:#91a4d9;
+	 }
+</style>
+
+<div class="easyui-panel" style="width:100%;margin-bottom:5px;">
+  <div id="gantt_here" style='width:100%; height:500px;'></div>
+</div>
+<div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
+  <!-- Set to width:100% cause overflow when toggle sidebar -->
+<div id="vue-main" class="vue-component">
+  <table class="input-table" style="width:95%"> 
+    <tr>
+      <th width="100px">Workplan CD</th>
+      <td width="200px">
+        <span>{{(row.work_plan_cd)? row.work_plan_cd : "NEW"}}</span>
+      </td>
+    </tr>
+    <tr>
+      <th>Task CD</th>
+      <td><input v-model="row.task_cd" type="text" style="width:80px"></td>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <td><input v-model="row.name" type="text" style="width:100%"></td>
+    </tr>
+    <tr>
+      <th>Assigned to</th>
+      <td>
+        <select name="category" v-model="row.user_cd">
+          <option v-for="category in key_value_user" :value="category.value">
+            {{ category.text }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th>Start date</th>
+      <td><input v-model="row.start_date" type="text" style="width:80px"></td>
+    </tr>
+    <tr>
+      <th>End date</th>
+      <td><input v-model="row.end_date" type="text" style="width:80px"></td>
+    </tr>
+    <tr>
+      <th>Progress</th>
+      <td><input v-model="row.progress" type="text" style="width:80px"></td>
+    </tr>
+    <tr>
+      <th>Parent CD</th>
+      <td><input v-model="row.parent_cd" type="text" style="width:80px"></td>
+    </tr>
+    <tr>
+      <th>Sort order</th>
+      <td><input v-model="row.sort_order" type="text" style="width:80px"></td>
+    </tr>
+    <tr>
+      <th>Work type</th>
+      <td>
+        <select name="category" v-model="row.work_type">
+          <option v-for="category in key_value_work_type" :value="category.value">
+            {{ category.text }}
+          </option>
+        </select>
+      </td>
+    </tr>
+  </table>
+</div>
+  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
+    <input id="btnRegister" type="button" value="Register" class="input-register"/>
+    <input id="btnNew" type="button" value="New" class="input-register"/>
+    <input id="btnCopy" type="button" value="Copy" class="input-register"/>
+    <input id="btnDelete" type="button" value="Delete" class="input-register"/>
+    <input id="btnScaleDay" type="button" value="Scale Day" class="input-register"/>
+    <input id="btnScaleHour" type="button" value="Scale Hour" class="input-register"/>
+    <input id="btnSortUp" type="button" value="UP" class="input-register"/>
+    <input id="btnSortDown" type="button" value="DOWN" class="input-register"/>
+  </div>
+</div>
+
+  <script>
+
+  $(document).ready(function() {
+    // autosize($('textarea'));
+
+    $("#btnNew").click(function() {
+      vue.row = newRecord();
+    });
+
+    $("#btnCopy").click(function() {
+      //singleNew(vue, "row", $("#dg"), copyRecord, "multiRowSelected");
+    });
+
+    $("#btnDelete").click(function() {
+      //if(vue.multiRowSelected) {
+      //  batchDel(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
+      //} else if(vue.row.task_cd !== "") {
+      //  singleDel(vue, "tasks", "row", "task_cd", $("#dg"), newRecord);
+      //}
+
+      $.ajax({
+        type: "DELETE",
+        url: "/workplans/" + vue.row.work_plan_cd,
+        data: JSON.stringify(vue.row),
+        success: function(data, dataType) { 
+          // defaultUpdtSuccessCallback(data, dataType);
+
+          // if(data.success) {
+          //   treegrid.treegrid("reload");
+          //   vue[propNameSelectedRow] = fnNewRecord();
+          // }
+          console.log("deleted");
+          gantt.deleteTask(vue.row.work_plan_cd);
+          loadTask();
+        },
+        // error: defaultUpdtErrorCallback,
+        dataType: "json"
+      });
+    });
+
+    $("#btnRegister").click(function() {
+      console.log("Register");
+      var id = vue.row.work_plan_cd;
+      $.ajax({
+        type: "POST",
+        url: "/workplans",
+        data: JSON.stringify(vue.row),
+        success: function(data, dataType) { 
+          // defaultUpdtSuccessCallback(data, dataType);
+
+          // if(data.success) {
+          //   treegrid.treegrid("reload");
+          //   vue[propNameSelectedRow] = fnNewRecord();
+          // }
+          if(id !== "") {
+            loadTask(function() { gantt.selectTask(id); });
+          } else {
+            loadTask();
+          }
+        },
+        // error: defaultUpdtErrorCallback,
+        dataType: "json"
+      });
+    });
+
+    $("#btnScaleDay").click(function() {
+      gantt.config.subscales = [
+        {unit: "day", step: 1, date: "%d", css: daysStyle}
+      ];
+      gantt.config.start_date = moment().add(-2,"months");
+      gantt.config.end_date = moment().add(4,"months");
+      gantt.init("gantt_here");
+      loadTask();
+    });
+
+    $("#btnScaleHour").click(function() {
+      gantt.config.subscales = [
+        {unit: "day", step:1,date:"%d",css:daysStyle},
+        {unit: "hour", step: 1, date: "%H", css: daysStyle}
+      ];
+
+
+      $.ajax({
+        type: "GET",
+        url: "/workplans",
+        data: JSON.stringify({}),
+        success: function(data, dataType) { 
+          var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").toDate();
+          var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").toDate();
+
+          gantt.config.start_date = st;
+          gantt.config.end_date = ed;
+          gantt.init("gantt_here");
+          loadTask();
+        },
+        // error: defaultUpdtErrorCallback,
+        dataType: "json"
+      });
+
+    });
+
+    function swapSortOrder(isUp, id, parentId) {
+      if(isUp) {
+        console.log("up");
+      } else {
+        console.log("down");
+      }
+      var targetId = id;
+      var index = gantt.getTaskIndex(id);
+      var children = gantt.getChildren(parentId);
+
+      var isMovable = (isUp)? (index > 0) : (index < (children.length - 1));
+      var targetIndex = (isUp)? (index-1) : (index+1);
+      var row = null;
+      var target = null;
+
+      if(isMovable) {
+        row = children[index];
+        target = children[targetIndex];
+        console.log("can swap", row, target);
+
+        var task1Row = gantt.getTask(row);
+        var task2Row = gantt.getTask(target);
+        var task1 = {
+          work_plan_cd : task1Row["id"]
+          ,task_cd : task1Row.task_cd
+          ,start_date : moment(task1Row.start_date).format('DD-MM-YYYY HH:mm')
+          ,end_date : moment(task1Row.end_date).format('DD-MM-YYYY HH:mm')
+          ,progress : task1Row.progress
+          ,user_cd : task1Row.user_cd
+          ,name : task1Row.name
+          ,parent_cd : task1Row.parent_cd
+          ,sort_order : task2Row.sort_order
+          ,work_type : task1Row.work_type
+        };
+        var task2 = {
+          work_plan_cd : task2Row["id"]
+          ,task_cd : task2Row.task_cd
+          ,start_date : moment(task2Row.start_date).format('DD-MM-YYYY HH:mm')
+          ,end_date : moment(task2Row.end_date).format('DD-MM-YYYY HH:mm')
+          ,progress : task2Row.progress
+          ,user_cd : task2Row.user_cd
+          ,name : task2Row.name
+          ,parent_cd : task2Row.parent_cd
+          ,sort_order : task1Row.sort_order
+          ,work_type : task2Row.work_type
+        };
+
+
+        $.when(
+          $.ajax({
+            type: "POST",
+            url: "/workplans",
+            data: JSON.stringify(task1),
+            success: function(data, dataType) { 
+              // defaultUpdtSuccessCallback(data, dataType);
+
+              // if(data.success) {
+              //   treegrid.treegrid("reload");
+              //   vue[propNameSelectedRow] = fnNewRecord();
+              // }
+            },
+            // error: defaultUpdtErrorCallback,
+            dataType: "json"
+          }),
+          $.ajax({
+            type: "POST",
+            url: "/workplans",
+            data: JSON.stringify(task2),
+            success: function(data, dataType) { 
+              // defaultUpdtSuccessCallback(data, dataType);
+
+              // if(data.success) {
+              //   treegrid.treegrid("reload");
+              //   vue[propNameSelectedRow] = fnNewRecord();
+              // }
+            },
+            // error: defaultUpdtErrorCallback,
+            dataType: "json"
+          })
+        )
+        .done(function(data_a, data_b) {
+          loadTask(function() { gantt.selectTask(targetId); });
+          // vue.row = newRecord();
+        })
+        .fail(function() {
+            console.log('error');
+        });
+
+      } else {
+        console.log("can't swap");
+      }
+    }
+
+    $("#btnSortUp").click(function() {
+      //console.log("up");
+      //var index = gantt.getTaskIndex(vue.row.work_plan_cd);
+      //var children = gantt.getChildren(vue.row.parent_cd);
+      //if(index > 0) {
+      //  console.log("can move up");
+      //  var row = children[index];
+      //  var target = children[index-1];
+      //  console.log("swap", row, target);
+      //}
+      swapSortOrder(true, vue.row.work_plan_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
+    });
+
+    $("#btnSortDown").click(function() {
+      //console.log("down");
+      //var index = gantt.getTaskIndex(vue.row.work_plan_cd);
+      //var children = gantt.getChildren(vue.row.parent_cd);
+      //if(index < (children.length - 1)) {
+      //  console.log("can move down");
+      //  var row = children[index];
+      //  var target = children[index+1];
+      //  console.log("swap", row, target);
+      //}
+      swapSortOrder(false, vue.row.work_plan_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
+    });
+  });
+  </script>
+
+
+  <script>
+
+  var lastScrollPos = null;
+
+	// var tasks = {
+	// 	data: [
+	// 		{
+	// 			id: 1, text: "Project #2", start_date: "01-04-2018", duration: 18, order: 10,
+	// 			progress: 0.4, open: true
+	// 		},
+	// 		{
+	// 			id: 2, text: "Task #1", start_date: "02-04-2018", duration: 8, order: 10,
+	// 			progress: 0.6, parent: 1
+	// 		},
+	// 		{
+	// 			id: 3, text: "Task #2", start_date: "11-04-2018", duration: 8, order: 20,
+	// 			progress: 0.6, parent: 2
+	// 		}
+	// 	],
+	// 	links: [
+	// 		{id: 1, source: 1, target: 2, type: "1"},
+	// 		{id: 2, source: 2, target: 3, type: "0"}
+	// 	]
+	// };
+
+  function daysStyle(date){
+      var dateToStr = gantt.date.date_to_str("%D");
+      if (dateToStr(date) == "Sun"||dateToStr(date) == "Sat")  return "weekend";
+   
+      return "";
+  };
+
+	var tasks = {
+		data: [
+			{
+        id: 1, text: "Project #2", start_date: "01-04-2018", end_date: "02-04-2018", order: 10,
+				progress: "0.4", open: true
+			},
+			{
+				id: 2, text: "Task #1", start_date: "02-04-2018", end_date: "06-04-2018", order: 10,
+				progress: 0.6, parent: 1, open:true
+			},
+			{
+				id: 3, text: "Task #2", start_date: "03-04-2018", end_date: "04-04-2018", order: 20,
+				progress: 0.6, parent: 2
+			}
+		],
+		links: [
+			// {id: 1, source: 1, target: 2, type: "1"},
+			// {id: 2, source: 2, target: 3, type: "0"}
+		]
+  };
+
+function formatTask(task){
+    // if(task.priority ==1)
+    //     return "<div class='important'>"+task.text+" ("+task.users+") </div>";
+  // return task.text+" ("+task.users+")";
+  if(task.task_cd !== "") {
+    return task.task_cd + " : " + task.text;
+  } else {
+    return task.name;
+  }
+};
+
+
+  function mapper(field, map) {
+    var col = field;
+    var kv = {};
+    for(var i = 0; i < map.length; i+=1) {
+      kv[map[i]["value"]] = map[i]["text"];
+    }
+
+    return function(task) { return kv[task[col]]; }
+  }
+
+  gantt.config.columns=[
+      {name:"text",       label:"Task name",  tree:true, width:"*", min_width: 120, template:formatTask },
+      //{name:"start_date", label:"Start time", align: "center",resize:true },
+      //{name:"duration",   label:"Duration",   align: "center",resize:true },
+    {name:"user_cd",   label:"Assigned to",   align: "center", template : mapper("user_cd", <%= @key_value_user %>) },
+    {name:"progress",   label:"Progress",   align: "center", template: function(task) {return Math.round(task.progress * 100.0) + "%";} }
+  ];
+
+
+	gantt.config.keep_grid_width = false;
+	gantt.config.grid_resize = true;
+  gantt.config.row_height = 20;
+  gantt.config.open_tree_initially = true;
+
+  gantt.config.start_date = moment().add(-2,"months");
+  gantt.config.end_date = moment().add(4,"months");
+
+  gantt.templates.scale_cell_class = function(date){
+      if(date.getDay()==0||date.getDay()==6){ return "weekend"; }
+  };
+
+	gantt.config.scale_unit = "month";
+	gantt.config.date_scale = "%F, %Y";
+
+  gantt.config.min_column_width = 18;
+	gantt.config.scale_height = 50;
+
+  gantt.config.order_branch = true;
+
+  gantt.config.duration_unit = "hour";
+
+  gantt.templates.scale_cell_class = function(date){
+    return "";
+  };
+
+	gantt.config.subscales = [
+		{unit: "day", step: 1, date: "%d", css: daysStyle}
+	];
+
+  //gantt.groupBy({
+  //  relation_property: "user_cd",
+  //  groups: [
+  //    {key:'001', label: "admin"},
+  //    {key:'002', label: "worker1"},
+  //  ],
+  //  group_id: "key",
+  //  group_text: "label"
+  //});
+
+  //gantt.config.start_date = new Date(2017, 11, 01);
+  //gantt.config.end_date = new Date(2018, 2, 01);
+  //gantt.config.scale_unit = "day"; 
+  //gantt.config.fit_tasks = false; 
+  //gantt.config.date_scale = "Week #%W";
+
+	gantt.templates.task_class = function(start, end, obj){
+    if(obj.work_type === "WT01PL") {
+      return "";
+    } else if(obj.work_type == "WT02AC") {
+      return "task_actual";
+    } else if(obj.work_type == "WT03PJ") {
+      return "task_project";
+    }
+	}
+
+  gantt.init("gantt_here");
+
+  gantt.attachEvent("onBeforeRowDragEnd", function(id, parent, tindex){
+    var task = gantt.getTask(id);
+    if(task.parent != parent)
+        return false;
+    return true;
+  });
+
+  gantt.attachEvent("onRowDragEnd", function(id, target) {
+
+    var task1Row = gantt.getTask(id);
+    var task2Row = gantt.getTask(target);
+    var task1 = {
+      work_plan_cd : task1Row["id"]
+      ,task_cd : task1Row.task_cd
+      ,start_date : moment(task1Row.start_date).format('DD-MM-YYYY HH:mm')
+      ,end_date : moment(task1Row.end_date).format('DD-MM-YYYY HH:mm')
+      ,progress : task1Row.progress
+      ,user_cd : task1Row.user_cd
+      ,name : task1Row.name
+      ,parent_cd : task1Row.parent_cd
+      ,sort_order : task2Row.sort_order
+      ,work_type : task1Row.work_type
+    };
+    var task2 = {
+      work_plan_cd : task2Row["id"]
+      ,task_cd : task2Row.task_cd
+      ,start_date : moment(task2Row.start_date).format('DD-MM-YYYY HH:mm')
+      ,end_date : moment(task2Row.end_date).format('DD-MM-YYYY HH:mm')
+      ,progress : task2Row.progress
+      ,user_cd : task2Row.user_cd
+      ,name : task2Row.name
+      ,parent_cd : task2Row.parent_cd
+      ,sort_order : task1Row.sort_order
+      ,work_type : task2Row.work_type
+    };
+
+
+    $.when(
+      $.ajax({
+        type: "POST",
+        url: "/workplans",
+        data: JSON.stringify(task1),
+        success: function(data, dataType) { 
+          // defaultUpdtSuccessCallback(data, dataType);
+
+          // if(data.success) {
+          //   treegrid.treegrid("reload");
+          //   vue[propNameSelectedRow] = fnNewRecord();
+          // }
+        },
+        // error: defaultUpdtErrorCallback,
+        dataType: "json"
+      }),
+      $.ajax({
+        type: "POST",
+        url: "/workplans",
+        data: JSON.stringify(task2),
+        success: function(data, dataType) { 
+          // defaultUpdtSuccessCallback(data, dataType);
+
+          // if(data.success) {
+          //   treegrid.treegrid("reload");
+          //   vue[propNameSelectedRow] = fnNewRecord();
+          // }
+        },
+        // error: defaultUpdtErrorCallback,
+        dataType: "json"
+      })
+    )
+    .done(function(data_a, data_b) {
+          loadTask();
+          vue.row = newRecord();
+    })
+    .fail(function() {
+        console.log('error');
+    });
+
+  });
+
+  gantt.attachEvent("onGanttScroll", function (left, top){
+    lastScrollPos = left;
+  });
+
+  gantt.attachEvent("onTaskSelected", function(id){
+    //any custom logic here
+    var item = gantt.getTask(id);
+    var vueRow = {
+      work_plan_cd : item["id"]
+      ,task_cd : item.task_cd
+      ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
+      ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
+      ,progress : item.progress
+      ,user_cd : item.user_cd
+      ,name : item.name
+      ,parent_cd : item.parent_cd
+      ,sort_order : item.sort_order
+      ,work_type : item.work_type
+    };
+    vue.row = vueRow;
+  });
+
+  gantt.attachEvent("onTaskRowClick", function(id,row){
+    //any custom logic here
+    var item = gantt.getTask(id);
+    var vueRow = {
+      work_plan_cd : item["id"]
+      ,task_cd : item.task_cd
+      ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
+      ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
+      ,progress : item.progress
+      ,user_cd : item.user_cd
+      ,name : item.name
+      ,parent_cd : item.parent_cd
+      ,sort_order : item.sort_order
+      ,work_type : item.work_type
+    };
+    vue.row = vueRow;
+  });
+
+  gantt.attachEvent("onAfterTaskUpdate", function(id,item){
+      //any custom logic here
+    console.log("updated");
+    console.log(item);
+    console.log(moment(item.start_date).format('DD-MM-YYYY HH:mm'));
+    var diff = {
+      work_plan_cd : item["id"]
+      ,task_cd : item.task_cd
+      ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
+      ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
+      ,progress : item.progress
+      ,user_cd : item.user_cd
+      ,name : item.name
+      ,parent_cd : item.parent_cd
+      ,sort_order : item.sort_order
+      ,work_type : item.work_type
+    };
+    var id = item["id"];
+    $.ajax({
+      type: "POST",
+      url: "/workplans",
+      data: JSON.stringify(diff),
+      success: function(data, dataType) { 
+        // defaultUpdtSuccessCallback(data, dataType);
+
+        // if(data.success) {
+        //   treegrid.treegrid("reload");
+        //   vue[propNameSelectedRow] = fnNewRecord();
+        // }
+
+        if(id !== "") {
+          loadTask(function() { gantt.selectTask(id); });
+        } else {
+          loadTask();
+        }
+
+
+        // var item = gantt.getTask(id);
+        // var vueRow = {
+        //   work_plan_cd : item["id"]
+        //   ,task_cd : item.task_cd
+        //   ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
+        //   ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
+        //   ,progress : item.progress
+        //   ,user_cd : item.user_cd
+        //   ,name : item.name
+        //   ,parent_cd : item.parent_cd
+        //   ,sort_order : item.sort_order
+        //   ,work_type : item.work_type
+        // };
+        // vue.row = vueRow;
+      },
+      // error: defaultUpdtErrorCallback,
+      dataType: "json"
+    });
+  });
+
+  loadTask();
+
+  function loadTask(postLoad) {
+    $.ajax({
+      type: "GET",
+      url: "/workplans",
+      data: JSON.stringify({}),
+      success: function(data, dataType) { 
+        // defaultUpdtSuccessCallback(data, dataType);
+
+        // if(data.success) {
+        //   treegrid.treegrid("reload");
+        //   vue[propNameSelectedRow] = fnNewRecord();
+        // }
+
+        var x = {
+          data:data,
+          links:[]
+        };
+        gantt.clearAll(); 
+        gantt.parse(x);
+        if(lastScrollPos) {
+          gantt.scrollTo(lastScrollPos, null);
+        } else {
+          gantt.showDate(new Date());
+        }
+
+        var today = moment();
+        gantt.addMarker({ start_date: today.toDate(), css: "today", text: "",  title:today.format("DD-MM-YYYY")});
+
+        if(postLoad) {
+          postLoad();
+        }
+      },
+      // error: defaultUpdtErrorCallback,
+      dataType: "json"
+    });
+  }
+
+  function toLocaleString( date )
+  {
+    return [
+        date.getDate(),
+        date.getMonth() + 1,
+        date.getFullYear()
+        ].join( '-' );
+  }
+  </script>
+
+<script>
+  function newRecord() {
+    return { 
+      work_plan_cd : null,
+      task_cd : "",
+      parent_cd : "",
+      start_date : moment().format("DD-MM-YYYY HH:mm"),
+      end_date : moment().add(7,"days").format("DD-MM-YYYY HH:mm"),
+      progress : 0.0,
+      user_cd : "",
+      name : "",
+      parent_cd : "",
+      sort_order : 0,
+      work_type : "WT01PL"
+    };
+  }
+  //
+  //function copyRecord() {
+  //  var source = vue.row;
+  //  var record = newRecord();
+  //  record.solution_cd = source.solution_cd;
+  //  record.task_cd = null;
+  //  record.task_type = source.task_type;
+  //  record.name = source.name;
+  //  record.status_type = "TS01NW";
+  //  record.priority_type = source.priority_type;
+  //  record.description = source.description;
+  //  record.parent_cd = source.parent_cd;
+  //  return record;
+  //}
+  //
+  //
+  //function blankRecordForBatchUpdate() {
+  //  return { 
+  //    solution_cd : "",
+  //    task_cd : "",
+  //    task_type : "",
+  //    name : "",
+  //    status_type : "",
+  //    description : "",
+  //    priority_type : "",
+  //    created: "",
+  //    created_by : "",
+  //    updated: "",
+  //    updated_by : "",
+  //    parent_cd : ""
+  //  };
+  //}
+
+  var vue = new Vue({
+    el: '#vue-main',
+    data: {
+      //key_value_task_status_type : <%= @key_value_task_status_type %>,
+      //key_value_task_type : <%= @key_value_task_type %>,
+      //key_value_task_priority_type : <%= @key_value_task_priority_type %>,
+      //key_value_solution : <%= @key_value_solution %>,
+      //key_value_task_task_relation_type : <%= @key_value_task_task_relation_type %>,
+      key_value_user : <%= @key_value_user %>,
+      key_value_work_type : <%= @key_value_work_type %>,
+      row: newRecord(),
+      //descContent : "",
+      //multiRowSelected : false,
+      //rowSelections : null,
+      //showDescriptionView : false,
+      //relTaskCd : "",
+      //relType : "TR01RR",
+      //contextRow : null
+    }
+    //,
+    //methods: {
+    //  //toggleDescriptionEdit : function() {
+    //  //  this.showDescriptionView = !(this.showDescriptionView);
+    //  //},
+    //  //linkTask : function () {
+    //  //  $.ajax({
+    //  //    type: "POST",
+    //  //    url: "/link/task_task",
+    //  //    data: JSON.stringify({taskCdA:vue.row.task_cd, taskCdB:vue.relTaskCd,relType:vue.relType}),
+    //  //    success: function(data, dataType) { 
+    //  //      if(data.success) {
+    //  //        messageUpdateSuccess(data.message);
+    //  //      } else {
+    //  //        messageUpdateError(data.message);
+    //  //      }
+    //  //      $("#dg").treegrid("reload");
+    //  //    },
+    //  //    error: function() {
+    //  //    },
+    //  //    dataType: "json"
+    //  //  });
+    //  //},
+    //  //unlinkTask : function(taskCdA,taskCdB,relType) {
+    //  //  $.ajax({
+    //  //    type: "POST",
+    //  //    url: "/unlink/task_task",
+    //  //    data: JSON.stringify({taskCdA:taskCdA, taskCdB:taskCdB,relType:relType}),
+    //  //    success: function(data, dataType) { 
+    //  //      if(data.success) {
+    //  //        messageUpdateSuccess(data.message);
+    //  //      } else {
+    //  //        messageUpdateError(data.message);
+    //  //      }
+    //  //      $("#dg").treegrid("reload");
+    //  //    },
+    //  //    error: function() {
+    //  //    },
+    //  //    dataType: "json"
+    //  //  });
+    //  //},
+    //  //reloadTask : function(taskCd) {
+    //  //  console.log("****", taskCd);
+    //  //  var self = this;
+
+    //  //  $.ajax({
+    //  //    type: "GET",
+    //  //    url: "/tasks/"+taskCd,
+    //  //    success: function(data, dataType) { 
+    //  //      //if(data.success) {
+    //  //        self.multiRowSelected = false;
+    //  //        self.row = $.extend(true, {}, data);
+    //  //      //} else {
+    //  //      //  messageUpdateError("Retrieve information failed");
+    //  //      //}
+    //  //      console.log(data);
+    //  //    },
+    //  //    error: function() {
+    //  //      messageUpdateError("Request failed");
+    //  //    },
+    //  //    dataType: "json"
+    //  //  });
+    //  //},
+    //  //relationStyle : function(relType) {
+    //  //  if(relType == "TR01RR") {
+    //  //    return "icon icon-arrow-left";
+    //  //  }
+    //  //  if(relType == "TR02PR") {
+    //  //    return "icon icon-arrow-up-left";
+    //  //  }
+    //  //  if(relType == "TR03CH") {
+    //  //    return "icon icon-arrow-down-right";
+    //  //  }
+    //  //}
+    //},
+    //computed: {
+    //  //markedDescription: function () {
+    //  //  if(this.row) {
+    //  //    return marked(this.row.description);
+    //  //  } else {
+    //  //    return "";
+    //  //  }
+    //  //},
+    //  //taskRelation : function() {
+    //  //  if(this.row !== null) {
+    //  //    var infos = [];
+    //  //    if(this.row.parent_task != null) {
+    //  //      infos.push({task_cd_a : this.row.task_cd, task_cd_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
+    //  //    }
+    //  //    if(this.row.children_all && this.row.children_all.length > 0) {
+    //  //      for(var i = 0; i < this.row.children_all.length; i+=1) {
+    //  //        infos.push({task_cd_a : this.row.task_cd, task_cd_b : this.row.children_all[i].task_cd, t_task : this.row.children_all[i], rel_type : "TR03CH"});
+    //  //      }
+    //  //    }
+    //  //    if(this.row.t_task_task_rel != null) {
+    //  //      for(var i = 0; i < this.row.t_task_task_rel.length; i+=1) {
+    //  //        infos.push(this.row.t_task_task_rel[i]);
+    //  //      }
+    //  //    }
+    //  //    return infos;
+    //  //  } else {
+    //  //    return [];
+    //  //  }
+    //  //}
+    //},
+    //updated: function () {
+    //  //autosize.update($("textarea"))
+    //}
+  });
+</script>

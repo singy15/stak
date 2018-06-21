@@ -1,0 +1,196 @@
+
+<div id="vue-main" class="vue-component">
+  <div class="easyui-panel" style="width:100%;margin-bottom:5px;">
+    <div id="dg" class="easyui-datagrid" style="width:100%;"></div>
+  </div>
+  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
+    <table class="input-table" style="width:95%"> 
+      <tr>
+        <th style="width:100px">Solution CD</th>
+        <td><span>{{(row.solution_cd)? row.solution_cd : "NEW"}}</td>
+      </tr>
+      <tr>
+        <th>Status</th>
+        <td>
+          <select name="category" v-model="row.status_type">
+            <option v-for="category in status_types" :value="category.type_cd">
+              {{ category.name }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Name</th>
+        <td><input v-model="row.name" type="text" style="width:100%"></td>
+      </tr>
+      <tr>
+        <th>Created</th>
+        <td><span>{{row.created_by}}</span><span>&nbsp;</span><span>{{row.created}}</span></td>
+      </tr>
+      <tr>
+        <th>Updated</th>
+        <td><span>{{row.updated_by}}</span><span>&nbsp;</span><span>{{row.updated}}</span></td>
+      </tr>
+    </table>
+  </div>
+  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
+    <input id="btnRegister" type="button" value="Register" class="input-register"/>
+    <input id="btnNew" type="button" value="New" class="input-register"/>
+    <input id="btnDelete" type="button" value="Delete" class="input-register"/>
+  </div>
+</div>
+<script type="text/javascript">
+  function genFormatter(_paths, _fn) {
+    var paths = _paths;
+    var fn = _fn;
+    return function(value,row,index) {
+      var obj;
+      var curpath;
+      var rslts = [];
+      for(var j = 0; j<paths.length; j+=1) {
+        obj = row;
+        curpath = paths[j].split(".");
+        for(var i = 0; i<curpath.length; i+=1) {
+          if((obj !== "") && (obj[curpath[i]] != null) && (obj[curpath[i]] !== undefined)) {
+            obj = obj[curpath[i]];
+          } else {
+            obj = "";
+          }
+        }
+        rslts.push(obj);
+      }
+
+      console.log(rslts);
+
+      // return fn(rslts);
+      return rslts.join(".");
+    }
+  }
+
+  $(document).ready(function() {
+    $("#btnNew").click(function() {
+      vue.row = newRecord();
+    });
+
+    $("#btnDelete").click(function() {
+      if(vue.row.task_cd === "") { return; }
+      $.ajax({
+        type: "DELETE",
+        url: "/solutions/" + vue.row.solution_cd,
+        data: JSON.stringify(vue.row),
+        success: function(data, dataType) { 
+          console.log("success");
+          console.log(data);
+
+          $.messager.show({
+              title:'Info',
+              msg:'Update success.',
+              timeout:3000,
+              showType:'fade'
+          });
+
+          $("#dg").datagrid("reload");
+          vue.row = newRecord();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("error");
+          console.log(errorThrown);
+          $.messager.show({
+              title:'Error',
+              msg:'Error occured!',
+              timeout:3000,
+              showType:'fade'
+          });
+        },
+        dataType: "json"
+      });
+    });
+
+    $("#btnRegister").click(function() {
+      $.ajax({
+        type: "PUT",
+        url: "/solutions",
+        data: JSON.stringify(vue.row),
+        success: function(data, dataType) { 
+          console.log("success");
+          console.log(data);
+
+          $.messager.show({
+              title:'Info',
+              msg:'Update success.',
+              timeout:3000,
+              showType:'fade'
+          });
+
+          $("#dg").datagrid("reload");
+          vue.row = newRecord();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("error");
+          console.log(errorThrown);
+          $.messager.show({
+              title:'Error',
+              msg:'Error occured!',
+              timeout:3000,
+              showType:'fade'
+          });
+        },
+        dataType: "json"
+      });
+    });
+
+    $("#dg").datagrid({
+      url : '/solutions',
+      // width: '100%',
+      // height: '100%',
+      method : 'get',
+      sortName : "solution_cd",
+      sortOrder : 'asc',
+      //multiSort : true,
+      ctrlSelect : true,
+      remoteFilter : true,
+      remoteSort : false,
+      columns : [[
+          {field : 'solution_cd', title : 'solution_cd', sortable : true},
+          {field : 'name', title : 'name', sortable : true},
+          {field : 'status_type', title : 'status_type', sortable : true, formatter: genFormatter(["solution_status_info.name"])},
+          {field : 'created', title : 'created', sortable : true},
+          {field : 'created_by', title : 'created_by', sortable : true},
+          {field : 'updated', title : 'updated', sortable : true},
+          {field : 'updated_by', title : 'updated_by', sortable : true}
+      ]],
+      onClickRow : function(index, row) {
+        vue.row = $.extend(true, {}, row);
+        console.log(row);
+      }
+    })
+    .datagrid("enableFilter",
+      [
+        createMultiSelectFilter($("#dg"), "status_type", vue.key_value_solution_status_type),
+      ]
+    );
+  });
+</script>
+<script>
+  function newRecord() {
+    return { 
+        solution_cd : "",
+        name : "",
+        status_type : "SS-NW",
+        created: "",
+        created_by : "",
+        updated: "",
+        updated_by : ""
+    };
+  }
+
+  var vue = new Vue({
+    el: '#vue-main',
+    data: {
+      status_types : <%= @status_types %>,
+      key_value_solution_status_type : <%= @key_value_solution_status_type %>,
+      row: newRecord()
+    }
+  });
+</script>
+

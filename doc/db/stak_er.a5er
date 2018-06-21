@@ -1,0 +1,661 @@
+﻿# A5:ER FORMAT:11
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright (C)2007 m.matsubara
+# A5:SQL Mk-2 Copyright (C)1997 m.matsubara
+#  http://www.wind.sannet.ne.jp/m_matsu/developer/a5m2/
+
+[Manager]
+ProjectName=taskmng
+Author=
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+Page=Main
+PageInfo="Main",4,"A3Landscape",$FFFFFF
+Domain=work_cd=varchar(11)
+Domain=solution_cd=varchar(2)
+Domain=task_cd=varchar(7)
+Domain=gen_name=varchar(100)
+Domain=gen_type=varchar(6)
+Domain=comment_cd=varchar(10)
+Domain=text_content=varchar(500)
+Domain=tag_cd=varchar(3)
+Domain=user_cd=varchar(3)
+Domain=blob_cd=varchar(13)
+Domain=gen_datetime=timestamp
+Domain=gen_blob=bytea
+Domain=type_category=varchar(2)
+Domain=type_part=varchar(2)
+Domain=gen_date_str=varchar(8)
+Domain=gen_flag=boolean
+Domain=gen_gantt_date_str=varchar(10)
+Domain=gen_gantt_duration=integer
+Domain=gen_gantt_progress=numeric
+LogicalView=1
+DecodeDomain=0
+ViewModePageIndividually=1
+ViewMode=4
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=Tahoma
+FontSize=6
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+RDBMSType=6
+RDBMSTypeName=PostgreSQL
+GenerateDropTableStatement=1
+DropTableIfExists=1
+FkOnDeleteOption=on delete no action
+FkOnUpdateOption=on update no action
+CommonField="created","created","*gen_datetime","NOT NULL",,"now()","",$FFFFFFFF
+CommonField="created_by","created_by","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF
+CommonField="updated","updated","*gen_datetime","NOT NULL",,"now()","",$FFFFFFFF
+CommonField="updated_by","updated_by","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF
+CommonField="version","version","*gen_datetime","NOT NULL",,"now()","",$FFFFFFFF
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+ShowTag=1
+ShowCommonAttributes=0
+
+[Entity]
+PName=t_workplan
+LName=t_workplan
+Comment=
+TableOption=
+Page=MAIN
+Left=1850
+Top=1250
+Field="work_plan_cd","work_plan_cd","*work_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="name","name","*text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="start_date","start_date","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="end_date","end_date","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="progress","progress","*gen_gantt_progress","NOT NULL",,"0.0","",$FFFFFFFF,""
+Field="parent_cd","parent_cd","*work_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="user_cd","user_cd","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="sort_order","sort_order","bigint","NOT NULL",,"to_number(to_char(now(), \qYYMMDDHH24MISSMSUS\q),\q9999999999999999999\q)","",$FFFFFFFF,""
+Field="work_type","work_type","*gen_type","NOT NULL",,"\qWT01TS\q","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180410200700
+Position="MAIN",1850,1250,314,282
+
+[View]
+PName=v_type_task_priority
+LName=v_type_task_priority
+Comment=
+ViewOption=
+Query=select type_cd, name, sort_order from c_type where type_category = \qTP\q
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="MAIN",1850,250
+Page=MAIN
+Left=1850
+Top=250
+
+[View]
+PName=v_type_solution_status
+LName=v_type_solution_status
+Comment=
+ViewOption=
+Query=select type_cd, name, sort_order from c_type where type_category = \qSS\q
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="MAIN",2100,250,132,76
+Page=MAIN
+Left=2100
+Top=250
+
+[View]
+PName=v_type_task_type
+LName=v_type_task_type
+Comment=
+ViewOption=
+Query=select type_cd, name, sort_order from c_type where type_category = \qTT\q
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="MAIN",2100,100
+Page=MAIN
+Left=2100
+Top=100
+
+[View]
+PName=v_type_task_status
+LName=v_type_task_status
+Comment=
+ViewOption=
+Query=select type_cd, name, sort_order from c_type where type_category = \qTS\q
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="MAIN",1850,100
+Page=MAIN
+Left=1850
+Top=100
+
+[Entity]
+PName=c_code_def
+LName=c_code_def
+Comment=
+TableOption=
+Page=MAIN
+Left=600
+Top=50
+Field="code_type","code_type","*gen_type","NOT NULL",0,"","",$FFFFFFFF,""
+Field="cd_len","cd_len","bigint","NOT NULL",,"","",$FFFFFFFF,""
+Field="max_seq","max_seq","bigint","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180324085357
+Position="MAIN",600,50,308,76
+
+[Comment]
+Comment=*** numbering ***\n\n* solution\ncd : SL, maxseq : 99\n\n* task\ncd : TK, maxseq : 9999\n\n* user\ncd : UR, maxseq : 999\n\n* comment\ncd : CM, maxseq : 99\n\n* blob\ncd : BL, maxseq : 99\n\n* work plan\ncd : WP, maxseq : 99999999\n\n* work actual\ncd : WA, maxseq : 99999999\n\n* tag\ncd : TG, maxseq : 999
+FontName=Tahoma
+FontBold=0
+FontItalic=0
+FontUnderline=0
+FontSize=6
+FontColor=$000000
+LineColor=$000000
+BkColor=$FFFFFF
+Page=Main
+Left=3100
+Top=350
+Width=302
+Height=824
+
+[Relation]
+Entity1=t_comment
+Entity2=t_blob
+RelationType1=2
+RelationType2=3
+Fields1=comment_cd
+Fields2=comment_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,5977,6238,3835,R,R
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=598
+Bar2=624
+Bar3=384
+TermPos1=R
+TermPos2=R
+
+[Relation]
+Entity1=t_task
+Entity2=t_comment
+RelationType1=2
+RelationType2=3
+Fields1=task_cd
+Fields2=task_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,3731,6269,5977,R,R
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=373
+Bar2=627
+Bar3=598
+TermPos1=R
+TermPos2=R
+
+[Entity]
+PName=t_blob
+LName=t_blob
+Comment=
+TableOption=
+Page=MAIN
+Left=600
+Top=600
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="comment_cd","comment_cd","*comment_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="blob_cd","blob_cd","*blob_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="caption","caption","*text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="data","data","*gen_blob","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180321113749
+Position="MAIN",600,600,323,173
+
+[Comment]
+Comment=*** codes ***\n\n* solution code\n'00'\n\n* task code\n'[solution code]-0000'\n\n* type and type category\n'XX'\n\n* user code\n'000'\n\n* comment code\n'[task code]-00'\n\n* blob code\n'[comment code]-00'\n\n* tag code\n'000'\n\n* work code\n'[solution code]-00000000'
+FontName=Tahoma
+FontBold=0
+FontItalic=0
+FontUnderline=0
+FontSize=6
+FontColor=$000000
+LineColor=$000000
+BkColor=$FFFFFF
+Page=Main
+Left=2750
+Top=350
+Width=288
+Height=824
+
+[Relation]
+Entity1=t_solution
+Entity2=t_user_solution_rel
+RelationType1=2
+RelationType2=3
+Fields1=solution_cd
+Fields2=solution_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,5577,5819,5388,R,R
+Dependence=1
+Caption=
+PName=
+LineMode=0
+Bar1=558
+Bar2=582
+Bar3=539
+TermPos1=R
+TermPos2=R
+
+[Entity]
+PName=t_user_solution_rel
+LName=t_user_solution_rel
+Comment=
+TableOption=
+Page=MAIN
+Left=1000
+Top=450
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="user_cd","user_cd","*user_cd","NOT NULL",1,"","",$FFFFFFFF,""
+Field="rel_type","rel_type","*gen_type","NOT NULL",2,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318141044
+Position="MAIN",1000,450,289,88
+
+[Relation]
+Entity1=t_task
+Entity2=t_user_task_rel
+RelationType1=2
+RelationType2=3
+Fields1=task_cd
+Fields2=task_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,9608,5859,5107,R,R
+Dependence=1
+Caption=
+PName=
+LineMode=0
+Bar1=961
+Bar2=586
+Bar3=511
+TermPos1=R
+TermPos2=R
+
+[Relation]
+Entity1=t_task
+Entity2=t_tag_task_rel
+RelationType1=2
+RelationType2=3
+Fields1=task_cd
+Fields2=task_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,5980,5859,5016,R,R
+Dependence=1
+Caption=
+PName=
+LineMode=0
+Bar1=598
+Bar2=586
+Bar3=502
+TermPos1=R
+TermPos2=R
+
+[Relation]
+Entity1=t_work_plan
+Entity2=t_work_actual
+RelationType1=1
+RelationType2=3
+Fields1=work_plan_cd
+Fields2=work_plan_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4911,5210,4835,R,R
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20180318134524
+LineMode=0
+Bar1=491
+Bar2=521
+Bar3=484
+TermPos1=R
+TermPos2=R
+
+[Relation]
+Entity1=t_task
+Entity2=t_work_actual
+RelationType1=2
+RelationType2=3
+Fields1=task_cd
+Fields2=task_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,7982,4653,5616,R,R
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20180318134447
+LineMode=0
+Bar1=798
+Bar2=465
+Bar3=562
+TermPos1=R
+TermPos2=R
+
+[Relation]
+Entity1=t_solution
+Entity2=t_task
+RelationType1=2
+RelationType2=3
+Fields1=solution_cd
+Fields2=solution_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4974,4492,5040,R,R
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20180318134410
+LineMode=0
+Bar1=497
+Bar2=449
+Bar3=504
+TermPos1=R
+TermPos2=R
+
+[Relation]
+Entity1=t_task
+Entity2=t_work_plan
+RelationType1=2
+RelationType2=3
+Fields1=task_cd
+Fields2=task_cd
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,1977,4359,4404,R,R
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20180318134438
+LineMode=0
+Bar1=198
+Bar2=436
+Bar3=440
+TermPos1=R
+TermPos2=R
+
+[Entity]
+PName=t_work_actual
+LName=t_work_actual
+Comment=
+TableOption=
+Page=MAIN
+Left=1850
+Top=900
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="work_plan_cd","work_plan_cd","*work_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="work_actual_cd","work_actual_cd","*work_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="user_cd","user_cd","*user_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="workload","workload","int","NOT NULL",,"","",$FFFFFFFF,""
+Field="begindttm","begindttm","*gen_datetime","NOT NULL",,"","",$FFFFFFFF,""
+Field="enddttm","enddttm","*gen_datetime","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180321113716
+Position="MAIN",1850,900,323,219
+
+[Entity]
+PName=c_type
+LName=c_type
+Comment=
+TableOption=
+Page=MAIN
+Left=1000
+Top=250
+Field="type_cd","type_cd","*gen_type","NOT NULL",0,"","",$FFFFFFFF,""
+Field="type_category","type_category","*type_category","NOT NULL",,"","",$FFFFFFFF,""
+Field="type_part","type_part","*type_part","NOT NULL",,"","",$FFFFFFFF,""
+Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="sort_order","sort_order","int","NOT NULL",,"0","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180401174519
+Position="MAIN",1000,250,348,144
+
+[Comment]
+Comment=*** types ***\n\nsolution-user relation [SU]\n* 01(WK) : worker\n* 02(MG) : manager\n* 03(RV) : reviewer\n* 04(WT) : watcher\n\ntask-task relation [TR]\n* 01(PR) : a is parent of b\n* 02(RR) : a relataed b\n* 03(LR) : a locks b\n\ntask-user relation [TU]\n* 01(WK) : worker\n* 02(WT) : watcher\n* 03(RV) : reviewer\n\ntask status [TS]\n* 01(NW) : new\n* 02(PC) : proceeding\n* 03(PD) : pending\n* 04(FB) : feedback\n* 05(RV) : review\n* 06(CL) : closed\n\ntask type [TT]\n* 01(ST) : stack\n* 02(PJ) : project\n* 03(BG) : bug\n\nsolution status [SS]\n* 01(NW) : new\n* 02(AC) : active\n* 03(NA) : not active\n* 04(CL) : closed\n\ntask priority [TP]\n* 01(LS) : Lowest\n* 02(LW) : Lower\n* 03(NM) : Medium\n* 04(HG) : Higher\n* 05(HS) : Highest\n* 06(UR) : Urgent!\n\nwork type [WT]\n* 01(TS) : Task\n* 02(PJ) : Project\n
+FontName=Tahoma
+FontBold=0
+FontItalic=0
+FontUnderline=0
+FontSize=6
+FontColor=$000000
+LineColor=$000000
+BkColor=$FFFFFF
+Page=Main
+Left=2400
+Top=350
+Width=298
+Height=1326
+
+[Entity]
+PName=c_numbering
+LName=c_numbering
+Comment=
+TableOption=
+Page=MAIN
+Left=1000
+Top=50
+Field="numbering_type","numbering_type","varchar(2)","NOT NULL",0,"","",$FFFFFFFF,""
+Field="parent_cd","parent_cd","varchar(20)","NOT NULL",1,"\q\q","",$FFFFFFFF,""
+Field="seq","seq","bigint","NOT NULL",,"0","",$FFFFFFFF,""
+Field="max_seq","max_seq","bigint","NOT NULL",,"","",$FFFFFFFF,""
+Field="cd_len","cd_len","int","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318202220
+Position="MAIN",1000,50,346,147
+
+[Entity]
+PName=t_work_plan
+LName=t_work_plan
+Comment=
+TableOption=
+Page=MAIN
+Left=1850
+Top=550
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="work_plan_cd","work_plan_cd","*work_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="user_cd","user_cd","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="workload","workload","int","NOT NULL",,"0","",$FFFFFFFF,""
+Field="begindttm","begindttm","*gen_datetime",,,"","",$FFFFFFFF,""
+Field="enddttm","enddttm","*gen_datetime",,,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180321113704
+Position="MAIN",1850,550,318,196
+
+[Entity]
+PName=t_user_task_rel
+LName=t_user_task_rel
+Comment=
+TableOption=
+Page=MAIN
+Left=1000
+Top=950
+Field="task_cd","task_cd","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="user_cd","user_cd","*user_cd","NOT NULL",1,"","",$FFFFFFFF,""
+Field="rel_type","rel_type","*gen_type","NOT NULL",2,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318140116
+Position="MAIN",1000,950,297,90
+
+[Entity]
+PName=m_user
+LName=m_user
+Comment=
+TableOption=
+Page=MAIN
+Left=1400
+Top=150
+Field="user_cd","user_cd","*user_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318132830
+Position="MAIN",1400,150,282,65
+
+[Entity]
+PName=m_tag
+LName=m_tag
+Comment=
+TableOption=
+Page=MAIN
+Left=1400
+Top=50
+Field="tag_cd","tag_cd","*tag_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318132745
+Position="MAIN",1400,50,278,67
+
+[Entity]
+PName=t_tag_task_rel
+LName=t_tag_task_rel
+Comment=
+TableOption=
+Page=MAIN
+Left=1000
+Top=800
+Field="task_cd","task_cd","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="tag_cd","tag_cd","*tag_cd","NOT NULL",1,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318132703
+Position="MAIN",1000,800,297,72
+
+[Entity]
+PName=t_comment
+LName=t_comment
+Comment=
+TableOption=
+Page=MAIN
+Left=1000
+Top=600
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="comment_cd","comment_cd","*comment_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="content","content","*text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Index==1,task_cd,comment_cd
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318203401
+Position="MAIN",1000,600,297,111
+
+[Entity]
+PName=t_task_task_rel
+LName=t_task_task_rel
+Comment=
+TableOption=
+Page=MAIN
+Left=1400
+Top=1200
+Field="task_cd_a","task_cd_a","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="task_cd_b","task_cd_b","*task_cd","NOT NULL",1,"","",$FFFFFFFF,""
+Field="rel_type","rel_type","*gen_type","NOT NULL",2,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180318140340
+Position="MAIN",1400,1200,304,86
+
+[Entity]
+PName=t_task
+LName=t_task
+Comment=
+TableOption=
+Page=MAIN
+Left=1400
+Top=750
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="task_type","task_type","*gen_type","NOT NULL",,"","",$FFFFFFFF,""
+Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="status_type","status_type","*gen_type","NOT NULL",,"\qTS-NW\q","",$FFFFFFFF,""
+Field="description","description","*text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="start_dt","start_dt","*gen_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="end_dt","end_dt","*gen_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="priority_type","priority_type","*gen_type","NOT NULL",,"\qTP-NM\q","",$FFFFFFFF,""
+Field="parent_cd","parent_cd","*task_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="root_parent_cd","root_parent_cd","*task_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="path","path","varchar(500)","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="start_date","start_date","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="duration","duration","*gen_gantt_duration","NOT NULL",,"1","",$FFFFFFFF,""
+Field="progress","progress","*gen_gantt_progress","NOT NULL",,"0.0","",$FFFFFFFF,""
+Index==1,solution_cd,task_cd
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180407154736
+Position="MAIN",1400,750,300,399
+
+[Entity]
+PName=t_solution
+LName=t_solution
+Comment=
+TableOption=
+Page=MAIN
+Left=1400
+Top=550
+Field="solution_cd","solution_cd","*solution_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="name","name","varchar(100)","NOT NULL",,"","",$FFFFFFFF,""
+Field="status_type","status_type","*gen_type","NOT NULL",,"\qSS-NW\q","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180325003410
+Position="MAIN",1400,550,304,86

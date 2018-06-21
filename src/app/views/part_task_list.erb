@@ -1,0 +1,702 @@
+
+<style>
+.descriptionView table {
+  border: 1px #000000 solid;
+  border-collapse: collapse;
+}
+.descriptionView td {
+  border: 1px #000000 solid;
+}
+.descriptionView th {
+  border: 1px #000000 solid;
+}
+.icon {
+ cursor: pointer
+}
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.tree-icon {
+  display : none;
+}
+.tree-checkbox0 {
+  opacity : 0.3;
+}
+.tree-checkbox1 {
+  opacity : 1.0;
+}
+.tree-indent {
+  opacity : 0.5;
+}
+.datagrid-row-selected  td {
+  /*background: #ffe48d;*/
+  /*background: #ffffff;*/
+  /*color: #FF0000;*/
+  /*font-weight : bold;*/
+  background-color:rgba( 0, 0, 0, 0.2 );
+  color : #000;
+}
+.datagrid-row-selected {
+  /*background-color:rgba( 0, 0, 0, 0.1 );*/
+  background: #ffffff;
+}
+.datagrid-row{
+    height: 10px;
+}
+</style>
+
+<div id="vue-main" class="vue-component">
+  <div class="easyui-panel" style="width:100%;margin-bottom:5px;">
+    <div id="dg" class="easyui-treegrid" style="width:100%"></div>
+  </div>
+  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
+    <!-- Set to width:100% cause overflow when toggle sidebar -->
+    <table class="input-table" style="width:95%"> 
+      <tr>
+        <th>Task CD</th>
+        <td>
+          <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span>
+        </td>
+      </tr>
+      <tr>
+        <th width="100px">Solution CD</th>
+        <td>
+          <select name="category" v-model="row.solution_cd" v-bind:disabled="multiRowSelected">
+            <option v-for="category in key_value_solution" :value="category.value">
+              {{ category.text }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Type</th>
+        <td>
+          <select name="category" v-model="row.task_type">
+            <option v-for="category in key_value_task_type" :value="category.value">
+              {{ category.text }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Name</th>
+        <td><input v-model="row.name" type="text" style="width:100%"></td>
+      </tr>
+      <tr>
+        <th>Status</th>
+        <td>
+          <select name="category" v-model="row.status_type">
+            <option v-for="category in key_value_task_status_type" :value="category.value">
+              {{ category.text }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Priority</th>
+        <td>
+          <select name="category" v-model="row.priority_type">
+            <option v-for="category in key_value_task_priority_type" :value="category.value">
+              {{ category.text }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>Created</th>
+        <td><span>{{row.created_by}}</span><span>&nbsp;</span><span>{{row.created}}</span></td>
+      </tr>
+      <tr>
+        <th>Updated</th>
+        <td><span>{{row.updated_by}}</span><span>&nbsp;</span><span>{{row.updated}}</span></td>
+      </tr>
+      <tr>
+        <th>Parent</th>
+        <td><input v-model="row.parent_cd" type="text" style="width:80px"></td>
+      </tr>
+      <tr>
+        <th>Related</th>
+        <td>
+          <select name="category" v-model="relType">
+            <option v-for="category in key_value_task_task_relation_type" :value="category.value">
+              {{ category.text }}
+            </option>
+          </select>
+          <input v-model="relTaskCd" type="text" style="width:80px">
+          <span class="icon icon-link" v-on:click="linkTask"></span>
+
+          <ul id="lsRelated">
+            <li v-for="(item, index) in taskRelation">
+              <span v-bind:class="relationStyle(item.rel_type)"></span>
+              <span class="link" v-on:click="reloadTask(item.task_cd_b)">{{item.task_cd_b}}</span> : {{item.t_task.name}}
+              <span class="icon icon-cancel-circle" v-on:click="unlinkTask(item.task_cd_a, item.task_cd_b, item.rel_type)"></span>
+            </li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th>Description <span class="icon icon-pencil" v-on:click="toggleDescriptionEdit"></span></th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <textarea v-show="showDescriptionView" id="taDesc" v-model="row.description" type="text" style="width:100%"> </textarea>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="easyui-panel descriptionView" v-html="markedDescription" style="padding:5px">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
+    <input id="btnRegister" type="button" value="Register" class="input-register"/>
+    <input id="btnNew" type="button" value="New" class="input-register"/>
+    <input id="btnCopy" type="button" value="Copy" class="input-register"/>
+    <input id="btnDelete" type="button" value="Delete" class="input-register"/>
+  </div>
+</div>
+<script type="text/javascript">
+  function mapper(field, map) {
+    var col = field;
+    var kv = {};
+    for(var i = 0; i < map.length; i+=1) {
+      kv[map[i]["value"]] = map[i]["text"];
+    }
+
+    return function(value,row,index) { return kv[row[col]]; }
+  }
+
+  $(document).ready(function() {
+    autosize($('textarea'));
+
+    $("#btnNew").click(function() {
+      singleNew(vue, "row", $("#dg"), newRecord, "multiRowSelected");
+    });
+
+    $("#btnCopy").click(function() {
+      singleNew(vue, "row", $("#dg"), copyRecord, "multiRowSelected");
+    });
+
+    $("#btnDelete").click(function() {
+      if(vue.multiRowSelected) {
+        batchDel(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
+      } else if(vue.row.task_cd !== "") {
+        singleDel(vue, "tasks", "row", "task_cd", $("#dg"), newRecord);
+      }
+    });
+
+    $("#btnRegister").click(function() {
+      if(vue.multiRowSelected) {
+        batchUpd(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
+      } else {
+        singleInsUpd(vue, "row", $("#dg"), newRecord, "tasks");
+      }
+    });
+
+    $("#dg").treegrid({
+      // url : '/tasks',
+      method : 'get',
+      sortName : "name",
+      //sortOrder : 'asc',
+      multiSort : true,
+      remoteSort : true,
+      ctrlSelect : true,
+      remoteFilter : true,
+      //pagination : false,
+      pagination : true,
+      //pageSize : 1,
+      //pageList : [1, 2, 3, 4, 10,20],
+      rownumbers:true,
+      filterDelay : 700,
+      idField : "task_cd",
+      treeField : "name",
+      lines:true,
+      checkbox : true,
+      columns : [[
+        {field : 'solution_cd', title : 'Solution', sortable : true, formatter: mapper("solution_cd", <%= @key_value_solution %>)},
+        {field : 'task_cd', title : 'Task CD', sortable : true, width:80, hidden:false},
+        {field : 'name', title : 'Name', sortable : true, 
+          formatter:function(value,row){
+            var iconClass = "";
+            if(row.task_type == "TT03PJ") {
+              iconClass = "icon-stack";
+            } 
+            else if(row.task_type == "TT02BG") {
+              iconClass = "icon-notification";
+            }
+            else {
+              iconClass = "icon-ticket";
+            }
+            return '<span class="icon '+iconClass+'"></span>&nbsp;'+ row.task_cd + "&nbsp;&nbsp;&nbsp;" + value + ((row.children_all.length != row.children.length)? '&nbsp;<span class="icon icon-menu"></span>' : "");
+          }
+        },
+        {field : 'task_type', title : 'Type', width : 90,  sortable : true, formatter: mapper("task_type", <%= @key_value_task_type %>), hidden:true},
+        {field : 'status_type', title : 'Status', width: 110,sortable : true, formatter: mapper("status_type", <%= @key_value_task_status_type %>)},
+        {field : 'priority_type', title : 'Priority', width: 110,sortable : true, formatter: mapper("priority_type", <%= @key_value_task_priority_type %>)},
+        {field : 'description', title : 'Description', sortable : true},
+        {field : 'created', title : 'Created', sortable : true},
+        {field : 'created_by', title : 'Created by', sortable : true},
+        {field : 'updated', title : 'Updated', sortable : true},
+        {field : 'updated_by', title : 'Updated by', sortable : true}
+      ]],
+      rowStyler: function(row){
+        //return 'background-color:#6293BB;color:#fff;';
+        if(row) {
+          switch(row.priority_type) {
+            case "TP01LS":
+              return 'background-color:rgba( 0, 0, 255, 0.2 );';
+              break;
+            case "TP02LW":
+              return 'background-color:rgba( 0, 0, 255, 0.1 );';
+              break;
+            case "TP03NM":
+              return '';
+              break;
+            case "TP04HG":
+              return 'background-color:rgba( 255, 0, 0, 0.2 );';
+              break;
+            case "TP05HS":
+              return 'background-color:rgba( 255, 0, 0, 0.4 );';
+              break;
+            case "TP06UR":
+              return 'background-color:rgba( 255, 0, 0, 0.7 );';
+              break;
+            default:
+              return "";
+              break;
+          }
+        } else {
+          return "";
+        }
+      },
+      onClickRow : function(row) {
+        if($("#dg").treegrid("getSelections").length > 1) {
+          vue.multiRowSelected = true;
+          vue.row = blankRecordForBatchUpdate();
+        } else {
+          vue.multiRowSelected = false;
+          vue.row = $.extend(true, {}, row);
+        }
+
+        vue.rowSelections = $("#dg").treegrid("getSelections");
+      },
+      onHeaderContextMenu: function(e, field){
+        e.preventDefault();
+        if (!cmenuHeader){
+            createColumnMenu();
+        }
+        cmenuHeader.menu('show', {
+            left:e.pageX,
+            top:e.pageY
+        });
+      },
+      onContextMenu: function(e, row){
+        e.preventDefault();
+        vue.contextRow = row;
+        //if(vue.rowSelections.length == 0) { reutrn; }
+        if (!cmenuRow){
+            createRowMenu();
+        }
+        cmenuRow.menu('show', {
+            left:e.pageX,
+            top:e.pageY
+        });
+      },
+      onLoadSuccess : function() {
+        // if($("#dg").treegrid("getSelections").length > 0) {
+        //   console.log($("#dg").treegrid("getSelections").length);
+
+        //   if($("#dg").treegrid("getSelections").length > 1) {
+        //     vue.multiRowSelected = true;
+        //     vue.row = blankRecordForBatchUpdate();
+        //     console.log($("#dg").treegrid("getSelections"));
+        //   } else if($("#dg").treegrid("getSelections").length == 1) {
+        //     var row = $("#dg").treegrid("getSelected");
+        //     vue.multiRowSelected = false;
+        //     vue.row = $.extend(true, {}, row);
+        //     console.log(row);
+        //   }
+
+        // } else {
+        //   vue.row = newRecord();
+        // }
+
+        // vue.rowSelections = $("#dg").treegrid("getSelections");
+
+        if(($("#dg").treegrid("getSelections").length) == 1){
+          var cd = ($("#dg").treegrid("getSelections")[0]).task_cd;
+          $("#dg").treegrid("clearSelections");
+          //$("#dg").treegrid("selectRecord", cd);
+          $("#dg").treegrid("select", cd);
+          var row = $("#dg").treegrid("getSelected");
+          vue.multiRowSelected = false;
+          vue.row = $.extend(true, {}, row);
+        } else {
+          $("#dg").treegrid("clearSelections");
+        }
+      }
+    })
+    .treegrid("enableFilter",
+      [
+        createMultiSelectFilter($("#dg"), "solution_cd", vue.key_value_solution),
+        createMultiSelectFilter($("#dg"), "status_type", vue.key_value_task_status_type),
+        createMultiSelectFilter($("#dg"), "task_type", vue.key_value_task_type),
+        createMultiSelectFilter($("#dg"), "priority_type", vue.key_value_task_priority_type),
+        //createLabelFilter("solution_cd"),
+        createLabelFilter("created"),
+        createLabelFilter("created_by"),
+        createLabelFilter("updated"),
+        createLabelFilter("updated_by")
+      ]
+    )
+    .treegrid('addFilterRule', {
+      field: "status_type",
+      op: 'equal',
+      value: "TS01NW,TS03FB,TS02PC,TS04PD,TS05RV"
+    });
+
+    $("#dg").treegrid("options").url = "/tasks";
+    $("#dg").treegrid("load");
+  });
+
+  var cmenuHeader = null;
+  function createColumnMenu(){
+    cmenuHeader = $('<div/>').appendTo('body');
+    cmenuHeader.menu({
+      onClick: function(item){
+        if (item.iconCls == 'icon-ok'){
+          $('#dg').treegrid('hideColumn', item.name);
+          cmenuHeader.menu('setIcon', {
+            target: item.target,
+            iconCls: 'icon-empty'
+          });
+        } else {
+          $('#dg').treegrid('showColumn', item.name);
+          cmenuHeader.menu('setIcon', {
+            target: item.target,
+            iconCls: 'icon-ok'
+          });
+        }
+      }
+    });
+    var fields = $('#dg').treegrid('getColumnFields');
+    for(var i=0; i<fields.length; i++){
+      var field = fields[i];
+      var col = $('#dg').treegrid('getColumnOption', field);
+      cmenuHeader.menu('appendItem', {
+        text: col.title,
+        name: field,
+        iconCls: (col.hidden)? 'icon-empty' : 'icon-ok'
+      });
+    }
+  }
+
+  var cmenuRow = null;
+  function createRowMenu(){
+    cmenuRow = $('<div/>').appendTo('body');
+    cmenuRow.menu({
+      onClick: function(item){
+        console.log(item);
+        //if (item.iconCls == 'icon-ok'){
+        //  $('#dg').treegrid('hideColumn', item.name);
+        //  cmenuRow.menu('setIcon', {
+        //    target: item.target,
+        //    iconCls: 'icon-empty'
+        //  });
+        //} else {
+        //  $('#dg').treegrid('showColumn', item.name);
+        //  cmenuRow.menu('setIcon', {
+        //    target: item.target,
+        //    iconCls: 'icon-ok'
+        //  });
+        //}
+      }
+    });
+    // var fields = $('#dg').treegrid('getColumnFields');
+    // for(var i=0; i<fields.length; i++){
+    //   var field = fields[i];
+    //   var col = $('#dg').treegrid('getColumnOption', field);
+    //   cmenuRow.menu('appendItem', {
+    //     text: col.title,
+    //     name: field,
+    //     iconCls: 'icon-ok'
+    //   });
+    // }
+
+    // append a top menu item
+    cmenuRow.menu('appendItem', {
+      text: 'Status',
+      // iconCls: 'icon-ok',
+    });
+    cmenuRow.menu('appendItem', {
+      text: 'Set Task CD',
+      onclick: function(item){
+        vue.relTaskCd = vue.contextRow.task_cd;
+      }
+      // iconCls: 'icon-ok',
+    });
+    cmenuRow.menu('appendItem', {
+      text: 'Set as parent',
+      onclick: function(item){
+        vue.row.parent_cd = vue.contextRow.task_cd;
+      }
+      // iconCls: 'icon-ok',
+    });
+    //cmenuRow.menu('appendItem', {
+    //  text: 'Show all children',
+    //  onclick: function(item){
+    //    //var index = $("#dg").treegrid("getRowIndex", vue.contextRow);
+    //    //vue.contextRow.children = vue.contextRow.children_all;
+    //    $.ajax({
+    //      type: "GET",
+    //      url: "/tasks/"+vue.contextRow.task_cd,
+    //      data: JSON.stringify({}),
+    //      success: function(data, dataType) { 
+    //        //defaultUpdtSuccessCallback(data, dataType);
+
+    //        //if(data.success) {
+    //          //treegrid.treegrid("update", {id:vue.contextRow.task_cd,row:data});
+    //          $("#dg").treegrid("update", {id:vue.contextRow.task_cd,row:data});
+    //        //  vue[propNameSelectedRow] = fnNewRecord();
+    //        //}
+    //      },
+    //      //error: defaultUpdtErrorCallback,
+    //      dataType: "json"
+    //    });
+    //  }
+    //  // iconCls: 'icon-ok',
+    //});
+    // cmenuRow.menu('appendItem', {
+    //   separator: true
+    // });
+
+    var parentItem = cmenuRow.menu('findItem', 'Status');
+    cmenuRow.menu('appendItem', {
+      parent: parentItem.target,
+      text: 'New',
+      onclick: function(){
+        batchManualUpd("tasks", $("#dg"), [vue.contextRow] /*vue.rowSelections*/, {status_type : "TS01NW"});
+      }
+    });
+    cmenuRow.menu('appendItem', {
+      parent: parentItem.target,
+      text: 'In Progress',
+      onclick: function(){
+        //batchManualUpd("tasks", $("#dg"), vue.rowSelections, {status_type : "TS-PC"});
+        batchManualUpd("tasks", $("#dg"), [vue.contextRow] /*vue.rowSelections*/, {status_type : "TS02PC"});
+      }
+    });
+    cmenuRow.menu('appendItem', {
+      parent: parentItem.target,
+      text: 'Feedback',
+      onclick: function(){
+        //batchManualUpd("tasks", $("#dg"), vue.rowSelections, {status_type : "TS-FB"});
+        batchManualUpd("tasks", $("#dg"), [vue.contextRow] /*vue.rowSelections*/, {status_type : "TS03FB"});
+      }
+    });
+    cmenuRow.menu('appendItem', {
+      parent: parentItem.target,
+      text: 'Pending',
+      onclick: function(){
+        //batchManualUpd("tasks", $("#dg"), vue.rowSelections, {status_type : "TS-PD"});
+        batchManualUpd("tasks", $("#dg"), [vue.contextRow] /*vue.rowSelections*/, {status_type : "TS04PD"});
+      }
+    });
+    cmenuRow.menu('appendItem', {
+      parent: parentItem.target,
+      text: 'Review',
+      onclick: function(){
+        //batchManualUpd("tasks", $("#dg"), vue.rowSelections, {status_type : "TS-RV"});
+        batchManualUpd("tasks", $("#dg"), [vue.contextRow] /*vue.rowSelections*/, {status_type : "TS05RV"});
+      }
+    });
+    cmenuRow.menu('appendItem', {
+      parent: parentItem.target,
+      text: 'Closed',
+      onclick: function(){
+        //batchManualUpd("tasks", $("#dg"), vue.rowSelections, {status_type : "TS-CL"});
+        batchManualUpd("tasks", $("#dg"), [vue.contextRow] /*vue.rowSelections*/, {status_type : "TS06CL"});
+      }
+    });
+  }
+</script>
+<script>
+  function newRecord() {
+    return { 
+      solution_cd : "",
+      task_cd : "",
+      task_type : "TT01TS",
+      name : "",
+      status_type : "TS01NW",
+      description : "",
+      priority_type : "TP03NM",
+      created: "",
+      created_by : "",
+      updated: "",
+      updated_by : "",
+      parent_cd : ""
+    };
+  }
+
+  function copyRecord() {
+    var source = vue.row;
+    var record = newRecord();
+    record.solution_cd = source.solution_cd;
+    record.task_cd = null;
+    record.task_type = source.task_type;
+    record.name = source.name;
+    record.status_type = "TS01NW";
+    record.priority_type = source.priority_type;
+    record.description = source.description;
+    record.parent_cd = source.parent_cd;
+    return record;
+  }
+
+
+  function blankRecordForBatchUpdate() {
+    return { 
+      solution_cd : "",
+      task_cd : "",
+      task_type : "",
+      name : "",
+      status_type : "",
+      description : "",
+      priority_type : "",
+      created: "",
+      created_by : "",
+      updated: "",
+      updated_by : "",
+      parent_cd : ""
+    };
+  }
+
+  var vue = new Vue({
+    el: '#vue-main',
+    data: {
+      key_value_task_status_type : <%= @key_value_task_status_type %>,
+      key_value_task_type : <%= @key_value_task_type %>,
+      key_value_task_priority_type : <%= @key_value_task_priority_type %>,
+      key_value_solution : <%= @key_value_solution %>,
+      key_value_task_task_relation_type : <%= @key_value_task_task_relation_type %>,
+      row: newRecord(),
+      descContent : "",
+      multiRowSelected : false,
+      rowSelections : null,
+      showDescriptionView : false,
+      relTaskCd : "",
+      relType : "TR01RR",
+      contextRow : null
+    },
+    methods: {
+      toggleDescriptionEdit : function() {
+        this.showDescriptionView = !(this.showDescriptionView);
+      },
+      linkTask : function () {
+        $.ajax({
+          type: "POST",
+          url: "/link/task_task",
+          data: JSON.stringify({taskCdA:vue.row.task_cd, taskCdB:vue.relTaskCd,relType:vue.relType}),
+          success: function(data, dataType) { 
+            if(data.success) {
+              messageUpdateSuccess(data.message);
+            } else {
+              messageUpdateError(data.message);
+            }
+            $("#dg").treegrid("reload");
+          },
+          error: function() {
+          },
+          dataType: "json"
+        });
+      },
+      unlinkTask : function(taskCdA,taskCdB,relType) {
+        $.ajax({
+          type: "POST",
+          url: "/unlink/task_task",
+          data: JSON.stringify({taskCdA:taskCdA, taskCdB:taskCdB,relType:relType}),
+          success: function(data, dataType) { 
+            if(data.success) {
+              messageUpdateSuccess(data.message);
+            } else {
+              messageUpdateError(data.message);
+            }
+            $("#dg").treegrid("reload");
+          },
+          error: function() {
+          },
+          dataType: "json"
+        });
+      },
+      reloadTask : function(taskCd) {
+        console.log("****", taskCd);
+        var self = this;
+
+        $.ajax({
+          type: "GET",
+          url: "/tasks/"+taskCd,
+          success: function(data, dataType) { 
+            //if(data.success) {
+              self.multiRowSelected = false;
+              self.row = $.extend(true, {}, data);
+            //} else {
+            //  messageUpdateError("Retrieve information failed");
+            //}
+            console.log(data);
+          },
+          error: function() {
+            messageUpdateError("Request failed");
+          },
+          dataType: "json"
+        });
+      },
+      relationStyle : function(relType) {
+        if(relType == "TR01RR") {
+          return "icon icon-arrow-left";
+        }
+        if(relType == "TR02PR") {
+          return "icon icon-arrow-up-left";
+        }
+        if(relType == "TR03CH") {
+          return "icon icon-arrow-down-right";
+        }
+      }
+    },
+    computed: {
+      markedDescription: function () {
+        if(this.row) {
+          return marked(this.row.description);
+        } else {
+          return "";
+        }
+      },
+      taskRelation : function() {
+        if(this.row !== null) {
+          var infos = [];
+          if(this.row.parent_task != null) {
+            infos.push({task_cd_a : this.row.task_cd, task_cd_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
+          }
+          if(this.row.children_all && this.row.children_all.length > 0) {
+            for(var i = 0; i < this.row.children_all.length; i+=1) {
+              infos.push({task_cd_a : this.row.task_cd, task_cd_b : this.row.children_all[i].task_cd, t_task : this.row.children_all[i], rel_type : "TR03CH"});
+            }
+          }
+          if(this.row.t_task_task_rel != null) {
+            for(var i = 0; i < this.row.t_task_task_rel.length; i+=1) {
+              infos.push(this.row.t_task_task_rel[i]);
+            }
+          }
+          return infos;
+        } else {
+          return [];
+        }
+      }
+    },
+    updated: function () {
+      autosize.update($("textarea"))
+    }
+  });
+</script>
+

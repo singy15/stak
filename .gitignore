@@ -1,0 +1,5 @@
+/src/app/vendor
+/src/app/.bundle
+/src/app/Gemfile.lock
+/src/app/log/sql.log
+/src/app/log/sql.log.*

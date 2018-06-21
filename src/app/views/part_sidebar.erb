@@ -1,0 +1,46 @@
+
+<div id="vue-sidebar" class="vue-component">
+<div id="sidebar" class="w3-sidebar w3-light-grey w3-bar-block" v-bind:style="sidebarWidth">
+    <!--<span class="icon icon-circle-left" v-on:click="toggleDescriptionEdit"></span>-->
+    <h3 v-show="sidebarShown" class="w3-bar-item" style="display:inline"><span class="icon icon-stack" style="font-size:18px"></span>&nbsp;Stak</h3>
+    <span v-show="sidebarShown" v-on:click="toggleSidebar" class="icon icon-circle-left" style="float:right;padding:10px;font-size:large;cursor : pointer;"></span>
+    <span v-show="!sidebarShown" v-on:click="toggleSidebar" class="icon icon-circle-right" style="float:right;padding:10px;font-size:large;cursor : pointer;"></span>
+    <a v-show="sidebarShown" href="/view/dashboard" class="w3-bar-item w3-button">Dashboard</a>
+    <a v-show="sidebarShown" href="/view/solutions" class="w3-bar-item w3-button">Solutions</a>
+    <a v-show="sidebarShown" href="/view/tasks" class="w3-bar-item w3-button">Tasks</a>
+    <a v-show="sidebarShown" href="/view/workplan" class="w3-bar-item w3-button">Workplan</a>
+    <a v-show="sidebarShown" href="/view/users" class="w3-bar-item w3-button">Users</a>
+</div>
+</div>
+
+<script>
+  var sidebar_vue = new Vue({
+    el: '#vue-sidebar',
+    data : {
+      sidebarShown : true
+    },
+    methods : {
+      toggleSidebar : function() {
+        this.sidebarShown = !(this.sidebarShown);
+      }
+    },
+    computed : {
+      sidebarWidth : function() {
+        if(this.sidebarShown) {
+          return {width:'150px'};
+        } else {
+          return {width:'35px'};
+        }
+      }
+    },
+    updated: function () {
+      if(this.sidebarShown) {
+        $("#pageContent").css("margin-left","150px");
+      } else {
+        $("#pageContent").css("margin-left","35px");
+      }
+
+      $(window).resize();
+    }
+  });
+</script>

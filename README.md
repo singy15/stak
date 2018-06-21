@@ -1,2 +1,2 @@
 # stak
-stak, the task management.
+stak, the task management application.
