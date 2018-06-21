@@ -78,19 +78,19 @@
     </tr>
     <tr>
       <th>Start date</th>
-      <td><input v-model="row.start_date" type="text" style="width:80px"></td>
+      <td><input v-model="row.start_date" type="text" style="width:140px"></td>
     </tr>
     <tr>
       <th>End date</th>
-      <td><input v-model="row.end_date" type="text" style="width:80px"></td>
+      <td><input v-model="row.end_date" type="text" style="width:140px"></td>
     </tr>
     <tr>
       <th>Progress</th>
-      <td><input v-model="row.progress" type="text" style="width:80px"></td>
+      <td><input v-model="row.progress" type="text" style="width:140px"></td>
     </tr>
     <tr>
       <th>Parent CD</th>
-      <td><input v-model="row.parent_cd" type="text" style="width:80px"></td>
+      <td><input v-model="row.parent_cd" type="text" style="width:140px"></td>
     </tr>
     <tr>
       <th>Sort order</th>
@@ -117,10 +117,30 @@
     <input id="btnScaleHour" type="button" value="Scale Hour" class="input-register"/>
     <input id="btnSortUp" type="button" value="UP" class="input-register"/>
     <input id="btnSortDown" type="button" value="DOWN" class="input-register"/>
+    <input id="btnCopyWorkNo" type="button" value="Copy WkNo" class="input-register"/>
   </div>
 </div>
 
   <script>
+
+
+  function execCopy(string){
+    var temp = document.createElement('div');
+
+    temp.appendChild(document.createElement('pre')).textContent = string;
+
+    var s = temp.style;
+    s.position = 'fixed';
+    s.left = '-100%';
+
+    document.body.appendChild(temp);
+    document.getSelection().selectAllChildren(temp);
+
+    var result = document.execCommand('copy');
+
+    document.body.removeChild(temp);
+    return result;
+  }
 
   $(document).ready(function() {
     // autosize($('textarea'));
@@ -189,8 +209,11 @@
       gantt.config.subscales = [
         {unit: "day", step: 1, date: "%d", css: daysStyle}
       ];
-      gantt.config.start_date = moment().add(-2,"months");
-      gantt.config.end_date = moment().add(4,"months");
+      // gantt.config.start_date = moment().add(-2,"months");
+      gantt.config.start_date = moment().add(-2,"months").startOf("day");
+      // gantt.config.end_date = moment().add(4,"months");
+      gantt.config.end_date = moment().add(4,"months").startOf("day");
+      gantt.config.min_column_width = 36;
       gantt.init("gantt_here");
       loadTask();
     });
@@ -198,7 +221,9 @@
     $("#btnScaleHour").click(function() {
       gantt.config.subscales = [
         {unit: "day", step:1,date:"%d",css:daysStyle},
-        {unit: "hour", step: 1, date: "%H", css: daysStyle}
+        // {unit: "hour", step: 1, date: "%H", css: daysStyle}
+        {unit: "hour", step: 1, date: "%G", css: daysStyle},
+        {unit: "minute", step: 30, date: " ", css: daysStyle}
       ];
 
 
@@ -207,17 +232,21 @@
         url: "/workplans",
         data: JSON.stringify({}),
         success: function(data, dataType) { 
-          var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").toDate();
-          var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").toDate();
+          // var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").toDate();
+          var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
+          // var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").toDate();
+          var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
 
           gantt.config.start_date = st;
           gantt.config.end_date = ed;
+          gantt.config.min_column_width = 18;
           gantt.init("gantt_here");
           loadTask();
         },
         // error: defaultUpdtErrorCallback,
         dataType: "json"
       });
+
 
     });
 
@@ -339,6 +368,12 @@
       //}
       swapSortOrder(false, vue.row.work_plan_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
     });
+
+    $("#btnCopyWorkNo").click(function() {
+      execCopy(vue.row.work_plan_cd);
+    });
+
+
   });
   </script>
 
@@ -442,7 +477,8 @@ function formatTask(task){
 	gantt.config.scale_unit = "month";
 	gantt.config.date_scale = "%F, %Y";
 
-  gantt.config.min_column_width = 18;
+  gantt.config.min_column_width = 36;
+  // gantt.config.min_column_width = 36;
 	gantt.config.scale_height = 50;
 
   gantt.config.order_branch = true;
