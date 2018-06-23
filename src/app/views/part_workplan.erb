@@ -44,11 +44,38 @@
 	 .task_project .gantt_task_progress{
 	 	 background:#91a4d9;
 	 }
+
+   .slider-rulelabel > span {
+     font-size: 0.5em;
+   }
+
+   .slider-inner > span {
+     font-size: 0.5em;
+   }
+
+   .slider-handle {
+     background-size: 14px 14px;
+     margin-left: -7px;;
+     margin-top: -7px;;
+   }
+
+   .gantt_tooltip {
+    z-index : 0;
+   }
+
+   th {
+    width : 20px;
+   }
+
+   .
 </style>
 
+
 <div class="easyui-panel" style="width:100%;margin-bottom:5px;">
-  <div id="gantt_here" style='width:100%; height:500px;'></div>
+  <div id="gantt_here" style='width:100%; height:400px;'></div>
 </div>
+<span class="icon icon-calendar" id="btnScaleDay" style="cursor: pointer"></span>
+<span class="icon icon-clock" id="btnScaleHour" style="cursor: pointer"></span>
 <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
   <!-- Set to width:100% cause overflow when toggle sidebar -->
 <div id="vue-main" class="vue-component">
@@ -79,6 +106,16 @@
       </td>
     </tr>
     <tr>
+      <th>Type</th>
+      <td>
+        <select name="category" v-model="row.task_type">
+          <option v-for="category in key_value_task_type" :value="category.value">
+            {{ category.text }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr>
       <th>Assigned to</th>
       <td>
         <select name="category" v-model="row.user_cd">
@@ -89,25 +126,40 @@
       </td>
     </tr>
     <tr>
-      <th>Start date</th>
-      <td><input v-model="row.start_date" type="text" style="width:140px"></td>
+      <!-- <th>Start date</th> -->
+      <!-- <td><input v-model="row.start_date" type="text" style="width:140px"></td> -->
+      <th>Term</th>
+      <td>
+        <input id="dpStart" class="easyui-datetimebox" style="width:145px;">
+        <span> --- </span>
+        <input id="dpEnd" class="easyui-datetimebox" style="width:145px;">
+      </td>
     </tr>
-    <tr>
-      <th>End date</th>
-      <td><input v-model="row.end_date" type="text" style="width:140px"></td>
-    </tr>
+    <!-- <tr> -->
+    <!--   <th>End date</th> -->
+      <!-- <td><input v-model="row.end_date" type="text" style="width:140px"></td> -->
+      <!-- <td><input id="dpEnd" class="easyui-datetimebox" style="width:200px;"></td> -->
+      <!-- </tr> -->
     <tr>
       <th>Progress</th>
-      <td><input v-model="row.progress" type="text" style="width:140px"></td>
+      <!-- <td><input v-model="row.progress" type="text" style="width:140px"></td> -->
+      <td style="height:60px;">
+        <input class="easyui-slider" id="progress" style="width:300px" 
+               data-options="showTip:true, rule: [0,'|',25,'|',50,'|',75,'|',100], step: 5">
+      </td>
     </tr>
     <tr>
       <th>Parent CD</th>
-      <td><input v-model="row.parent_cd" type="text" style="width:140px"></td>
+      <td>
+        <input v-model="row.parent_cd" type="text" style="width:140px">
+        <span class="icon icon-copy" id="btnCopyTaskCd" style="cursor: pointer;font-size:16px"></span>
+        <span class="icon icon-paste" id="btnPasteTaskCd" style="cursor: pointer;font-size:16px"></span>
+      </td>
     </tr>
-    <tr>
-      <th>Sort order</th>
-      <td><input v-model="row.sort_order" type="text" style="width:200px"></td>
-    </tr>
+    <!-- <tr> -->
+    <!--   <th>Sort order</th> -->
+    <!--   <td><input v-model="row.sort_order" type="text" style="width:200px"></td> -->
+    <!-- </tr> -->
     <!-- <tr> -->
     <!--   <th>Work type</th> -->
     <!--   <td> -->
@@ -118,16 +170,6 @@
     <!--     </select> -->
     <!--   </td> -->
     <!-- </tr> -->
-    <tr>
-      <th>Type</th>
-      <td>
-        <select name="category" v-model="row.task_type">
-          <option v-for="category in key_value_task_type" :value="category.value">
-            {{ category.text }}
-          </option>
-        </select>
-      </td>
-    </tr>
     <tr>
       <th>Description <span class="icon icon-pencil" v-on:click="toggleDescriptionEdit"></span></th>
     </tr>
@@ -149,16 +191,50 @@
     <input id="btnNew" type="button" value="New" class="input-register"/>
     <input id="btnCopy" type="button" value="Copy" class="input-register"/>
     <input id="btnDelete" type="button" value="Delete" class="input-register"/>
-    <input id="btnScaleDay" type="button" value="Scale Day" class="input-register"/>
-    <input id="btnScaleHour" type="button" value="Scale Hour" class="input-register"/>
+    <!-- <input id="btnScaleDay" type="button" value="Scale Day" class="input-register"/> -->
+    <!-- <input id="btnScaleHour" type="button" value="Scale Hour" class="input-register"/> -->
     <input id="btnSortUp" type="button" value="UP" class="input-register"/>
     <input id="btnSortDown" type="button" value="DOWN" class="input-register"/>
-    <input id="btnCopyWorkNo" type="button" value="Copy WkNo" class="input-register"/>
+    <!-- <input id="btnCopyWorkNo" type="button" value="Copy WkNo" class="input-register"/> -->
   </div>
 </div>
 
   <script>
 
+  // $.fn.datebox.defaults.formatter = function(date){
+  //   return moment(date).format("DD-MM-YYYY h:m");
+  //   // var y = date.getFullYear();
+  //   // var m = date.getMonth()+1;
+  //   // var d = date.getDate();
+  //   // var h = date.getHours();
+  //   // var mm = date.getMinutes();
+  //   // return m+'/'+d+'/'+y + " " + h +":"+ mm;
+  // }
+
+  $.fn.datetimebox.defaults.formatter = function(date){
+    return moment(date).format("DD-MM-YYYY HH:mm");
+    // var y = date.getFullYear();
+    // var m = date.getMonth()+1;
+    // var d = date.getDate();
+    // var h = date.getHours();
+    // var mm = date.getMinutes();
+    // return m+'/'+d+'/'+y + " " + h +":"+ mm;
+  }
+  $.fn.datetimebox.defaults.parser = function(date){
+    var m = moment(date, "DD-MM-YYYY HH:mm");
+    if(m.isValid()) {
+      return m.toDate();
+    } else {
+      return moment().startOf('day').toDate();
+    }
+
+    // var y = date.getFullYear();
+    // var m = date.getMonth()+1;
+    // var d = date.getDate();
+    // var h = date.getHours();
+    // var mm = date.getMinutes();
+    // return m+'/'+d+'/'+y + " " + h +":"+ mm;
+  }
 
   function execCopy(string){
     var temp = document.createElement('div');
@@ -180,6 +256,27 @@
 
   $(document).ready(function() {
     // autosize($('textarea'));
+
+    // $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
+    $("#progress").slider({
+      onChange : function(newval, oldval) {
+        vue.row.progress = newval / 100.0;
+      }
+    });
+
+    $("#dpStart").datetimebox({
+      onChange: function(newval, oldval) {
+        // vue.row.start_date = moment(newval, "MM/DD/YYYY HH:mm:ss").format("DD-MM-YYYY HH:mm");
+        vue.row.start_date = newval;
+      }
+    });
+
+    $("#dpEnd").datetimebox({
+      onChange: function(newval, oldval) {
+        // vue.row.end_date = moment(newval, "MM/DD/YYYY HH:mm:ss").format("DD-MM-YYYY HH:mm");
+        vue.row.end_date = newval;
+      }
+    });
 
     $("#btnNew").click(function() {
       vue.row = newRecord();
@@ -413,8 +510,17 @@
       swapSortOrder(false, vue.row.task_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
     });
 
-    $("#btnCopyWorkNo").click(function() {
+    // $("#btnCopyWorkNo").click(function() {
+    //   execCopy(vue.row.task_cd);
+    // });
+
+    $("#btnCopyTaskCd").click(function() {
+      vue.currentParentCd = vue.row.task_cd;
       execCopy(vue.row.task_cd);
+    });
+
+    $("#btnPasteTaskCd").click(function() {
+      vue.row.parent_cd = vue.currentParentCd;
     });
 
 
@@ -476,7 +582,8 @@
   };
 
   function formatTask(task){
-    return task.task_cd + " : " + task.name;
+    // return task.task_cd + " : " + task.name;
+    return task.name;
   };
 
 
@@ -491,12 +598,12 @@
   }
 
   gantt.config.columns=[
-    {name:"text",       label:"Task name",  tree:true, width:"*", min_width: 120, template:formatTask },
+    {name:"text", label:"Task name", tree:true, width: 250, /*width:"*", min_width: 120,*/ template:formatTask },
     // {name:"start_date", label:"Start", align: "center",resize:true },
     // {name:"end_date",   label:"End",   align: "center",resize:true },
-    {name:"solution_cd",   label:"Solution",   align: "center", template : mapper("solution_cd", <%= @key_value_solution %>) },
-    {name:"user_cd",   label:"Assigned to",   align: "center", template : mapper("user_cd", <%= @key_value_user %>) },
-    {name:"progress",   label:"Progress",   align: "center", template: function(task) {return Math.round(task.progress * 100.0) + "%";} }
+    // {name:"solution_cd",   label:"Solution",   align: "center", template : mapper("solution_cd", <%= @key_value_solution %>) },
+    {name:"user_cd", label:"Assign", width: 60, align: "center", template : mapper("user_cd", <%= @key_value_user %>) },
+    {name:"progress", label:"Progr.", width: 45, align: "center", template: function(task) {return Math.round(task.progress * 100.0) + "%";} }
   ];
 
 
@@ -504,6 +611,7 @@
 	gantt.config.grid_resize = true;
   gantt.config.row_height = 20;
   gantt.config.open_tree_initially = true;
+  // gantt.config.autosize = "y";
 
   gantt.config.start_date = moment().add(-2,"months");
   gantt.config.end_date = moment().add(4,"months");
@@ -515,9 +623,9 @@
     var text = "";
     text += "<b>Solution: </b>" + (mapper("solution_cd", <%= @key_value_solution %>))(task) + "<br>";
     text += "<b>Task CD: </b>" + task.task_cd + "<br>";
-    text += "<b>Assigned to: </b>" + (mapper("user_cd", <%= @key_value_user %>))(task) + "<br>";
-    text += "<b>Progress: </b>" + Math.round(task.progress * 100.0) + "%<br>";
-    text += "<b>Task type: </b>" + (mapper("task_type", <%= @key_value_task_type %>))(task) + "<br>";
+    // text += "<b>Assigned to: </b>" + (mapper("user_cd", <%= @key_value_user %>))(task) + "<br>";
+    // text += "<b>Progress: </b>" + Math.round(task.progress * 100.0) + "%<br>";
+    // text += "<b>Task type: </b>" + (mapper("task_type", <%= @key_value_task_type %>))(task) + "<br>";
     text += "<b>Name: </b>" + task.name + "<br>";
     text += "<b>Description: </b><br>";
     // text += '<textarea>' +  task.description + '</textarea>' + "<br>";
@@ -585,6 +693,13 @@
         return false;
     return true;
   });
+
+  // gantt.attachEvent("onAfterTaskDrag", function(id, mode, e){
+  //   if (mode === "progress") {
+  //     // var task = gantt.getTask(id);
+  //     // var roundedProgress = (Math.ceil((task.progress * 100.0)/5.0) * 5.0) / 100.0;
+  //   }
+  // });
 
   gantt.attachEvent("onRowDragEnd", function(id, target) {
 
@@ -712,12 +827,16 @@
     console.log("updated");
     console.log(item);
     console.log(moment(item.start_date).format('DD-MM-YYYY HH:mm'));
+
+    var roundedProgress = (Math.round((item.progress * 100.0)/5.0) * 5.0) / 100.0;
+
     var diff = {
       task_cd : item["id"]
       ,task_cd2 : item.task_cd2
       ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
       ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
-      ,progress : item.progress
+      // ,progress : item.progress
+      ,progress : roundedProgress
       ,user_cd : item.user_cd
       ,name : item.name
       ,parent_cd : item.parent_cd
@@ -883,6 +1002,7 @@
       //multiRowSelected : false,
       //rowSelections : null,
       showDescriptionView : false,
+      currentParentCd : ""
       //relTaskCd : "",
       //relType : "TR01RR",
       //contextRow : null
@@ -943,6 +1063,11 @@
     },
     updated: function () {
       //autosize.update($("textarea"))
+      $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
+      // $("#dpStart").datetimebox("setValue", moment(vue.row.start_date, "DD-MM-YYYY HH:mm").format("MM/DD/YYYY HH:mm:ss"));
+      $("#dpStart").datetimebox("setValue", vue.row.start_date);
+      // $("#dpEnd").datetimebox("setValue",  moment(vue.row.end_date, "DD-MM-YYYY HH:mm").format("MM/DD/YYYY HH:mm:ss"));
+      $("#dpEnd").datetimebox("setValue",  vue.row.end_date);
     }
 
     //,
