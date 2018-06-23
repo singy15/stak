@@ -50,3 +50,7 @@ INSERT INTO c_code_def (code_type,cd_len,max_seq) VALUES ('TG','3','999');
 INSERT INTO c_code_def (code_type,cd_len,max_seq) VALUES ('UR','3','999');
 INSERT INTO c_code_def (code_type,cd_len,max_seq) VALUES ('TK','4','9999');
 
+-- c_version
+DELETE FROM c_version;
+INSERT INTO c_version (version) VALUES ('1');
+

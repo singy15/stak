@@ -66,6 +66,21 @@ ShowTag=1
 ShowCommonAttributes=0
 
 [Entity]
+PName=c_version
+LName=c_version
+Comment=
+TableOption=
+Page=Main
+Left=1050
+Top=1300
+Field="version","version","integer","NOT NULL",0,"1","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180623161035
+Position="Main",1050,1300,230,73
+
+[Entity]
 PName=t_workplan
 LName=t_workplan
 Comment=
@@ -382,7 +397,7 @@ Fields1=solution_cd
 Fields2=solution_cd
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,4974,4492,5040,R,R
+Position="MAIN",0,4974,4492,4154,R,R
 Dependence=0
 Caption=
 PName=
@@ -390,7 +405,7 @@ ModifiedDateTime=20180318134410
 LineMode=0
 Bar1=497
 Bar2=449
-Bar3=504
+Bar3=415
 TermPos1=R
 TermPos2=R
 
@@ -603,7 +618,7 @@ Comment=
 TableOption=
 Page=MAIN
 Left=1400
-Top=1200
+Top=1300
 Field="task_cd_a","task_cd_a","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
 Field="task_cd_b","task_cd_b","*task_cd","NOT NULL",1,"","",$FFFFFFFF,""
 Field="rel_type","rel_type","*gen_type","NOT NULL",2,"","",$FFFFFFFF,""
@@ -611,7 +626,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20180318140340
-Position="MAIN",1400,1200,304,86
+Position="MAIN",1400,1300,304,86
 
 [Entity]
 PName=t_task
@@ -627,8 +642,8 @@ Field="task_type","task_type","*gen_type","NOT NULL",,"","",$FFFFFFFF,""
 Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
 Field="status_type","status_type","*gen_type","NOT NULL",,"\qTS-NW\q","",$FFFFFFFF,""
 Field="description","description","*text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
-Field="start_dt","start_dt","*gen_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
-Field="end_dt","end_dt","*gen_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="start_dt","start_dt","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="end_dt","end_dt","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="priority_type","priority_type","*gen_type","NOT NULL",,"\qTP-NM\q","",$FFFFFFFF,""
 Field="parent_cd","parent_cd","*task_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="root_parent_cd","root_parent_cd","*task_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
@@ -636,12 +651,13 @@ Field="path","path","varchar(500)","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="start_date","start_date","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="duration","duration","*gen_gantt_duration","NOT NULL",,"1","",$FFFFFFFF,""
 Field="progress","progress","*gen_gantt_progress","NOT NULL",,"0.0","",$FFFFFFFF,""
+Field="user_cd","user_cd","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Index==1,solution_cd,task_cd
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20180407154736
-Position="MAIN",1400,750,300,399
+ModifiedDateTime=20180623154630
+Position="MAIN",1400,750,364,431
 
 [Entity]
 PName=t_solution

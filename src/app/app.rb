@@ -269,7 +269,32 @@ get '/workplans' do
   # TWorkplan.json(workplan)
  
   con = ActiveRecord::Base.connection
-  sql = "select pl.*,pl.work_plan_cd as id, pl.parent_cd as parent, case when pl.task_cd <> '' then ts.name else pl.name end as text from t_workplan pl left join t_task ts on pl.task_cd = ts.task_cd order by sort_order asc"
+  # from t_workplan
+  # sql = ""
+  # sql += "select"
+  # sql += " pl.*,"
+  # sql += " pl.work_plan_cd as id,"
+  # sql += " pl.parent_cd as parent,"
+  # sql += " case when pl.task_cd <> '' then ts.name else pl.name end as text"
+  # sql += " from t_workplan pl"
+  # sql += " left join t_task ts"
+  # sql += " on pl.task_cd = ts.task_cd"
+  # sql += " order by sort_order asc"
+
+  # from t_task
+  sql = ""
+  sql += "select"
+  sql += " pl.*,"
+  sql += " task_cd as id,"
+  sql += " task_cd as work_plan_cd,"
+  sql += " parent_cd as parent,"
+  sql += " pl.name as text,"
+  sql += " pl.name as name,"
+  sql += " start_dt as start_date,"
+  sql += " end_dt as end_date,"
+  sql += " pl.sort_order as sort_order"
+  sql += " from t_task pl"
+  sql += " order by pl.sort_order asc"
   p "*** sql ***"
   rows = con.select_all(sql).to_hash
   rows.to_json(:include => {:user_info => {}})
@@ -278,84 +303,185 @@ get '/workplans' do
 end
 
 post '/workplans', provides: :json do
-  # svc = TaskSvc.new()
+  #  # svc = TaskSvc.new()
 
-  p "*** UPDATING ***"
+  #  p "*** UPDATING ***"
+
+  #  target = JSON.parse(request.body.read)
+
+  #  ## workplan version
+  #  # if target["work_plan_cd"] != nil
+  #  #   workplan = TWorkplan.find(target["work_plan_cd"])
+  #  # else
+  #  #   workplan = TWorkplan.new()
+  #  #   work_plan_cd = ActiveRecord::Base.connection.select_value(
+  #  #       ActiveRecord::Base.send(
+  #  #         :sanitize_sql_array,
+  #  #         [ 'select sp_numbering(:numbering_type, :parent_cd)', 
+  #  #           numbering_type: 'WP',
+  #  #           parent_cd: ""]))
+  #  #   p work_plan_cd
+  #  #   workplan.work_plan_cd = work_plan_cd
+  #  # end
+
+  #  ## task version
+  #  if target["work_plan_cd"] != nil
+  #    # workplan = TWorkplan.find(target["work_plan_cd"])
+  #    workplan = TTask.find(target["work_plan_cd"])
+  #  else
+  #    svc = TaskSvc.new()
+  #    workplan = TTask.new()
+  #    workplan["task_cd"] = svc.fetch_new_cd("00")
+  #    workplan["solution_cd"] = "00"
+  #    workplan["task_type"] = "TS01NW"
+  #    workplan["status_type"] = "TT01TS"
+  #    workplan["description"] = ""
+  #    workplan["parent_cd"] = ""
+  #    workplan["root_parent_cd"] = workplan["task_cd"]
+  #    workplan["user_cd"] = "001"
+  #    workplan["path"] = ""
+  #    workplan["created"] = Time.now
+  #    workplan["updated"] = Time.now
+  #    workplan["created_by"] = ""
+  #    workplan["updated_by"] = ""
+
+  #    p workplan["task_cd"]
+  #  end
+
+  #  ## workplan version
+  #  # workplan.task_cd = target["task_cd"]
+  #  # workplan.start_date = target["start_date"]
+  #  # workplan.end_date = target["end_date"]
+  #  # workplan.progress = target["progress"].to_f()
+  #  # workplan.user_cd = target["user_cd"]
+  #  # workplan.name = target["name"]
+  #  # workplan.parent_cd = target["parent_cd"]
+  #  # if target["work_plan_cd"] != nil
+  #  #   workplan.sort_order = target["sort_order"]
+  #  # end
+  #  # workplan.work_type = target["work_type"]
+
+  #  ## task version
+  #  # workplan.task_cd = target["task_cd"]
+  #  workplan.start_dt = target["start_date"]
+  #  workplan.end_dt = target["end_date"]
+  #  # workplan.progress = target["progress"].to_f()
+  #  # workplan.user_cd = target["user_cd"]
+  #  workplan.name = target["name"]
+  #  # workplan.parent_cd = target["parent_cd"]
+  #  if target["work_plan_cd"] != nil
+  #    workplan.sort_order = target["sort_order"]
+  #  end
+  #  # workplan.work_type = target["work_type"]
+
+  #  p workplan
+
+  #  workplan.save()
+
+  #  # if (target["solution_cd"] == nil) || (target["solution_cd"] == "")
+  #  #   return {success: false, message: "Solution is not designated.", data: target}.to_json
+  #  # end
+
+  #  # p target
+  #  # task = TTask.where(task_cd: target["task_cd"])
+
+  #  # if(task.length == 0) 
+  #  #   task = TTask.new()
+
+  #  #   task["task_cd"] = svc.fetch_new_cd(target["solution_cd"])
+  #  #   task["created"] = Time.now
+  #  #   task["updated"] = Time.now
+  #  #   task["created_by"] = ""
+  #  #   task["updated_by"] = ""
+  #  # else
+  #  #   task = task[0]
+  #  # end
+
+
+  #  # task["solution_cd"] = target["solution_cd"]
+  #  # task["task_type"] = target["task_type"]
+  #  # task["name"] = target["name"]
+  #  # task["status_type"] = target["status_type"]
+  #  # task["priority_type"] = target["priority_type"]
+  #  # task["description"] = target["description"]
+  #  # task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
+  #  # task["root_parent_cd"] = ""
+  #  # task["path"] = ""
+
+  #  # task.save()
+  #  # if(task.parent_cd != "")
+  #  #   svc.link(task.task_cd, task.parent_cd, "TR02PR")
+  #  # else
+  #  #   svc.set_parent_root(task.task_cd)
+  #  # end
+
+  #  # {success: true, message: "Register success", data: task}.to_json
+  #  target.to_json()
+
+
+
+
+
+
+
+
+
+
+
+  svc = TaskSvc.new()
 
   target = JSON.parse(request.body.read)
-
-  if target["work_plan_cd"] != nil
-    workplan = TWorkplan.find(target["work_plan_cd"])
-  else
-    workplan = TWorkplan.new()
-    work_plan_cd = ActiveRecord::Base.connection.select_value(
-        ActiveRecord::Base.send(
-          :sanitize_sql_array,
-          [ 'select sp_numbering(:numbering_type, :parent_cd)', 
-            numbering_type: 'WP',
-            parent_cd: ""]))
-    p work_plan_cd
-    workplan.work_plan_cd = work_plan_cd
-  end
-
-  workplan.task_cd = target["task_cd"]
-  workplan.start_date = target["start_date"]
-  workplan.end_date = target["end_date"]
-  workplan.progress = target["progress"].to_f()
-  workplan.user_cd = target["user_cd"]
-  workplan.name = target["name"]
-  workplan.parent_cd = target["parent_cd"]
-  if target["work_plan_cd"] != nil
-    workplan.sort_order = target["sort_order"]
-  end
-  workplan.work_type = target["work_type"]
-
-  p workplan
-
-  workplan.save()
 
   # if (target["solution_cd"] == nil) || (target["solution_cd"] == "")
   #   return {success: false, message: "Solution is not designated.", data: target}.to_json
   # end
 
-  # p target
-  # task = TTask.where(task_cd: target["task_cd"])
+  p target
+  task = TTask.where(task_cd: target["task_cd"])
 
-  # if(task.length == 0) 
-  #   task = TTask.new()
+  if(task.length == 0) 
+    task = TTask.new()
 
-  #   task["task_cd"] = svc.fetch_new_cd(target["solution_cd"])
-  #   task["created"] = Time.now
-  #   task["updated"] = Time.now
-  #   task["created_by"] = ""
-  #   task["updated_by"] = ""
-  # else
-  #   task = task[0]
-  # end
+    task["task_cd"] = svc.fetch_new_cd("00")
+    task["created"] = Time.now
+    task["updated"] = Time.now
+    task["created_by"] = ""
+    task["updated_by"] = ""
+  else
+    task = task[0]
+  end
 
+  task["solution_cd"] = "00"
+  task["task_type"] =  "TS01NW"
+  task["name"] = target["name"]
+  task["status_type"] =  "TT01TS"
+  task["priority_type"] = "TP03NM"
+  task["description"] = ""
+  task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
+  task["root_parent_cd"] = ""
+  task["path"] = ""
+  task["start_dt"] = target["start_date"]
+  task["end_dt"] = target["end_date"]
+  if target["task_cd"] != nil
+    task.sort_order = target["sort_order"]
+  end
+  task["progress"] = target["progress"]
+  task["user_cd"] = "001"
 
-  # task["solution_cd"] = target["solution_cd"]
-  # task["task_type"] = target["task_type"]
-  # task["name"] = target["name"]
-  # task["status_type"] = target["status_type"]
-  # task["priority_type"] = target["priority_type"]
-  # task["description"] = target["description"]
-  # task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
-  # task["root_parent_cd"] = ""
-  # task["path"] = ""
+  task.save()
+  if(task.parent_cd != "")
+    svc.link(task.task_cd, task.parent_cd, "TR02PR")
+  else
+    svc.set_parent_root(task.task_cd)
+  end
 
-  # task.save()
-  # if(task.parent_cd != "")
-  #   svc.link(task.task_cd, task.parent_cd, "TR02PR")
-  # else
-  #   svc.set_parent_root(task.task_cd)
-  # end
+  {success: true, message: "Register success", data: task}.to_json
 
-  # {success: true, message: "Register success", data: task}.to_json
   target.to_json()
 end
 
 delete '/workplans/:cd' do
-  TWorkplan.destroy(params[:cd])
+  # TWorkplan.destroy(params[:cd])
+  TTask.destroy(params[:cd])
   {success: true, message: "Register success", data: {}}.to_json
 end

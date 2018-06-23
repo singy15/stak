@@ -55,13 +55,13 @@
     <tr>
       <th width="100px">Workplan CD</th>
       <td width="200px">
-        <span>{{(row.work_plan_cd)? row.work_plan_cd : "NEW"}}</span>
+        <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span>
       </td>
     </tr>
-    <tr>
-      <th>Task CD</th>
-      <td><input v-model="row.task_cd" type="text" style="width:80px"></td>
-    </tr>
+    <!-- <tr> --> 
+    <!--   <th>Task CD</th> --> 
+    <!--   <td><input v-model="row.task_cd2" type="text" style="width:80px"></td> --> 
+    <!-- </tr> --> 
     <tr>
       <th>Name</th>
       <td><input v-model="row.name" type="text" style="width:100%"></td>
@@ -94,7 +94,7 @@
     </tr>
     <tr>
       <th>Sort order</th>
-      <td><input v-model="row.sort_order" type="text" style="width:80px"></td>
+      <td><input v-model="row.sort_order" type="text" style="width:200px"></td>
     </tr>
     <tr>
       <th>Work type</th>
@@ -156,13 +156,13 @@
     $("#btnDelete").click(function() {
       //if(vue.multiRowSelected) {
       //  batchDel(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
-      //} else if(vue.row.task_cd !== "") {
-      //  singleDel(vue, "tasks", "row", "task_cd", $("#dg"), newRecord);
+      //} else if(vue.row.task_cd2 !== "") {
+      //  singleDel(vue, "tasks", "row", "task_cd2", $("#dg"), newRecord);
       //}
 
       $.ajax({
         type: "DELETE",
-        url: "/workplans/" + vue.row.work_plan_cd,
+        url: "/workplans/" + vue.row.task_cd,
         data: JSON.stringify(vue.row),
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
@@ -172,7 +172,7 @@
           //   vue[propNameSelectedRow] = fnNewRecord();
           // }
           console.log("deleted");
-          gantt.deleteTask(vue.row.work_plan_cd);
+          gantt.deleteTask(vue.row.task_cd);
           loadTask();
         },
         // error: defaultUpdtErrorCallback,
@@ -182,7 +182,7 @@
 
     $("#btnRegister").click(function() {
       console.log("Register");
-      var id = vue.row.work_plan_cd;
+      var id = vue.row.task_cd;
       $.ajax({
         type: "POST",
         url: "/workplans",
@@ -214,6 +214,9 @@
       // gantt.config.end_date = moment().add(4,"months");
       gantt.config.end_date = moment().add(4,"months").startOf("day");
       gantt.config.min_column_width = 36;
+
+      gantt.config.keep_grid_width = false;
+      gantt.config.grid_resize = true;
       gantt.init("gantt_here");
       loadTask();
     });
@@ -240,6 +243,9 @@
           gantt.config.start_date = st;
           gantt.config.end_date = ed;
           gantt.config.min_column_width = 18;
+
+          gantt.config.keep_grid_width = false;
+          gantt.config.grid_resize = true;
           gantt.init("gantt_here");
           loadTask();
         },
@@ -273,8 +279,8 @@
         var task1Row = gantt.getTask(row);
         var task2Row = gantt.getTask(target);
         var task1 = {
-          work_plan_cd : task1Row["id"]
-          ,task_cd : task1Row.task_cd
+          task_cd : task1Row["id"]
+          ,task_cd2 : task1Row.task_cd2
           ,start_date : moment(task1Row.start_date).format('DD-MM-YYYY HH:mm')
           ,end_date : moment(task1Row.end_date).format('DD-MM-YYYY HH:mm')
           ,progress : task1Row.progress
@@ -285,8 +291,8 @@
           ,work_type : task1Row.work_type
         };
         var task2 = {
-          work_plan_cd : task2Row["id"]
-          ,task_cd : task2Row.task_cd
+          task_cd : task2Row["id"]
+          ,task_cd2 : task2Row.task_cd2
           ,start_date : moment(task2Row.start_date).format('DD-MM-YYYY HH:mm')
           ,end_date : moment(task2Row.end_date).format('DD-MM-YYYY HH:mm')
           ,progress : task2Row.progress
@@ -345,7 +351,7 @@
 
     $("#btnSortUp").click(function() {
       //console.log("up");
-      //var index = gantt.getTaskIndex(vue.row.work_plan_cd);
+      //var index = gantt.getTaskIndex(vue.row.task_cd);
       //var children = gantt.getChildren(vue.row.parent_cd);
       //if(index > 0) {
       //  console.log("can move up");
@@ -353,12 +359,12 @@
       //  var target = children[index-1];
       //  console.log("swap", row, target);
       //}
-      swapSortOrder(true, vue.row.work_plan_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
+      swapSortOrder(true, vue.row.task_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
     });
 
     $("#btnSortDown").click(function() {
       //console.log("down");
-      //var index = gantt.getTaskIndex(vue.row.work_plan_cd);
+      //var index = gantt.getTaskIndex(vue.row.task_cd);
       //var children = gantt.getChildren(vue.row.parent_cd);
       //if(index < (children.length - 1)) {
       //  console.log("can move down");
@@ -366,11 +372,11 @@
       //  var target = children[index+1];
       //  console.log("swap", row, target);
       //}
-      swapSortOrder(false, vue.row.work_plan_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
+      swapSortOrder(false, vue.row.task_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
     });
 
     $("#btnCopyWorkNo").click(function() {
-      execCopy(vue.row.work_plan_cd);
+      execCopy(vue.row.task_cd);
     });
 
 
@@ -431,16 +437,9 @@
 		]
   };
 
-function formatTask(task){
-    // if(task.priority ==1)
-    //     return "<div class='important'>"+task.text+" ("+task.users+") </div>";
-  // return task.text+" ("+task.users+")";
-  if(task.task_cd !== "") {
-    return task.task_cd + " : " + task.text;
-  } else {
-    return task.name;
-  }
-};
+  function formatTask(task){
+    return task.task_cd + " : " + task.name;
+  };
 
 
   function mapper(field, map) {
@@ -533,8 +532,8 @@ function formatTask(task){
     var task1Row = gantt.getTask(id);
     var task2Row = gantt.getTask(target);
     var task1 = {
-      work_plan_cd : task1Row["id"]
-      ,task_cd : task1Row.task_cd
+      task_cd : task1Row["id"]
+      ,task_cd2 : task1Row.task_cd2
       ,start_date : moment(task1Row.start_date).format('DD-MM-YYYY HH:mm')
       ,end_date : moment(task1Row.end_date).format('DD-MM-YYYY HH:mm')
       ,progress : task1Row.progress
@@ -545,8 +544,8 @@ function formatTask(task){
       ,work_type : task1Row.work_type
     };
     var task2 = {
-      work_plan_cd : task2Row["id"]
-      ,task_cd : task2Row.task_cd
+      task_cd : task2Row["id"]
+      ,task_cd2 : task2Row.task_cd2
       ,start_date : moment(task2Row.start_date).format('DD-MM-YYYY HH:mm')
       ,end_date : moment(task2Row.end_date).format('DD-MM-YYYY HH:mm')
       ,progress : task2Row.progress
@@ -608,8 +607,8 @@ function formatTask(task){
     //any custom logic here
     var item = gantt.getTask(id);
     var vueRow = {
-      work_plan_cd : item["id"]
-      ,task_cd : item.task_cd
+      task_cd : item["id"]
+      ,task_cd2 : item.task_cd2
       ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
       ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
       ,progress : item.progress
@@ -625,9 +624,10 @@ function formatTask(task){
   gantt.attachEvent("onTaskRowClick", function(id,row){
     //any custom logic here
     var item = gantt.getTask(id);
+    console.log(item);
     var vueRow = {
-      work_plan_cd : item["id"]
-      ,task_cd : item.task_cd
+      task_cd : item["id"]
+      ,task_cd2 : item.task_cd2
       ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
       ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
       ,progress : item.progress
@@ -646,8 +646,8 @@ function formatTask(task){
     console.log(item);
     console.log(moment(item.start_date).format('DD-MM-YYYY HH:mm'));
     var diff = {
-      work_plan_cd : item["id"]
-      ,task_cd : item.task_cd
+      task_cd : item["id"]
+      ,task_cd2 : item.task_cd2
       ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
       ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
       ,progress : item.progress
@@ -679,8 +679,8 @@ function formatTask(task){
 
         // var item = gantt.getTask(id);
         // var vueRow = {
-        //   work_plan_cd : item["id"]
-        //   ,task_cd : item.task_cd
+        //   task_cd : item["id"]
+        //   ,task_cd2 : item.task_cd2
         //   ,start_date : moment(item.start_date).format('DD-MM-YYYY HH:mm')
         //   ,end_date : moment(item.end_date).format('DD-MM-YYYY HH:mm')
         //   ,progress : item.progress
@@ -749,8 +749,8 @@ function formatTask(task){
 <script>
   function newRecord() {
     return { 
-      work_plan_cd : null,
-      task_cd : "",
+      task_cd : null,
+      task_cd2 : "",
       parent_cd : "",
       start_date : moment().format("DD-MM-YYYY HH:mm"),
       end_date : moment().add(7,"days").format("DD-MM-YYYY HH:mm"),
@@ -767,7 +767,7 @@ function formatTask(task){
   //  var source = vue.row;
   //  var record = newRecord();
   //  record.solution_cd = source.solution_cd;
-  //  record.task_cd = null;
+  //  record.task_cd2 = null;
   //  record.task_type = source.task_type;
   //  record.name = source.name;
   //  record.status_type = "TS01NW";
@@ -781,7 +781,7 @@ function formatTask(task){
   //function blankRecordForBatchUpdate() {
   //  return { 
   //    solution_cd : "",
-  //    task_cd : "",
+  //    task_cd2 : "",
   //    task_type : "",
   //    name : "",
   //    status_type : "",
@@ -823,7 +823,7 @@ function formatTask(task){
     //  //  $.ajax({
     //  //    type: "POST",
     //  //    url: "/link/task_task",
-    //  //    data: JSON.stringify({taskCdA:vue.row.task_cd, taskCdB:vue.relTaskCd,relType:vue.relType}),
+    //  //    data: JSON.stringify({taskCdA:vue.row.task_cd2, taskCdB:vue.relTaskCd,relType:vue.relType}),
     //  //    success: function(data, dataType) { 
     //  //      if(data.success) {
     //  //        messageUpdateSuccess(data.message);
@@ -901,11 +901,11 @@ function formatTask(task){
     //  //  if(this.row !== null) {
     //  //    var infos = [];
     //  //    if(this.row.parent_task != null) {
-    //  //      infos.push({task_cd_a : this.row.task_cd, task_cd_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
+    //  //      infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
     //  //    }
     //  //    if(this.row.children_all && this.row.children_all.length > 0) {
     //  //      for(var i = 0; i < this.row.children_all.length; i+=1) {
-    //  //        infos.push({task_cd_a : this.row.task_cd, task_cd_b : this.row.children_all[i].task_cd, t_task : this.row.children_all[i], rel_type : "TR03CH"});
+    //  //        infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.children_all[i].task_cd2, t_task : this.row.children_all[i], rel_type : "TR03CH"});
     //  //      }
     //  //    }
     //  //    if(this.row.t_task_task_rel != null) {
