@@ -6,6 +6,7 @@
 <script src="/lib/gantt/codebase/dhtmlxgantt.js?v=20180227"></script>
 <link rel="stylesheet" href="/lib/gantt/codebase/skins/dhtmlxgantt_meadow.css?v=20180227">
 <script src="/lib/gantt/codebase/ext/dhtmlxgantt_marker.js"></script>
+<script src="/lib/gantt/codebase/ext/dhtmlxgantt_tooltip.js"></script>
 
 <style type="text/css">
    .weekend{ background: #888888!important; color:white !important;}
@@ -53,7 +54,7 @@
 <div id="vue-main" class="vue-component">
   <table class="input-table" style="width:95%"> 
     <tr>
-      <th width="100px">Workplan CD</th>
+      <th width="100px">Task CD</th>
       <td width="200px">
         <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span>
       </td>
@@ -65,6 +66,17 @@
     <tr>
       <th>Name</th>
       <td><input v-model="row.name" type="text" style="width:100%"></td>
+    </tr>
+    <tr>
+      <th width="100px">Solution CD</th>
+      <td>
+        <!-- <select name="category" v-model="row.solution_cd" v-bind:disabled="multiRowSelected"> -->
+        <select name="category" v-model="row.solution_cd">
+          <option v-for="category in key_value_solution" :value="category.value">
+            {{ category.text }}
+          </option>
+        </select>
+      </td>
     </tr>
     <tr>
       <th>Assigned to</th>
@@ -96,14 +108,38 @@
       <th>Sort order</th>
       <td><input v-model="row.sort_order" type="text" style="width:200px"></td>
     </tr>
+    <!-- <tr> -->
+    <!--   <th>Work type</th> -->
+    <!--   <td> -->
+    <!--     <select name="category" v-model="row.work_type"> -->
+    <!--       <option v-for="category in key_value_work_type" :value="category.value"> -->
+    <!--         {{ category.text }} -->
+    <!--       </option> -->
+    <!--     </select> -->
+    <!--   </td> -->
+    <!-- </tr> -->
     <tr>
-      <th>Work type</th>
+      <th>Type</th>
       <td>
-        <select name="category" v-model="row.work_type">
-          <option v-for="category in key_value_work_type" :value="category.value">
+        <select name="category" v-model="row.task_type">
+          <option v-for="category in key_value_task_type" :value="category.value">
             {{ category.text }}
           </option>
         </select>
+      </td>
+    </tr>
+    <tr>
+      <th>Description <span class="icon icon-pencil" v-on:click="toggleDescriptionEdit"></span></th>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <textarea v-show="showDescriptionView" id="taDesc" v-model="row.description" type="text" style="width:100%"> </textarea>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <div class="easyui-panel descriptionView" v-html="markedDescription" style="padding:5px">
+        </div>
       </td>
     </tr>
   </table>
@@ -150,19 +186,14 @@
     });
 
     $("#btnCopy").click(function() {
-      //singleNew(vue, "row", $("#dg"), copyRecord, "multiRowSelected");
+      vue.row.task_cd = "";
     });
 
     $("#btnDelete").click(function() {
-      //if(vue.multiRowSelected) {
-      //  batchDel(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
-      //} else if(vue.row.task_cd2 !== "") {
-      //  singleDel(vue, "tasks", "row", "task_cd2", $("#dg"), newRecord);
-      //}
-
       $.ajax({
         type: "DELETE",
-        url: "/workplans/" + vue.row.task_cd,
+        // url: "/workplans/" + vue.row.task_cd,
+        url: "/tasks/" + vue.row.task_cd,
         data: JSON.stringify(vue.row),
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
@@ -174,6 +205,7 @@
           console.log("deleted");
           gantt.deleteTask(vue.row.task_cd);
           loadTask();
+          vue.row = newRecord();
         },
         // error: defaultUpdtErrorCallback,
         dataType: "json"
@@ -289,6 +321,9 @@
           ,parent_cd : task1Row.parent_cd
           ,sort_order : task2Row.sort_order
           ,work_type : task1Row.work_type
+          ,solution_cd : task1Row.solution_cd
+          ,task_type : task1Row.task_type
+          ,description : task1Row.description
         };
         var task2 = {
           task_cd : task2Row["id"]
@@ -301,6 +336,9 @@
           ,parent_cd : task2Row.parent_cd
           ,sort_order : task1Row.sort_order
           ,work_type : task2Row.work_type
+          ,solution_cd : task2Row.solution_cd
+          ,task_type : task2Row.task_type
+          ,description : task1Row.description
         };
 
 
@@ -453,9 +491,10 @@
   }
 
   gantt.config.columns=[
-      {name:"text",       label:"Task name",  tree:true, width:"*", min_width: 120, template:formatTask },
-      //{name:"start_date", label:"Start time", align: "center",resize:true },
-      //{name:"duration",   label:"Duration",   align: "center",resize:true },
+    {name:"text",       label:"Task name",  tree:true, width:"*", min_width: 120, template:formatTask },
+    // {name:"start_date", label:"Start", align: "center",resize:true },
+    // {name:"end_date",   label:"End",   align: "center",resize:true },
+    {name:"solution_cd",   label:"Solution",   align: "center", template : mapper("solution_cd", <%= @key_value_solution %>) },
     {name:"user_cd",   label:"Assigned to",   align: "center", template : mapper("user_cd", <%= @key_value_user %>) },
     {name:"progress",   label:"Progress",   align: "center", template: function(task) {return Math.round(task.progress * 100.0) + "%";} }
   ];
@@ -471,6 +510,19 @@
 
   gantt.templates.scale_cell_class = function(date){
       if(date.getDay()==0||date.getDay()==6){ return "weekend"; }
+  };
+  gantt.templates.tooltip_text = function(start,end,task){
+    var text = "";
+    text += "<b>Solution: </b>" + (mapper("solution_cd", <%= @key_value_solution %>))(task) + "<br>";
+    text += "<b>Task CD: </b>" + task.task_cd + "<br>";
+    text += "<b>Assigned to: </b>" + (mapper("user_cd", <%= @key_value_user %>))(task) + "<br>";
+    text += "<b>Progress: </b>" + Math.round(task.progress * 100.0) + "%<br>";
+    text += "<b>Task type: </b>" + (mapper("task_type", <%= @key_value_task_type %>))(task) + "<br>";
+    text += "<b>Name: </b>" + task.name + "<br>";
+    text += "<b>Description: </b><br>";
+    // text += '<textarea>' +  task.description + '</textarea>' + "<br>";
+    text += '<div style="padding:5px">'+marked(task.description)+'</div>';
+    return text;
   };
 
 	gantt.config.scale_unit = "month";
@@ -509,11 +561,18 @@
   //gantt.config.date_scale = "Week #%W";
 
 	gantt.templates.task_class = function(start, end, obj){
-    if(obj.work_type === "WT01PL") {
+    // if(obj.work_type === "WT01PL") {
+    //   return "";
+    // } else if(obj.work_type == "WT02AC") {
+    //   return "task_actual";
+    // } else if(obj.work_type == "WT03PJ") {
+    //   return "task_project";
+    // }
+    if(obj.task_type === "TT01TS") {
       return "";
-    } else if(obj.work_type == "WT02AC") {
+    } else if(obj.task_type == "TT02BG") {
       return "task_actual";
-    } else if(obj.work_type == "WT03PJ") {
+    } else if(obj.task_type == "TT03PJ") {
       return "task_project";
     }
 	}
@@ -542,6 +601,7 @@
       ,parent_cd : task1Row.parent_cd
       ,sort_order : task2Row.sort_order
       ,work_type : task1Row.work_type
+      ,description : task1Row.description
     };
     var task2 = {
       task_cd : task2Row["id"]
@@ -554,6 +614,7 @@
       ,parent_cd : task2Row.parent_cd
       ,sort_order : task1Row.sort_order
       ,work_type : task2Row.work_type
+      ,description : task2Row.description
     };
 
 
@@ -617,6 +678,9 @@
       ,parent_cd : item.parent_cd
       ,sort_order : item.sort_order
       ,work_type : item.work_type
+      ,solution_cd : item.solution_cd
+      ,task_type : item.task_type
+      ,description : item.description
     };
     vue.row = vueRow;
   });
@@ -636,6 +700,9 @@
       ,parent_cd : item.parent_cd
       ,sort_order : item.sort_order
       ,work_type : item.work_type
+      ,solution_cd : item.solution_cd
+      ,task_type : item.task_type
+      ,description : item.description
     };
     vue.row = vueRow;
   });
@@ -656,6 +723,9 @@
       ,parent_cd : item.parent_cd
       ,sort_order : item.sort_order
       ,work_type : item.work_type
+      ,solution_cd : item.solution_cd
+      ,task_type : item.task_type
+      ,description : item.description
     };
     var id = item["id"];
     $.ajax({
@@ -759,7 +829,10 @@
       name : "",
       parent_cd : "",
       sort_order : 0,
-      work_type : "WT01PL"
+      work_type : "WT01PL",
+      solution_cd : "",
+      task_type : "",
+      description : ""
     };
   }
   //
@@ -798,22 +871,80 @@
   var vue = new Vue({
     el: '#vue-main',
     data: {
-      //key_value_task_status_type : <%= @key_value_task_status_type %>,
-      //key_value_task_type : <%= @key_value_task_type %>,
-      //key_value_task_priority_type : <%= @key_value_task_priority_type %>,
-      //key_value_solution : <%= @key_value_solution %>,
-      //key_value_task_task_relation_type : <%= @key_value_task_task_relation_type %>,
+      key_value_task_status_type : <%= @key_value_task_status_type %>,
+      key_value_task_type : <%= @key_value_task_type %>,
+      key_value_task_priority_type : <%= @key_value_task_priority_type %>,
+      key_value_solution : <%= @key_value_solution %>,
+      key_value_task_task_relation_type : <%= @key_value_task_task_relation_type %>,
       key_value_user : <%= @key_value_user %>,
       key_value_work_type : <%= @key_value_work_type %>,
       row: newRecord(),
       //descContent : "",
       //multiRowSelected : false,
       //rowSelections : null,
-      //showDescriptionView : false,
+      showDescriptionView : false,
       //relTaskCd : "",
       //relType : "TR01RR",
       //contextRow : null
+    },
+    methods: {
+      toggleDescriptionEdit : function() {
+        this.showDescriptionView = !(this.showDescriptionView);
+      }
+      //,linkTask : function () {
+      //   $.ajax({
+      //     type: "POST",
+      //     url: "/link/task_task",
+      //     data: JSON.stringify({taskCdA:vue.row.task_cd2, taskCdB:vue.relTaskCd,relType:vue.relType}),
+      //     success: function(data, dataType) { 
+      //       if(data.success) {
+      //         messageUpdateSuccess(data.message);
+      //       } else {
+      //         messageUpdateError(data.message);
+      //       }
+      //       $("#dg").treegrid("reload");
+      //     },
+      //     error: function() {
+      //     },
+      //     dataType: "json"
+      //   });
+      // }
+    },
+    computed: {
+      markedDescription: function () {
+        if(this.row) {
+          return marked(this.row.description);
+        } else {
+          return "";
+        }
+      }
+      //,
+      // taskRelation : function() {
+      //   if(this.row !== null) {
+      //     var infos = [];
+      //     if(this.row.parent_task != null) {
+      //       infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
+      //     }
+      //     if(this.row.children_all && this.row.children_all.length > 0) {
+      //       for(var i = 0; i < this.row.children_all.length; i+=1) {
+      //         infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.children_all[i].task_cd2, t_task : this.row.children_all[i], rel_type : "TR03CH"});
+      //       }
+      //     }
+      //     if(this.row.t_task_task_rel != null) {
+      //       for(var i = 0; i < this.row.t_task_task_rel.length; i+=1) {
+      //         infos.push(this.row.t_task_task_rel[i]);
+      //       }
+      //     }
+      //     return infos;
+      //   } else {
+      //     return [];
+      //   }
+      // }
+    },
+    updated: function () {
+      //autosize.update($("textarea"))
     }
+
     //,
     //methods: {
     //  //toggleDescriptionEdit : function() {
@@ -889,38 +1020,5 @@
     //  //  }
     //  //}
     //},
-    //computed: {
-    //  //markedDescription: function () {
-    //  //  if(this.row) {
-    //  //    return marked(this.row.description);
-    //  //  } else {
-    //  //    return "";
-    //  //  }
-    //  //},
-    //  //taskRelation : function() {
-    //  //  if(this.row !== null) {
-    //  //    var infos = [];
-    //  //    if(this.row.parent_task != null) {
-    //  //      infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
-    //  //    }
-    //  //    if(this.row.children_all && this.row.children_all.length > 0) {
-    //  //      for(var i = 0; i < this.row.children_all.length; i+=1) {
-    //  //        infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.children_all[i].task_cd2, t_task : this.row.children_all[i], rel_type : "TR03CH"});
-    //  //      }
-    //  //    }
-    //  //    if(this.row.t_task_task_rel != null) {
-    //  //      for(var i = 0; i < this.row.t_task_task_rel.length; i+=1) {
-    //  //        infos.push(this.row.t_task_task_rel[i]);
-    //  //      }
-    //  //    }
-    //  //    return infos;
-    //  //  } else {
-    //  //    return [];
-    //  //  }
-    //  //}
-    //},
-    //updated: function () {
-    //  //autosize.update($("textarea"))
-    //}
   });
 </script>

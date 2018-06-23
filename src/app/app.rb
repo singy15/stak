@@ -36,6 +36,11 @@ get '/view/workplan' do
   typeSvc = TypeSvc.new()
   @key_value_user = typeSvc.kv_user()
   @key_value_work_type = typeSvc.kv_work_type()
+  @key_value_task_status_type = typeSvc.kv_task_status()
+  @key_value_task_type = typeSvc.kv_task_type()
+  @key_value_task_priority_type = typeSvc.kv_task_priority()
+  @key_value_task_task_relation_type = typeSvc.kv_task_task_relation()
+  @key_value_solution = typeSvc.kv_solution()
 
   @view_content = erb :part_workplan
   erb :template
@@ -442,7 +447,7 @@ post '/workplans', provides: :json do
   if(task.length == 0) 
     task = TTask.new()
 
-    task["task_cd"] = svc.fetch_new_cd("00")
+    task["task_cd"] = svc.fetch_new_cd(target["solution_cd"])
     task["created"] = Time.now
     task["updated"] = Time.now
     task["created_by"] = ""
@@ -451,10 +456,11 @@ post '/workplans', provides: :json do
     task = task[0]
   end
 
-  task["solution_cd"] = "00"
-  task["task_type"] =  "TS01NW"
+  task["solution_cd"] = target["solution_cd"]
+  # task["task_type"] = "TT01TS"
+  task["task_type"] = target["task_type"]
   task["name"] = target["name"]
-  task["status_type"] =  "TT01TS"
+  task["status_type"] = "TS01NW"
   task["priority_type"] = "TP03NM"
   task["description"] = ""
   task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
@@ -462,11 +468,12 @@ post '/workplans', provides: :json do
   task["path"] = ""
   task["start_dt"] = target["start_date"]
   task["end_dt"] = target["end_date"]
-  if target["task_cd"] != nil
+  if ((target["task_cd"] != nil) && (target["task_cd"] != ""))
     task.sort_order = target["sort_order"]
   end
   task["progress"] = target["progress"]
-  task["user_cd"] = "001"
+  task["user_cd"] = target["user_cd"]
+  task["description"] = target["description"]
 
   task.save()
   if(task.parent_cd != "")
