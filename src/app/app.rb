@@ -484,7 +484,8 @@ post '/workplans', provides: :json do
 
   {success: true, message: "Register success", data: task}.to_json
 
-  target.to_json()
+  # target.to_json()
+  task.to_json()
 end
 
 delete '/workplans/:cd' do

@@ -301,9 +301,18 @@
           //   vue[propNameSelectedRow] = fnNewRecord();
           // }
           console.log("deleted");
+
+          var sPos = gantt.getScrollState(); // {x:58,y:180}
+          var posX = sPos.x;
+          var posY = sPos.y;
           gantt.deleteTask(vue.row.task_cd);
-          loadTask();
-          vue.row = newRecord();
+
+          loadTask(function() {
+            gantt.scrollTo(posX,posY);
+            vue.row = newRecord();
+          });
+
+
         },
         // error: defaultUpdtErrorCallback,
         dataType: "json"
@@ -324,10 +333,22 @@
           //   treegrid.treegrid("reload");
           //   vue[propNameSelectedRow] = fnNewRecord();
           // }
-          if(id !== "") {
-            loadTask(function() { gantt.selectTask(id); });
+            console.log("comp");
+            console.log(data);
+          if((id !== "") && (id != null)) {
+            var sPos = gantt.getScrollState(); // {x:58,y:180}
+            var posX = sPos.x;
+            var posY = sPos.y;
+            loadTask(function() { 
+              gantt.selectTask(id); 
+              // gantt.showTask(id); 
+              gantt.scrollTo(posX,posY);
+            });
           } else {
-            loadTask();
+            loadTask(function() {
+              gantt.selectTask(data.task_cd); 
+              gantt.showTask(data.task_cd); 
+            });
           }
         },
         // error: defaultUpdtErrorCallback,
@@ -347,6 +368,12 @@
 
       gantt.config.keep_grid_width = false;
       gantt.config.grid_resize = true;
+
+  // gantt.config.duration_unit = "hour";
+  // gantt.config.work_time = true; 
+  // gantt.config.skip_off_time = true; 
+  // gantt.setWorkTime({ hours:[9,18] });
+
       gantt.init("gantt_here");
       loadTask();
     });
@@ -376,6 +403,12 @@
 
           gantt.config.keep_grid_width = false;
           gantt.config.grid_resize = true;
+
+  // gantt.config.duration_unit = "hour";
+  // gantt.config.work_time = true; 
+  // gantt.config.skip_off_time = true; 
+  // gantt.setWorkTime({ hours:[9,18] });
+
           gantt.init("gantt_here");
           loadTask();
         },
@@ -612,6 +645,12 @@
 	gantt.config.grid_resize = true;
   gantt.config.row_height = 20;
   gantt.config.open_tree_initially = true;
+
+  // gantt.config.duration_unit = "hour";
+  // gantt.config.work_time = true; 
+  // gantt.config.skip_off_time = true; 
+  // gantt.setWorkTime({ hours:[9,18] });
+
   // gantt.config.autosize = "y";
 
   gantt.config.start_date = moment().add(-2,"months");
@@ -638,7 +677,6 @@
 	gantt.config.date_scale = "%F, %Y";
 
   gantt.config.min_column_width = 36;
-  // gantt.config.min_column_width = 36;
 	gantt.config.scale_height = 50;
 
   gantt.config.order_branch = true;
@@ -860,10 +898,22 @@
         //   vue[propNameSelectedRow] = fnNewRecord();
         // }
 
-        if(id !== "") {
-          loadTask(function() { gantt.selectTask(id); });
+        if((id !== "") && (id != null)) {
+          var sPos = gantt.getScrollState(); // {x:58,y:180}
+          var posX = sPos.x;
+          var posY = sPos.y;
+          loadTask(function() { 
+            gantt.selectTask(id); 
+            // gantt.showTask(id); 
+            gantt.scrollTo(posX,posY);
+          });
+          console.log("task selecting");
         } else {
-          loadTask();
+          loadTask(function() {
+            gantt.selectTask(data.task_cd); 
+            gantt.showTask(data.task_cd); 
+          });
+          console.log("task not selecting");
         }
 
 
