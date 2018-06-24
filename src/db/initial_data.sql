@@ -2,6 +2,7 @@
 -- c_numbering
 DELETE FROM c_numbering;
 INSERT INTO c_numbering (numbering_type,parent_cd,seq,max_seq,cd_len) VALUES ('UR','',1,999,3);
+INSERT INTO c_numbering (numbering_type,parent_cd,seq,max_seq,cd_len) VALUES ('SL','',1,99,2);
 
 -- c_type
 DELETE FROM c_type;
@@ -53,5 +54,9 @@ INSERT INTO c_code_def (code_type,cd_len,max_seq) VALUES ('TK','4','9999');
 -- c_version
 DELETE FROM c_version;
 INSERT INTO c_version (version) VALUES ('1');
+
+-- t_solution
+DELETE FROM t_solution;
+INSERT INTO t_solution (solution_cd,name,status_type,name) VALUES ('01','DEFAULT','SS02AC');
 
 
