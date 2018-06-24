@@ -70,7 +70,7 @@ PName=c_version
 LName=c_version
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1050
 Top=1300
 Field="version","version","integer","NOT NULL",0,"1","",$FFFFFFFF,""
@@ -78,7 +78,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20180623161035
-Position="Main",1050,1300,230,73
+Position="MAIN",1050,1300,230,73
 
 [Entity]
 PName=t_workplan
@@ -652,12 +652,14 @@ Field="start_date","start_date","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFF
 Field="duration","duration","*gen_gantt_duration","NOT NULL",,"1","",$FFFFFFFF,""
 Field="progress","progress","*gen_gantt_progress","NOT NULL",,"0.0","",$FFFFFFFF,""
 Field="user_cd","user_cd","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="sort_order","sort_order","bigint","NOT NULL",,"to_number(to_char(now(), \qYYMMDDHH24MISSMSUS\q),\q9999999999999999999\q)","",$FFFFFFFF,""
+Field="sort_order_dbl","sort_order_dbl","numeric","NOT NULL",,"to_number(to_char(now(), \qYYMMDDHH24MISSMSUS\q),\q9999999999999999999\q)","",$FFFFFFFF,""
 Index==1,solution_cd,task_cd
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20180623154630
-Position="MAIN",1400,750,364,431
+ModifiedDateTime=20180624183938
+Position="MAIN",1400,750,364,478
 
 [Entity]
 PName=t_solution

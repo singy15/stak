@@ -40,5 +40,13 @@ update t_task set progress = 0.0;
 alter table t_task alter progress set default 0.0;
 alter table t_task alter progress set not null;
 
+alter table t_task add sort_order_dbl numeric;
+update t_task set sort_order_dbl = sort_order;
+alter table t_task alter sort_order_dbl set default to_number(to_char(now(), 'YYMMDDHH24MISSMSUS'),'9999999999999999999');
+alter table t_task alter sort_order_dbl set not null;
+
+alter table t_task alter sort_order type numeric;
+
+
 update c_version set version = '1';
 

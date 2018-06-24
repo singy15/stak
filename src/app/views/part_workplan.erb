@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="/lib/gantt/codebase/skins/dhtmlxgantt_meadow.css?v=20180227">
 <script src="/lib/gantt/codebase/ext/dhtmlxgantt_marker.js"></script>
 <script src="/lib/gantt/codebase/ext/dhtmlxgantt_tooltip.js"></script>
+<script type="text/javascript" src="/lib/decimal.min.js"> </script>
 
 <style type="text/css">
    .weekend{ background: #888888!important; color:white !important;}
@@ -775,56 +776,123 @@
 
   gantt.attachEvent("onRowDragEnd", function(id, target) {
 
-    var task1Row = gantt.getTask(id);
-    var task2Row = gantt.getTask(target);
-    var task1 = {
-      task_cd : task1Row["id"]
-      ,task_cd2 : task1Row.task_cd2
-      ,start_date : moment(task1Row.start_date).format('DD-MM-YYYY HH:mm')
-      ,end_date : moment(task1Row.end_date).format('DD-MM-YYYY HH:mm')
-      ,progress : task1Row.progress
-      ,user_cd : task1Row.user_cd
-      ,name : task1Row.name
-      ,parent_cd : task1Row.parent_cd
-      ,sort_order : task2Row.sort_order
-      ,work_type : task1Row.work_type
-      ,description : task1Row.description
+    console.log("id",id);
+    console.log("target",target);
+
+    var index = gantt.getTaskIndex(target);
+    var up = gantt.getTaskByIndex(index-2);
+    var drag = gantt.getTask(id);
+    var down = gantt.getTask(target);
+
+    var upOrder = new Decimal(up.sort_order);
+    var downOrder = new Decimal(down.sort_order);
+    var dragOrder = upOrder.add(downOrder).div(2.0).toNumber();
+    var updt = {
+      task_cd : drag["id"]
+      ,task_cd2 : drag.task_cd2
+      ,start_date : moment(drag.start_date).format('DD-MM-YYYY HH:mm')
+      ,end_date : moment(drag.end_date).format('DD-MM-YYYY HH:mm')
+      ,progress : drag.progress
+      ,user_cd : drag.user_cd
+      ,name : drag.name
+      ,parent_cd : drag.parent_cd
+      ,sort_order : dragOrder
+      ,work_type : drag.work_type
+      ,solution_cd : drag.solution_cd
+      ,task_type : drag.task_type
+      ,description : drag.description
+      ,priority_type : drag.priority_type
+      ,status_type : drag.status_type
     };
-    var task2 = {
-      task_cd : task2Row["id"]
-      ,task_cd2 : task2Row.task_cd2
-      ,start_date : moment(task2Row.start_date).format('DD-MM-YYYY HH:mm')
-      ,end_date : moment(task2Row.end_date).format('DD-MM-YYYY HH:mm')
-      ,progress : task2Row.progress
-      ,user_cd : task2Row.user_cd
-      ,name : task2Row.name
-      ,parent_cd : task2Row.parent_cd
-      ,sort_order : task1Row.sort_order
-      ,work_type : task2Row.work_type
-      ,description : task2Row.description
-    };
+
+
+
+
+    // var task1Row = gantt.getTask(id);
+    // var task2Row = gantt.getTask(target);
+    // var task1 = {
+    //   task_cd : task1Row["id"]
+    //   ,task_cd2 : task1Row.task_cd2
+    //   ,start_date : moment(task1Row.start_date).format('DD-MM-YYYY HH:mm')
+    //   ,end_date : moment(task1Row.end_date).format('DD-MM-YYYY HH:mm')
+    //   ,progress : task1Row.progress
+    //   ,user_cd : task1Row.user_cd
+    //   ,name : task1Row.name
+    //   ,parent_cd : task1Row.parent_cd
+    //   ,sort_order : task2Row.sort_order
+    //   ,work_type : task1Row.work_type
+    //   ,solution_cd : task1Row.solution_cd
+    //   ,task_type : task1Row.task_type
+    //   ,description : task1Row.description
+    //   ,priority_type : task1Row.priority_type
+    //   ,status_type : task1Row.status_type
+    // };
+    // var task2 = {
+    //   task_cd : task2Row["id"]
+    //   ,task_cd2 : task2Row.task_cd2
+    //   ,start_date : moment(task2Row.start_date).format('DD-MM-YYYY HH:mm')
+    //   ,end_date : moment(task2Row.end_date).format('DD-MM-YYYY HH:mm')
+    //   ,progress : task2Row.progress
+    //   ,user_cd : task2Row.user_cd
+    //   ,name : task2Row.name
+    //   ,parent_cd : task2Row.parent_cd
+    //   ,sort_order : task1Row.sort_order
+    //   ,work_type : task2Row.work_type
+    //   ,solution_cd : task2Row.solution_cd
+    //   ,task_type : task2Row.task_type
+    //   ,description : task2Row.description
+    //   ,priority_type : task2Row.priority_type
+    //   ,status_type : task2Row.status_type
+    // };
+
+
+    // $.when(
+    //   $.ajax({
+    //     type: "POST",
+    //     url: "/workplans",
+    //     data: JSON.stringify(task1),
+    //     success: function(data, dataType) { 
+    //       // defaultUpdtSuccessCallback(data, dataType);
+
+    //       // if(data.success) {
+    //       //   treegrid.treegrid("reload");
+    //       //   vue[propNameSelectedRow] = fnNewRecord();
+    //       // }
+    //     },
+    //     // error: defaultUpdtErrorCallback,
+    //     dataType: "json"
+    //   })
+    //   ,
+    //   $.ajax({
+    //     type: "POST",
+    //     url: "/workplans",
+    //     data: JSON.stringify(task2),
+    //     success: function(data, dataType) { 
+    //       // defaultUpdtSuccessCallback(data, dataType);
+
+    //       // if(data.success) {
+    //       //   treegrid.treegrid("reload");
+    //       //   vue[propNameSelectedRow] = fnNewRecord();
+    //       // }
+    //     },
+    //     // error: defaultUpdtErrorCallback,
+    //     dataType: "json"
+    //   })
+    // )
+    // .done(function(data_a, data_b) {
+    //       loadTask();
+    //       vue.row = newRecord();
+    // })
+    // .fail(function() {
+    //     console.log('error');
+    // });
 
 
     $.when(
       $.ajax({
         type: "POST",
         url: "/workplans",
-        data: JSON.stringify(task1),
-        success: function(data, dataType) { 
-          // defaultUpdtSuccessCallback(data, dataType);
-
-          // if(data.success) {
-          //   treegrid.treegrid("reload");
-          //   vue[propNameSelectedRow] = fnNewRecord();
-          // }
-        },
-        // error: defaultUpdtErrorCallback,
-        dataType: "json"
-      }),
-      $.ajax({
-        type: "POST",
-        url: "/workplans",
-        data: JSON.stringify(task2),
+        data: JSON.stringify(updt),
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
 
@@ -844,6 +912,7 @@
     .fail(function() {
         console.log('error');
     });
+
 
   });
 
