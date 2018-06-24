@@ -262,31 +262,8 @@ post '/unlink/task_task' do
   {success: true, message: "Link success.", data: target}.to_json
 end
 
-get '/workplans' do
-  # workplan = JSON.parse(TWorkplan.json(TWorkplan.all))
-  # workplan.each do |r|
-  #   r["id"] = r["work_plan_cd"]
-  #   if(r["parent_cd"] != "") 
-  #     r["parent"] = r["parent_cd"]
-  #   end
-  #   r["open"] = true
-  # end
-  # TWorkplan.json(workplan)
- 
+def select_workplans_by_task(hideClosed)
   con = ActiveRecord::Base.connection
-  # from t_workplan
-  # sql = ""
-  # sql += "select"
-  # sql += " pl.*,"
-  # sql += " pl.work_plan_cd as id,"
-  # sql += " pl.parent_cd as parent,"
-  # sql += " case when pl.task_cd <> '' then ts.name else pl.name end as text"
-  # sql += " from t_workplan pl"
-  # sql += " left join t_task ts"
-  # sql += " on pl.task_cd = ts.task_cd"
-  # sql += " order by sort_order asc"
-
-  # from t_task
   sql = ""
   sql += "select"
   sql += " pl.*,"
@@ -299,13 +276,110 @@ get '/workplans' do
   sql += " end_dt as end_date,"
   sql += " pl.sort_order as sort_order"
   sql += " from t_task pl"
+  if(hideClosed)
+    sql += " where pl.status_type <> 'TS06CL'"
+  end
   sql += " order by pl.sort_order asc"
-  p "*** sql ***"
-  rows = con.select_all(sql).to_hash
-  rows.to_json(:include => {:user_info => {}})
-
-  # TWorkplan.all().to_json(include: :parent)
+  rows = con.select_all(sql)
+  rows
 end
+
+get '/workplans' do
+  # # workplan = JSON.parse(TWorkplan.json(TWorkplan.all))
+  # # workplan.each do |r|
+  # #   r["id"] = r["work_plan_cd"]
+  # #   if(r["parent_cd"] != "") 
+  # #     r["parent"] = r["parent_cd"]
+  # #   end
+  # #   r["open"] = true
+  # # end
+  # # TWorkplan.json(workplan)
+ 
+  # con = ActiveRecord::Base.connection
+  # # from t_workplan
+  # # sql = ""
+  # # sql += "select"
+  # # sql += " pl.*,"
+  # # sql += " pl.work_plan_cd as id,"
+  # # sql += " pl.parent_cd as parent,"
+  # # sql += " case when pl.task_cd <> '' then ts.name else pl.name end as text"
+  # # sql += " from t_workplan pl"
+  # # sql += " left join t_task ts"
+  # # sql += " on pl.task_cd = ts.task_cd"
+  # # sql += " order by sort_order asc"
+
+  # # from t_task
+  # sql = ""
+  # sql += "select"
+  # sql += " pl.*,"
+  # sql += " task_cd as id,"
+  # sql += " task_cd as work_plan_cd,"
+  # sql += " parent_cd as parent,"
+  # sql += " pl.name as text,"
+  # sql += " pl.name as name,"
+  # sql += " start_dt as start_date,"
+  # sql += " end_dt as end_date,"
+  # sql += " pl.sort_order as sort_order"
+  # sql += " from t_task pl"
+  # sql += " order by pl.sort_order asc"
+  # p "*** sql ***"
+  # rows = con.select_all(sql).to_hash
+  # rows.to_json(:include => {:user_info => {}})
+
+  # # TWorkplan.all().to_json(include: :parent)
+  
+  rows = select_workplans_by_task(true)
+  rows.to_json(:include => {:user_info => {}})
+end
+
+get '/workplans/with_closed' do
+  # # workplan = JSON.parse(TWorkplan.json(TWorkplan.all))
+  # # workplan.each do |r|
+  # #   r["id"] = r["work_plan_cd"]
+  # #   if(r["parent_cd"] != "") 
+  # #     r["parent"] = r["parent_cd"]
+  # #   end
+  # #   r["open"] = true
+  # # end
+  # # TWorkplan.json(workplan)
+ 
+  # con = ActiveRecord::Base.connection
+  # # from t_workplan
+  # # sql = ""
+  # # sql += "select"
+  # # sql += " pl.*,"
+  # # sql += " pl.work_plan_cd as id,"
+  # # sql += " pl.parent_cd as parent,"
+  # # sql += " case when pl.task_cd <> '' then ts.name else pl.name end as text"
+  # # sql += " from t_workplan pl"
+  # # sql += " left join t_task ts"
+  # # sql += " on pl.task_cd = ts.task_cd"
+  # # sql += " order by sort_order asc"
+
+  # # from t_task
+  # sql = ""
+  # sql += "select"
+  # sql += " pl.*,"
+  # sql += " task_cd as id,"
+  # sql += " task_cd as work_plan_cd,"
+  # sql += " parent_cd as parent,"
+  # sql += " pl.name as text,"
+  # sql += " pl.name as name,"
+  # sql += " start_dt as start_date,"
+  # sql += " end_dt as end_date,"
+  # sql += " pl.sort_order as sort_order"
+  # sql += " from t_task pl"
+  # sql += " order by pl.sort_order asc"
+  # p "*** sql ***"
+  # rows = con.select_all(sql).to_hash
+  # rows.to_json(:include => {:user_info => {}})
+
+  # # TWorkplan.all().to_json(include: :parent)
+  
+  rows = select_workplans_by_task(false)
+  rows.to_json(:include => {:user_info => {}})
+end
+
 
 post '/workplans', provides: :json do
   #  # svc = TaskSvc.new()
@@ -460,8 +534,8 @@ post '/workplans', provides: :json do
   # task["task_type"] = "TT01TS"
   task["task_type"] = target["task_type"]
   task["name"] = target["name"]
-  task["status_type"] = "TS01NW"
-  task["priority_type"] = "TP03NM"
+  task["status_type"] = target["status_type"]
+  task["priority_type"] = target["priority_type"]
   task["description"] = ""
   task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
   task["root_parent_cd"] = ""

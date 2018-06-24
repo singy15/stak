@@ -66,19 +66,20 @@
    th {
     width : 20px;
    }
-
-   .
+   
 </style>
 
 
 <div class="easyui-panel" style="width:100%;margin-bottom:5px;">
   <div id="gantt_here" style='width:100%; height:400px;'></div>
 </div>
+<div id="vue-main" class="vue-component">
 <span class="icon icon-calendar" id="btnScaleDay" style="cursor: pointer"></span>
 <span class="icon icon-clock" id="btnScaleHour" style="cursor: pointer"></span>
+<input type="checkbox" style="width:12px;height:12px" id="cbHideClosed" v-model="hideClosed">
+<label for="cbHideClosed" style="font-size:0.5em; vertical-align:middle;">{{ (hideClosed)? "HIDE CLOSED" : "SHOW CLOSED" }}</label>
 <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
   <!-- Set to width:100% cause overflow when toggle sidebar -->
-<div id="vue-main" class="vue-component">
   <table class="input-table" style="width:95%"> 
     <tr>
       <th width="100px">Task CD</th>
@@ -120,6 +121,26 @@
       <td>
         <select name="category" v-model="row.user_cd">
           <option v-for="category in key_value_user" :value="category.value">
+            {{ category.text }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th>Priority</th>
+      <td>
+        <select name="category" v-model="row.priority_type">
+          <option v-for="category in key_value_task_priority_type" :value="category.value">
+            {{ category.text }}
+          </option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th>Status</th>
+      <td>
+        <select name="category" v-model="row.status_type">
+          <option v-for="category in key_value_task_status_type" :value="category.value">
             {{ category.text }}
           </option>
         </select>
@@ -257,6 +278,10 @@
   $(document).ready(function() {
     // autosize($('textarea'));
 
+    // $("#cbHideClosed").click(function() {
+    // 
+    // });
+
     // $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
     $("#progress").slider({
       onChange : function(newval, oldval) {
@@ -389,7 +414,8 @@
 
       $.ajax({
         type: "GET",
-        url: "/workplans",
+        // url: "/workplans",
+        url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
         data: JSON.stringify({}),
         success: function(data, dataType) { 
           // var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").toDate();
@@ -455,6 +481,8 @@
           ,solution_cd : task1Row.solution_cd
           ,task_type : task1Row.task_type
           ,description : task1Row.description
+          ,priority_type : task1Row.priority_type
+          ,status_type : task1Row.status_type
         };
         var task2 = {
           task_cd : task2Row["id"]
@@ -470,6 +498,8 @@
           ,solution_cd : task2Row.solution_cd
           ,task_type : task2Row.task_type
           ,description : task2Row.description
+          ,priority_type : task2Row.priority_type
+          ,status_type : task2Row.status_type
         };
 
 
@@ -558,6 +588,7 @@
     });
 
 
+    loadTask();
   });
   </script>
 
@@ -835,6 +866,8 @@
       ,solution_cd : item.solution_cd
       ,task_type : item.task_type
       ,description : item.description
+      ,priority_type : item.priority_type
+      ,status_type : item.status_type
     };
     vue.row = vueRow;
   });
@@ -857,6 +890,8 @@
       ,solution_cd : item.solution_cd
       ,task_type : item.task_type
       ,description : item.description
+      ,priority_type : item.priority_type
+      ,status_type : item.status_type
     };
     vue.row = vueRow;
   });
@@ -884,6 +919,8 @@
       ,solution_cd : item.solution_cd
       ,task_type : item.task_type
       ,description : item.description
+      ,priority_type : item.priority_type
+      ,status_type : item.status_type
     };
     var id = item["id"];
     $.ajax({
@@ -937,12 +974,13 @@
     });
   });
 
-  loadTask();
+  // loadTask();
 
   function loadTask(postLoad) {
     $.ajax({
       type: "GET",
-      url: "/workplans",
+      // url: "/workplans",
+      url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
       data: JSON.stringify({}),
       success: function(data, dataType) { 
         // defaultUpdtSuccessCallback(data, dataType);
@@ -1002,7 +1040,9 @@
       work_type : "WT01PL",
       solution_cd : "01",
       task_type : "TT01TS",
-      description : ""
+      description : "",
+      priority_type : "TP03NM",
+      status_type : "TS01NW"
     };
   }
   //
@@ -1053,12 +1093,25 @@
       //multiRowSelected : false,
       //rowSelections : null,
       showDescriptionView : false,
-      currentParentCd : ""
+      currentParentCd : "",
+      hideClosed : true
       //relTaskCd : "",
       //relType : "TR01RR",
       //contextRow : null
     },
+    watch: {
+        hideClosed: 'loadByChecked'
+    },
+    // methods: {
+    //     foo: function(){
+    //         alert(this.test);
+    //     }
+    // }
+
     methods: {
+      loadByChecked : function() {
+        loadTask();
+      },
       toggleDescriptionEdit : function() {
         this.showDescriptionView = !(this.showDescriptionView);
       }
