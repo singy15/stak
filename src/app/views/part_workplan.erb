@@ -78,6 +78,8 @@
 <span class="icon icon-clock" id="btnScaleHour" style="cursor: pointer"></span>
 <input type="checkbox" style="width:12px;height:12px" id="cbHideClosed" v-model="hideClosed">
 <label for="cbHideClosed" style="font-size:0.5em; vertical-align:middle;">{{ (hideClosed)? "HIDE CLOSED" : "SHOW CLOSED" }}</label>
+<input type="checkbox" style="width:12px;height:12px" id="cbFixedHeight" v-model="fixedHeight">
+<label for="cbFixedHeight" style="font-size:0.5em; vertical-align:middle;">{{ (fixedHeight)? "FIXED HEIGHT" : "AUTO HEIGHT" }}</label>
 <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
   <!-- Set to width:100% cause overflow when toggle sidebar -->
   <table class="input-table" style="width:95%"> 
@@ -1094,13 +1096,15 @@
       //rowSelections : null,
       showDescriptionView : false,
       currentParentCd : "",
-      hideClosed : true
+      hideClosed : true,
+      fixedHeight : true
       //relTaskCd : "",
       //relType : "TR01RR",
       //contextRow : null
     },
     watch: {
-        hideClosed: 'loadByChecked'
+      hideClosed: 'loadByChecked',
+      fixedHeight: 'loadByChangeHeight'
     },
     // methods: {
     //     foo: function(){
@@ -1110,6 +1114,18 @@
 
     methods: {
       loadByChecked : function() {
+        loadTask();
+      },
+      loadByChangeHeight : function() {
+        if(vue.fixedHeight) {
+          gantt.config.autosize = false;
+        } else {
+          gantt.config.autosize = "y";
+        }
+        gantt.init("gantt_here");
+        if(vue.fixedHeight) {
+          $("#gantt_here").css("height", "400px")
+        }
         loadTask();
       },
       toggleDescriptionEdit : function() {
