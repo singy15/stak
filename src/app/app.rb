@@ -2,13 +2,14 @@
 # Requires
 require 'sinatra'
 require './const.rb'
-require './service.rb'
+# require './service/*.rb'
+Dir[File.dirname(__FILE__) + '/service/*.rb'].each {|file| require file }
 require './db_setting.rb'
 
 configure :development do |c| 
   require 'sinatra/reloader' 
   c.also_reload "./const.rb" 
-  c.also_reload "./service.rb" 
+  c.also_reload "./service/*.rb" 
   c.also_reload "./db_setting.rb"
   # c.also_reload "./controllers/*.rb" 
   # c.also_reload "./init/*.rb" 
@@ -83,6 +84,37 @@ end
 get '/users' do
   userSvc = UserSvc.new()
   userSvc.select_all()
+end
+
+post '/users', provides: :json do
+  svc = UserSvc.new()
+
+  target = JSON.parse(request.body.read)
+
+  if (target["name"] == nil) || (target["name"] == "")
+    return {success: false, message: "User name should not be blank.", data: target}.to_json
+  end
+
+  p target
+  user = MUser.where(user_cd: target["user_cd"])
+
+  if(user.length == 0) 
+    user = MUser.new()
+
+    user["user_cd"] = svc.fetch_new_cd()
+    user["created"] = Time.now
+    user["updated"] = Time.now
+    user["created_by"] = ""
+    user["updated_by"] = ""
+  else
+    user = user[0]
+  end
+
+  user["name"] = target["name"]
+
+  user.save()
+
+  {success: true, message: "Register success", data: user}.to_json
 end
 
 get '/tasks' do
@@ -567,3 +599,4 @@ delete '/workplans/:cd' do
   TTask.destroy(params[:cd])
   {success: true, message: "Register success", data: {}}.to_json
 end
+

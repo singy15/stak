@@ -48,7 +48,7 @@
 
 <div id="vue-main" class="vue-component">
   <div class="easyui-panel" style="width:100%;margin-bottom:5px;">
-    <div id="dg" class="easyui-datagrid" style="width:100%"></div>
+    <div id="dg" class="easyui-treegrid" style="width:100%"></div>
   </div>
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
     <!-- Set to width:100% cause overflow when toggle sidebar -->
@@ -198,18 +198,18 @@
   //    }
   //  });
 
-  //  $("#btnRegister").click(function() {
-  //    if(vue.multiRowSelected) {
-  //      batchUpd(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
-  //    } else {
-  //      singleInsUpd(vue, "row", $("#dg"), newRecord, "tasks");
-  //    }
-  //  });
+    $("#btnRegister").click(function() {
+      // if(vue.multiRowSelected) {
+      //   batchUpd(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
+      // } else {
+        singleInsUpd(vue, "row", $("#dg"), newRecord, "users");
+      // }
+    });
 
-    $("#dg").datagrid({
+    $("#dg").treegrid({
       url : '/users',
       method : 'get',
-      sortName : "name",
+      // sortName : "user_cd",
       multiSort : true,
       remoteSort : true,
       ctrlSelect : true,
@@ -217,6 +217,7 @@
       pagination : true,
       rownumbers:true,
       filterDelay : 700,
+      idField : "user_cd",
       columns : [[
         {field : 'user_cd', title : 'User CD', width : 90, sortable : true},
         {field : 'name', title : 'Name', width: 200, sortable : true},
@@ -225,7 +226,7 @@
         {field : 'updated', title : 'Updated', sortable : true},
         {field : 'updated_by', title : 'Updated by', sortable : true}
       ]],
-      onClickRow : function(index,row) {
+      onClickRow : function(row) {
         //if($("#dg").treegrid("getSelections").length > 1) {
         //  vue.multiRowSelected = true;
         //  vue.row = blankRecordForBatchUpdate();
