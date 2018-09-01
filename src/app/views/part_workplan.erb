@@ -8,67 +8,7 @@
 <script src="/lib/gantt/codebase/ext/dhtmlxgantt_marker.js"></script>
 <script src="/lib/gantt/codebase/ext/dhtmlxgantt_tooltip.js"></script>
 
-<style type="text/css">
-   .weekend{ background: #888888!important; color:white !important;}
-   .gantt_add {display:none;}
-   .gantt_grid_head_cell.gantt_grid_head_add.gantt_last_cell {
-     display:none;
-   }
-   .gantt_tree_icon.gantt_folder_open {
-     background-image:url("/img/stack.png")
-   }
-   .gantt_tree_icon.gantt_folder_closed {
-     background-image:url("/img/stack.png")
-   }
-   .gantt_tree_icon.gantt_file {
-     background-image:url("/img/task.png")
-   }
-   .gantt_marker .gantt_marker_content {
-     font-size : x-small;
-     line-height : 5px;
-   }
-   .gantt_marker {
-     background-color : rgba(255, 0, 0, 0.2)
-   }
-   .task_actual{
-     background:#ffc0cb;
-     border-color:#db7093;
-   }
-	 .task_actual .gantt_task_progress{
-	 	 background:#f08080;
-	 }
-   .task_project{
-     background:#d4dfff;
-     border-color:#647bbc;
-   }
-	 .task_project .gantt_task_progress{
-	 	 background:#91a4d9;
-	 }
-
-   .slider-rulelabel > span {
-     font-size: 0.5em;
-   }
-
-   .slider-inner > span {
-     font-size: 0.5em;
-   }
-
-   .slider-handle {
-     background-size: 14px 14px;
-     margin-left: -7px;;
-     margin-top: -7px;;
-   }
-
-   .gantt_tooltip {
-    z-index : 0;
-   }
-
-   th {
-    width : 20px;
-   }
-   
-</style>
-
+<link rel="stylesheet" type="text/css" href="/css/workplan.css">
 
 <div class="easyui-panel" style="width:100%;margin-bottom:5px;">
   <div id="gantt_here" style='width:100%; height:400px;'></div>
@@ -89,10 +29,6 @@
         <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span>
       </td>
     </tr>
-    <!-- <tr> --> 
-    <!--   <th>Task CD</th> --> 
-    <!--   <td><input v-model="row.task_cd2" type="text" style="width:80px"></td> --> 
-    <!-- </tr> --> 
     <tr>
       <th>Name</th>
       <td><input v-model="row.name" type="text" style="width:100%"></td>
@@ -149,8 +85,6 @@
       </td>
     </tr>
     <tr>
-      <!-- <th>Start date</th> -->
-      <!-- <td><input v-model="row.start_date" type="text" style="width:140px"></td> -->
       <th>Term</th>
       <td>
         <input id="dpStart" class="easyui-datetimebox" style="width:145px;">
@@ -158,11 +92,6 @@
         <input id="dpEnd" class="easyui-datetimebox" style="width:145px;">
       </td>
     </tr>
-    <!-- <tr> -->
-    <!--   <th>End date</th> -->
-      <!-- <td><input v-model="row.end_date" type="text" style="width:140px"></td> -->
-      <!-- <td><input id="dpEnd" class="easyui-datetimebox" style="width:200px;"></td> -->
-      <!-- </tr> -->
     <tr>
       <th>Progress</th>
       <!-- <td><input v-model="row.progress" type="text" style="width:140px"></td> -->
@@ -222,61 +151,10 @@
   </div>
 </div>
 
+<script type="text/javascript" src="/js/ex_datetimebox.js"></script>
+<script type="text/javascript" src="/js/core_util.js"></script>
+
   <script>
-
-  // $.fn.datebox.defaults.formatter = function(date){
-  //   return moment(date).format("DD-MM-YYYY h:m");
-  //   // var y = date.getFullYear();
-  //   // var m = date.getMonth()+1;
-  //   // var d = date.getDate();
-  //   // var h = date.getHours();
-  //   // var mm = date.getMinutes();
-  //   // return m+'/'+d+'/'+y + " " + h +":"+ mm;
-  // }
-
-  $.fn.datetimebox.defaults.formatter = function(date){
-    return moment(date).format("DD-MM-YYYY HH:mm");
-    // var y = date.getFullYear();
-    // var m = date.getMonth()+1;
-    // var d = date.getDate();
-    // var h = date.getHours();
-    // var mm = date.getMinutes();
-    // return m+'/'+d+'/'+y + " " + h +":"+ mm;
-  }
-  $.fn.datetimebox.defaults.parser = function(date){
-    var m = moment(date, "DD-MM-YYYY HH:mm");
-    if(m.isValid()) {
-      return m.toDate();
-    } else {
-      return moment().startOf('day').toDate();
-    }
-
-    // var y = date.getFullYear();
-    // var m = date.getMonth()+1;
-    // var d = date.getDate();
-    // var h = date.getHours();
-    // var mm = date.getMinutes();
-    // return m+'/'+d+'/'+y + " " + h +":"+ mm;
-  }
-
-  function execCopy(string){
-    var temp = document.createElement('div');
-
-    temp.appendChild(document.createElement('pre')).textContent = string;
-
-    var s = temp.style;
-    s.position = 'fixed';
-    s.left = '-100%';
-
-    document.body.appendChild(temp);
-    document.getSelection().selectAllChildren(temp);
-
-    var result = document.execCommand('copy');
-
-    document.body.removeChild(temp);
-    return result;
-  }
-
   $(document).ready(function() {
     // autosize($('textarea'));
 
@@ -1269,3 +1147,7 @@
     //},
   });
 </script>
+
+<script src="/js/workplan.js"></script>
+
+
