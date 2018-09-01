@@ -30,6 +30,8 @@ Domain=gen_flag=boolean
 Domain=gen_gantt_date_str=varchar(10)
 Domain=gen_gantt_duration=integer
 Domain=gen_gantt_progress=numeric
+Domain=long_text_content=text
+Domain=version_string=text
 LogicalView=1
 DecodeDomain=0
 ViewModePageIndividually=1
@@ -70,15 +72,15 @@ PName=c_version
 LName=c_version
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1050
 Top=1300
-Field="version","version","integer","NOT NULL",0,"1","",$FFFFFFFF,""
+Field="version","version","*version_string","NOT NULL",0,"1","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20180623161035
-Position="Main",1050,1300,230,73
+ModifiedDateTime=20180901122934
+Position="MAIN",1050,1300,230,51
 
 [Entity]
 PName=t_workplan
@@ -641,7 +643,7 @@ Field="task_cd","task_cd","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
 Field="task_type","task_type","*gen_type","NOT NULL",,"","",$FFFFFFFF,""
 Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
 Field="status_type","status_type","*gen_type","NOT NULL",,"\qTS-NW\q","",$FFFFFFFF,""
-Field="description","description","*text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="description","description","*long_text_content","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="start_dt","start_dt","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="end_dt","end_dt","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFFFFFFF,""
 Field="priority_type","priority_type","*gen_type","NOT NULL",,"\qTP-NM\q","",$FFFFFFFF,""
@@ -656,7 +658,7 @@ Index==1,solution_cd,task_cd
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20180623154630
+ModifiedDateTime=20180901121728
 Position="MAIN",1400,750,364,431
 
 [Entity]
