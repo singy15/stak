@@ -2,15 +2,16 @@
 # Requires
 require 'sinatra'
 require './const.rb'
-# require './service/*.rb'
 Dir[File.dirname(__FILE__) + '/service/*.rb'].each {|file| require file }
 require './db_setting.rb'
+Dir[File.dirname(__FILE__) + '/entity/*.rb'].each {|file| require file }
 
 configure :development do |c| 
   require 'sinatra/reloader' 
   c.also_reload "./const.rb" 
   c.also_reload "./service/*.rb" 
   c.also_reload "./db_setting.rb"
+  c.also_reload "./entity/*.rb"
   # c.also_reload "./controllers/*.rb" 
   # c.also_reload "./init/*.rb" 
 end
