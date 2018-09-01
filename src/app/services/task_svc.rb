@@ -1,5 +1,15 @@
 
-class TaskSvc
+class TaskSvc < BaseSvc
+  def initialize()
+    super()
+    @entity = TTask
+    @numbering_type = 'TK'
+  end
+
+  def fetch_new_cd(solution_cd)
+    super(solution_cd)
+  end
+
   def recursive_get_parent_cd(cds, task)
     if task["parent_cd"] != ""
       cds << task["parent_cd"]
@@ -335,13 +345,5 @@ class TaskSvc
     recursive_path_update(task.task_cd, task.children_all)
   end
 
-  def fetch_new_cd(solution_cd)
-    ActiveRecord::Base.connection.select_value(
-      ActiveRecord::Base.send(
-        :sanitize_sql_array,
-        [ 'select sp_numbering(:numbering_type, :parent_cd)', 
-          numbering_type: 'TK',
-          parent_cd: solution_cd]))
-  end
 end
 

@@ -182,21 +182,19 @@
   $(document).ready(function() {
   //  autosize($('textarea'));
 
-  //  $("#btnNew").click(function() {
-  //    singleNew(vue, "row", $("#dg"), newRecord, "multiRowSelected");
-  //  });
+    $("#btnNew").click(function() {
+      singleNew(vue, "row", $("#dg"), newRecord);
+    });
 
-  //  $("#btnCopy").click(function() {
-  //    singleNew(vue, "row", $("#dg"), copyRecord, "multiRowSelected");
-  //  });
+    $("#btnCopy").click(function() {
+      singleCopy(vue, "row", $("#dg"), copyRecord);
+    });
 
-  //  $("#btnDelete").click(function() {
-  //    if(vue.multiRowSelected) {
-  //      batchDel(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
-  //    } else if(vue.row.task_cd !== "") {
-  //      singleDel(vue, "tasks", "row", "task_cd", $("#dg"), newRecord);
-  //    }
-  //  });
+    $("#btnDelete").click(function() {
+      if(vue.row.user_cd !== "") {
+        singleDel(vue, "users", "row", "user_cd", $("#dg"), newRecord);
+      }
+    });
 
     $("#btnRegister").click(function() {
       // if(vue.multiRowSelected) {
@@ -269,20 +267,14 @@
       updated_by : ""
     };
   }
-//
-//  function copyRecord() {
-//    var source = vue.row;
-//    var record = newRecord();
-//    record.solution_cd = source.solution_cd;
-//    record.task_cd = null;
-//    record.task_type = source.task_type;
-//    record.name = source.name;
-//    record.status_type = "TS01NW";
-//    record.priority_type = source.priority_type;
-//    record.description = source.description;
-//    record.parent_cd = source.parent_cd;
-//    return record;
-//  }
+
+  function copyRecord() {
+    var source = vue.row;
+    var record = newRecord();
+    record.user_cd = "";
+    record.name = source.name;
+    return record;
+  }
 //
 //
 //  function blankRecordForBatchUpdate() {

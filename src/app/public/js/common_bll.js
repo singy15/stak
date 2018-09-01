@@ -131,12 +131,16 @@ function batchManualUpd(partUrl, treegrid, rows, diff) {
 function singleNew(vue, propNameSelected, treegrid, fnNewRecord, propNameMultiRowSelected) {
   vue[propNameSelected] = fnNewRecord();
   treegrid.treegrid("clearSelections");
-  vue[propNameMultiRowSelected] = false;
+  if(propNameMultiRowSelected) {
+    vue[propNameMultiRowSelected] = false;
+  }
 }
 
 function singleCopy(vue, propNameSelected, treegrid, fnCopyRecord, propNameMultiRowSelected) {
   vue[propNameSelected] = fnCopyRecord();
   treegrid.treegrid("clearSelections");
-  vue[propNameMultiRowSelected] = false;
+  if(propNameMultiRowSelected) {
+    vue[propNameMultiRowSelected] = false;
+  }
 }
 
