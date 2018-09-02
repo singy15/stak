@@ -113,11 +113,11 @@
       </tr>
       <tr>
         <th>Created</th>
-        <td><span>{{row.created_by}}</span><span>&nbsp;</span><span>{{row.created}}</span></td>
+        <td><span>{{row.created_by}}</span><span>&nbsp;</span><span>{{formatterDatetime(row.created)}}</span></td>
       </tr>
       <tr>
         <th>Updated</th>
-        <td><span>{{row.updated_by}}</span><span>&nbsp;</span><span>{{row.updated}}</span></td>
+        <td><span>{{row.updated_by}}</span><span>&nbsp;</span><span>{{formatterDatetime(row.updated)}}</span></td>
       </tr>
       <tr>
         <th>Parent</th>
@@ -181,6 +181,10 @@
     return function(value,row,index) { return kv[row[col]]; }
   }
 
+  function formatterDatetime(value, row, index) {
+    return moment(value).format("YYYY/MM/DD HH:mm:ss");
+  }
+
   $(document).ready(function() {
     autosize($('textarea'));
 
@@ -227,6 +231,7 @@
         var tg = $("#dg");
         singleInsUpd(vue, "row", tg, newRecord, "tasks", function(data) {
           if(isInsert) {
+            tg.treegrid("reload");
             vue.reloadTask(data.data.task_cd);
             /* Filter by task_cd.
             var filter = tg.treegrid("getFilterComponent", "task_cd");
@@ -295,10 +300,10 @@
         {field : 'task_type', title : 'Type', width : 90,  sortable : true, formatter: mapper("task_type", <%= @key_value_task_type %>), hidden:true},
         {field : 'status_type', title : 'Status', width: 110,sortable : true, formatter: mapper("status_type", <%= @key_value_task_status_type %>)},
         {field : 'priority_type', title : 'Priority', width: 110,sortable : true, formatter: mapper("priority_type", <%= @key_value_task_priority_type %>)},
-        {field : 'description', title : 'Description', sortable : true},
-        {field : 'created', title : 'Created', sortable : true},
+        {field : 'description', title : 'Description', width: 500, sortable : true},
+        {field : 'created', title : 'Created', sortable : true, formatter: formatterDatetime},
         {field : 'created_by', title : 'Created by', sortable : true},
-        {field : 'updated', title : 'Updated', sortable : true},
+        {field : 'updated', title : 'Updated', sortable : true, formatter: formatterDatetime},
         {field : 'updated_by', title : 'Updated by', sortable : true}
       ]],
       rowStyler: function(row){
@@ -727,6 +732,10 @@
         if(relType == "TR03CH") {
           return "icon icon-arrow-down-right";
         }
+      },
+      formatterDatetime : function(value) {
+        var m = moment(value);
+        return (m.isValid())? m.format("YYYY/MM/DD HH:mm:ss") : "";
       }
     },
     computed: {
