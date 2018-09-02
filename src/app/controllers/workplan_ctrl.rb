@@ -105,7 +105,9 @@ post '/workplans', provides: :json do
 end
 
 delete '/workplans/:cd' do
-  # TWorkplan.destroy(params[:cd])
-  TTask.destroy(params[:cd])
-  {success: true, message: "Register success", data: {}}.to_json
+  taskSvc = TaskSvc.new()
+  taskSvc.delete_by_cd(params[:cd])
+  {success: true, message: "Delete success", data: nil}.to_json
 end
+
+
