@@ -63,6 +63,12 @@ post '/batch/tasks' do
     if((target["diff"]["priority_type"] != nil) && (target["diff"]["priority_type"] != ""))
       task.priority_type = target["diff"]["priority_type"]
     end
+    if((target["diff"]["start_dt"] != nil) && (target["diff"]["start_dt"] != ""))
+      task.start_dt = target["diff"]["start_dt"]
+    end
+    if((target["diff"]["end_dt"] != nil) && (target["diff"]["end_dt"] != ""))
+      task.end_dt = target["diff"]["end_dt"]
+    end
     task.save()
   end
 
@@ -104,6 +110,8 @@ post '/tasks', provides: :json do
   task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
   task["root_parent_cd"] = ""
   task["path"] = ""
+  task["start_dt"] = target["start_dt"]
+  task["end_dt"] = target["end_dt"]
 
   task.save()
   if(task.parent_cd != "")

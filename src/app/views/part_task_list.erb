@@ -104,6 +104,14 @@
         </td>
       </tr>
       <tr>
+        <th>Term</th>
+        <td>
+          <input id="dpStart" class="easyui-datetimebox" style="width:145px;">
+          <span> --- </span>
+          <input id="dpEnd" class="easyui-datetimebox" style="width:145px;">
+        </td>
+      </tr>
+      <tr>
         <th>Created</th>
         <td><span>{{row.created_by}}</span><span>&nbsp;</span><span>{{row.created}}</span></td>
       </tr>
@@ -158,6 +166,10 @@
     <input id="btnDelete" type="button" value="Delete" class="input-register"/>
   </div>
 </div>
+
+<script type="text/javascript" src="/js/ex_datetimebox.js"></script>
+<script type="text/javascript" src="/js/core_util.js"></script>
+
 <script type="text/javascript">
   function mapper(field, map) {
     var col = field;
@@ -171,6 +183,24 @@
 
   $(document).ready(function() {
     autosize($('textarea'));
+
+    $("#dpStart").datetimebox({
+      onChange: function(newval, oldval) {
+        vue.row.start_dt = newval;
+      }
+    });
+
+    $("#dpEnd").datetimebox({
+      onChange: function(newval, oldval) {
+        vue.row.end_dt = newval;
+        console.log("dp change");
+        console.log(vue.row);
+      }
+    });
+
+    $("#dpStart").datetimebox("setValue", moment().format("DD-MM-YYYY HH:mm"));
+    $("#dpEnd").datetimebox("setValue", moment().add(7,"days").format("DD-MM-YYYY HH:mm"));
+
 
     $("#btnNew").click(function() {
       singleNew(vue, "row", $("#dg"), newRecord, "multiRowSelected");
@@ -537,7 +567,9 @@
       created_by : "",
       updated: "",
       updated_by : "",
-      parent_cd : ""
+      parent_cd : "",
+      start_dt : moment().format("DD-MM-YYYY HH:mm"),
+      end_dt : moment().add(7,"days").format("DD-MM-YYYY HH:mm"),
     };
   }
 
@@ -552,6 +584,8 @@
     record.priority_type = source.priority_type;
     record.description = source.description;
     record.parent_cd = source.parent_cd;
+    record.start_dt = source.start_dt;
+    record.end_dt = source.end_dt;
     return record;
   }
 
@@ -569,7 +603,9 @@
       created_by : "",
       updated: "",
       updated_by : "",
-      parent_cd : ""
+      parent_cd : "",
+      start_dt : "",
+      end_dt : ""
     };
   }
 
@@ -696,6 +732,9 @@
     },
     updated: function () {
       autosize.update($("textarea"))
+
+      $("#dpStart").datetimebox("setValue", vue.row.start_dt);
+      $("#dpEnd").datetimebox("setValue",  vue.row.end_dt);
     }
   });
 </script>
