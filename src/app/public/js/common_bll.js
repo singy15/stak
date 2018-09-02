@@ -48,17 +48,20 @@ function defaultUpdtErrorCallback(XMLHttpRequest, textStatus, errorThrown) {
   messageUpdateError(errorThrown.message);
 }
 
-function singleInsUpd(vue, propNameSelectedRow, treegrid, fnNewRecord, partUrl) {
+function singleInsUpd(vue, propNameSelectedRow, treegrid, fnNewRecord, partUrl, after) {
   $.ajax({
     type: "POST",
     url: "/"+partUrl,
     data: JSON.stringify(vue[propNameSelectedRow]),
     success: function(data, dataType) { 
       defaultUpdtSuccessCallback(data, dataType);
-
       if(data.success) {
-        treegrid.treegrid("reload");
         vue[propNameSelectedRow] = fnNewRecord();
+        if(after) {
+          after(data);
+        } else {
+          treegrid.treegrid("reload");
+        }
       }
     },
     error: defaultUpdtErrorCallback,

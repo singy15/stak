@@ -17,3 +17,7 @@ function execCopy(string){
   return result;
 }
 
+String.prototype.isEmpty = function() {
+  return (this === "") || (this === undefined) || (this == null);
+}
+

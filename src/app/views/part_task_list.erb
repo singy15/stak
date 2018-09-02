@@ -222,7 +222,36 @@
       if(vue.multiRowSelected) {
         batchUpd(vue, "row", "rowSelections", $("#dg"), newRecord, "tasks");
       } else {
-        singleInsUpd(vue, "row", $("#dg"), newRecord, "tasks");
+        var task_cd = vue.row.task_cd;
+        var isInsert = (task_cd === "") || (task_cd == null) || (task_cd === undefined);
+        var tg = $("#dg");
+        singleInsUpd(vue, "row", tg, newRecord, "tasks", function(data) {
+          if(isInsert) {
+            vue.reloadTask(data.data.task_cd);
+            /* Filter by task_cd.
+            var filter = tg.treegrid("getFilterComponent", "task_cd");
+            tg.datagrid('removeFilterRule', "task_cd");
+            tg.datagrid('addFilterRule', {
+                field: "task_cd",
+                op: 'contains',
+                value: data.data.task_cd
+            });
+            tg.treegrid('doFilter');
+
+            // var cd = data.data.task_cd;
+            //$("#dg").treegrid("clearSelections");
+            //$("#dg").treegrid("selectRecord", cd);
+            // $("#dg").treegrid("select", cd);
+            // var row = $("#dg").treegrid("getSelected");
+            // vue.multiRowSelected = false;
+            // vue.row = $.extend(true, {}, row);
+
+            // tg.treegrid("selectAll");
+            */
+          } else {
+            tg.treegrid("reload");
+          }
+        });
       }
     });
 
