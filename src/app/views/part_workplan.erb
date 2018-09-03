@@ -156,7 +156,7 @@
 
   <script>
   $(document).ready(function() {
-    // autosize($('textarea'));
+    autosize($('textarea'));
 
     // $("#cbHideClosed").click(function() {
     // 
@@ -1063,7 +1063,7 @@
       // }
     },
     updated: function () {
-      //autosize.update($("textarea"))
+      autosize.update($("textarea"))
       $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
       // $("#dpStart").datetimebox("setValue", moment(vue.row.start_date, "DD-MM-YYYY HH:mm").format("MM/DD/YYYY HH:mm:ss"));
       $("#dpStart").datetimebox("setValue", vue.row.start_date);
