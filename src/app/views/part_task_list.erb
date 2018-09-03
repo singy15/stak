@@ -104,6 +104,16 @@
         </td>
       </tr>
       <tr>
+        <th>Assigned to</th>
+        <td>
+          <select name="category" v-model="row.user_cd">
+            <option v-for="category in key_value_user" :value="category.value">
+              {{ category.text }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
         <th>Term</th>
         <td>
           <input id="dpStart" class="easyui-datetimebox" style="width:145px;">
@@ -604,6 +614,7 @@
       parent_cd : "",
       start_dt : moment().format("DD-MM-YYYY HH:mm"),
       end_dt : moment().add(7,"days").format("DD-MM-YYYY HH:mm"),
+      user_cd : "000"
     };
   }
 
@@ -620,6 +631,7 @@
     record.parent_cd = source.parent_cd;
     record.start_dt = source.start_dt;
     record.end_dt = source.end_dt;
+    record.user_cd = source.user_cd;
     return record;
   }
 
@@ -639,7 +651,8 @@
       updated_by : "",
       parent_cd : "",
       start_dt : "",
-      end_dt : ""
+      end_dt : "",
+      user_cd : ""
     };
   }
 
@@ -651,6 +664,7 @@
       key_value_task_priority_type : <%= @key_value_task_priority_type %>,
       key_value_solution : <%= @key_value_solution %>,
       key_value_task_task_relation_type : <%= @key_value_task_task_relation_type %>,
+      key_value_user : <%= @key_value_user %>,
       row: newRecord(),
       descContent : "",
       multiRowSelected : false,

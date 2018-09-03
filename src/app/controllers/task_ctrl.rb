@@ -4,6 +4,7 @@ get '/view/tasks' do
   @view_subtitle = ""
 
   typeSvc = TypeSvc.new()
+  @key_value_user = typeSvc.kv_user()
   @key_value_task_status_type = typeSvc.kv_task_status()
   @key_value_task_type = typeSvc.kv_task_type()
   @key_value_task_priority_type = typeSvc.kv_task_priority()
@@ -112,6 +113,7 @@ post '/tasks', provides: :json do
   task["path"] = ""
   task["start_dt"] = target["start_dt"]
   task["end_dt"] = target["end_dt"]
+  task["user_cd"] = target["user_cd"]
 
   task.save()
   if(task.parent_cd != "")

@@ -42,6 +42,7 @@ class TypeSvc
   def kv_user()
     MUser
       .all
+      .order("user_cd")
       .map { |r| {value: r["user_cd"], text: r["name"]} }
       .to_json
   end
