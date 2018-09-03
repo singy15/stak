@@ -14,6 +14,7 @@
   <div id="gantt_here" style='width:100%; height:400px;'></div>
 </div>
 <div id="vue-main" class="vue-component">
+<span class="icon icon-spinner9" id="btnRefresh" style="cursor: pointer"></span>
 <span class="icon icon-calendar" id="btnScaleDay" style="cursor: pointer"></span>
 <span class="icon icon-clock" id="btnScaleHour" style="cursor: pointer"></span>
 <input type="checkbox" style="width:12px;height:12px" id="cbHideClosed" v-model="hideClosed">
@@ -259,6 +260,10 @@
         // error: defaultUpdtErrorCallback,
         dataType: "json"
       });
+    });
+
+    $("#btnRefresh").click(function() {
+      loadTask();
     });
 
     $("#btnScaleDay").click(function() {
