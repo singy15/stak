@@ -27,7 +27,8 @@
       <div class="field_container">
         <div class="field_header">Task CD</div>
         <div class="field_value">
-          <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span>
+          <!-- <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span> -->
+          <input v-model="dispTaskCd" type="text" style="width:80px" readonly>
         </div>
       </div>
 
@@ -1039,6 +1040,9 @@
         } else {
           return "";
         }
+      },
+      dispTaskCd: function() {
+        return (this.row.task_cd)? this.row.task_cd : "NEW";
       }
       //,
       // taskRelation : function() {
