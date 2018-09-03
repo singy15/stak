@@ -25,3 +25,29 @@ select {
   height : 24px;
   width : 120px;
 }
+
+.field_header {
+  font-weight: bold;
+  width: 100px;
+  /*display: inline-block;*/
+  display: flex;
+  background-color: #DDD;
+  align-items: center;
+  margin-right: 2px;
+}
+
+.field_value {
+  width: 200px;
+  display: flex;
+  /*display: inline-block;*/
+  align-items: center;
+}
+
+.field_container {
+  width: 400px;
+  /*display: inline-block;*/
+  height: 24px;
+  display: flex;
+  padding: 0px;
+  margin-bottom: 2px;
+}
