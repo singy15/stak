@@ -23,8 +23,42 @@
 
 <script type="text/javascript" src="/js/ex_datetimebox.js"></script>
 <script type="text/javascript" src="/js/core_util.js"></script>
+<script type="text/javascript" src="/js/domain/base_domain.js"></script>
+<script type="text/javascript" src="/js/domain/workplan_domain.js"></script>
 
-  <script>
+<script>
+  var domain = new WorkplanDomain();
+
+  function daysStyle(date){
+      var dateToStr = gantt.date.date_to_str("%D");
+      if (dateToStr(date) == "Sun"||dateToStr(date) == "Sat")  return "weekend";
+      return "";
+  };
+
+  function getSubScale(scale) {
+    if(scale === "day") {
+      return [
+        {unit: "day", step: 1, date: "%d", css: daysStyle}
+      ];
+    } else {
+      return [
+        {unit: "day", step:1,date:"%d",css:daysStyle},
+        {unit: "hour", step: 1, date: "%G", css: daysStyle},
+        {unit: "minute", step: 30, date: " ", css: daysStyle}
+      ];
+    }
+  }
+
+  function initGantt(id, subScale, startDate, endDate, minColumnWidth) {
+    gantt.config.subscales = subScale;
+    gantt.config.start_date = startDate;
+    gantt.config.end_date = endDate;
+    gantt.config.min_column_width = minColumnWidth;
+    gantt.config.keep_grid_width = false;
+    gantt.config.grid_resize = true;
+    gantt.init(id);
+  }
+
   $(document).ready(function() {
     autosize($('textarea'));
 
@@ -47,14 +81,15 @@
     });
 
     $("#dpStart").datetimebox("setValue", moment().format("DD-MM-YYYY HH:mm"));
+
     $("#dpEnd").datetimebox("setValue", moment().add(7,"days").format("DD-MM-YYYY HH:mm"));
 
     $("#btnNew").click(function() {
-      vue.row = newRecord();
+      vue.row = domain.getNewRecord();
     });
 
     $("#btnCopy").click(function() {
-      vue.row.task_cd = "";
+      vue.row = domain.copyRecord(vue.row);
     });
 
     $("#btnDelete").click(function() {
@@ -79,7 +114,7 @@
 
           loadTask(function() {
             gantt.scrollTo(posX,posY);
-            vue.row = newRecord();
+            vue.row = domain.getNewRecord();
           });
 
 
@@ -131,55 +166,26 @@
     });
 
     $("#btnScaleDay").click(function() {
-      gantt.config.subscales = [
-        {unit: "day", step: 1, date: "%d", css: daysStyle}
-      ];
-      gantt.config.start_date = moment().add(-2,"months").startOf("day");
-      gantt.config.end_date = moment().add(4,"months").startOf("day");
-      gantt.config.min_column_width = 36;
-
-      gantt.config.keep_grid_width = false;
-      gantt.config.grid_resize = true;
-
-      gantt.init("gantt_here");
+      var st = moment().add(-2,"months").startOf("day");
+      var ed = moment().add(4,"months").startOf("day");
+      initGantt("gantt_here", getSubScale("day"), st, ed, 36);
       loadTask();
     });
 
     $("#btnScaleHour").click(function() {
-      gantt.config.subscales = [
-        {unit: "day", step:1,date:"%d",css:daysStyle},
-        // {unit: "hour", step: 1, date: "%H", css: daysStyle}
-        {unit: "hour", step: 1, date: "%G", css: daysStyle},
-        {unit: "minute", step: 30, date: " ", css: daysStyle}
-      ];
-
-
       $.ajax({
         type: "GET",
-        // url: "/workplans",
         url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
         data: JSON.stringify({}),
         success: function(data, dataType) { 
-          // var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").toDate();
           var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
-          // var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").toDate();
           var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
-
-          gantt.config.start_date = st;
-          gantt.config.end_date = ed;
-          gantt.config.min_column_width = 18;
-
-          gantt.config.keep_grid_width = false;
-          gantt.config.grid_resize = true;
-
-          gantt.init("gantt_here");
+          initGantt("gantt_here", getSubScale("hour"), st, ed, 18);
           loadTask();
         },
         // error: defaultUpdtErrorCallback,
         dataType: "json"
       });
-
-
     });
 
     function swapSortOrder(isUp, id, parentId) {
@@ -274,7 +280,6 @@
         )
         .done(function(data_a, data_b) {
           loadTask(function() { gantt.selectTask(targetId); });
-          // vue.row = newRecord();
         })
         .fail(function() {
             console.log('error');
@@ -305,10 +310,10 @@
 
     loadTask();
   });
-  </script>
+</script>
 
 
-  <script>
+<script>
 
   var lastScrollPos = null;
 
@@ -333,12 +338,6 @@
 	// 	]
 	// };
 
-  function daysStyle(date){
-      var dateToStr = gantt.date.date_to_str("%D");
-      if (dateToStr(date) == "Sun"||dateToStr(date) == "Sat")  return "weekend";
-   
-      return "";
-  };
 
 	var tasks = {
 		data: [
@@ -410,12 +409,8 @@
     var text = "";
     text += "<b>Solution: </b>" + (mapper("solution_cd", <%= @key_value_solution %>))(task) + "<br>";
     text += "<b>Task CD: </b>" + task.task_cd + "<br>";
-    // text += "<b>Assigned to: </b>" + (mapper("user_cd", <%= @key_value_user %>))(task) + "<br>";
-    // text += "<b>Progress: </b>" + Math.round(task.progress * 100.0) + "%<br>";
-    // text += "<b>Task type: </b>" + (mapper("task_type", <%= @key_value_task_type %>))(task) + "<br>";
     text += "<b>Name: </b>" + task.name + "<br>";
     text += "<b>Description: </b><br>";
-    // text += '<textarea>' +  task.description + '</textarea>' + "<br>";
     text += '<div style="padding:5px">'+marked(task.description)+'</div>';
     return text;
   };
@@ -450,20 +445,8 @@
   //  group_text: "label"
   //});
 
-  //gantt.config.start_date = new Date(2017, 11, 01);
-  //gantt.config.end_date = new Date(2018, 2, 01);
-  //gantt.config.scale_unit = "day"; 
-  //gantt.config.fit_tasks = false; 
-  //gantt.config.date_scale = "Week #%W";
 
 	gantt.templates.task_class = function(start, end, obj){
-    // if(obj.work_type === "WT01PL") {
-    //   return "";
-    // } else if(obj.work_type == "WT02AC") {
-    //   return "task_actual";
-    // } else if(obj.work_type == "WT03PJ") {
-    //   return "task_project";
-    // }
     if(obj.task_type === "TT01TS") {
       return "";
     } else if(obj.task_type == "TT02BG") {
@@ -555,7 +538,7 @@
     )
     .done(function(data_a, data_b) {
           loadTask();
-          vue.row = newRecord();
+          vue.row = domain.getNewRecord();
     })
     .fail(function() {
         console.log('error');
@@ -692,12 +675,9 @@
     });
   });
 
-  // loadTask();
-
   function loadTask(postLoad) {
     $.ajax({
       type: "GET",
-      // url: "/workplans",
       url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
       data: JSON.stringify({}),
       success: function(data, dataType) { 
@@ -708,12 +688,11 @@
         //   vue[propNameSelectedRow] = fnNewRecord();
         // }
 
-        var x = {
+        gantt.clearAll(); 
+        gantt.parse({
           data:data,
           links:[]
-        };
-        gantt.clearAll(); 
-        gantt.parse(x);
+        });
         if(lastScrollPos) {
           gantt.scrollTo(lastScrollPos, null);
         } else {
@@ -740,30 +719,9 @@
         date.getFullYear()
         ].join( '-' );
   }
-  </script>
+</script>
 
 <script>
-  function newRecord() {
-    return { 
-      task_cd : null,
-      task_cd2 : "",
-      parent_cd : "",
-      start_date : moment().format("DD-MM-YYYY HH:mm"),
-      end_date : moment().add(7,"days").format("DD-MM-YYYY HH:mm"),
-      progress : 0.0,
-      user_cd : "000",
-      name : "",
-      parent_cd : "",
-      sort_order : 0,
-      work_type : "WT01PL",
-      solution_cd : "01",
-      task_type : "TT01TS",
-      description : "",
-      priority_type : "TP03NM",
-      status_type : "TS01NW"
-    };
-  }
-
   var vue = new Vue({
     el: '#vue-main',
     data: {
@@ -774,7 +732,7 @@
       key_value_task_task_relation_type : <%= @key_value_task_task_relation_type %>,
       key_value_user : <%= @key_value_user %>,
       key_value_work_type : <%= @key_value_work_type %>,
-      row: newRecord(),
+      row: domain.getNewRecord(),
       showDescriptionView : false,
       currentParentCd : "",
       hideClosed : true,
@@ -819,9 +777,7 @@
     updated: function () {
       autosize.update($("textarea"))
       $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
-      // $("#dpStart").datetimebox("setValue", moment(vue.row.start_date, "DD-MM-YYYY HH:mm").format("MM/DD/YYYY HH:mm:ss"));
       $("#dpStart").datetimebox("setValue", vue.row.start_date);
-      // $("#dpEnd").datetimebox("setValue",  moment(vue.row.end_date, "DD-MM-YYYY HH:mm").format("MM/DD/YYYY HH:mm:ss"));
       $("#dpEnd").datetimebox("setValue",  vue.row.end_date);
     }
   });
