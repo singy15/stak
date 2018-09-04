@@ -1,12 +1,8 @@
 
 
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<title>Basic initialization</title>
 
-<script src="/lib/gantt/codebase/dhtmlxgantt.js?v=20180227"></script>
-<link rel="stylesheet" href="/lib/gantt/codebase/skins/dhtmlxgantt_meadow.css?v=20180227">
-<script src="/lib/gantt/codebase/ext/dhtmlxgantt_marker.js"></script>
-<script src="/lib/gantt/codebase/ext/dhtmlxgantt_tooltip.js"></script>
+<%= erb :part_gantt_include %>
 
 <link rel="stylesheet" type="text/css" href="/css/workplan.css">
 
@@ -14,138 +10,14 @@
   <div id="gantt_here" style='width:100%; height:400px;'></div>
 </div>
 <div id="vue-main" class="vue-component">
-  <span class="icon icon-spinner9" id="btnRefresh" style="cursor: pointer"></span>
-  <span class="icon icon-calendar" id="btnScaleDay" style="cursor: pointer"></span>
-  <span class="icon icon-clock" id="btnScaleHour" style="cursor: pointer"></span>
-  <input type="checkbox" style="width:12px;height:12px" id="cbHideClosed" v-model="hideClosed">
-  <label for="cbHideClosed" style="font-size:0.5em; vertical-align:middle;">{{ (hideClosed)? "HIDE CLOSED" : "SHOW CLOSED" }}</label>
-  <input type="checkbox" style="width:12px;height:12px" id="cbFixedHeight" v-model="fixedHeight">
-  <label for="cbFixedHeight" style="font-size:0.5em; vertical-align:middle;">{{ (fixedHeight)? "FIXED HEIGHT" : "AUTO HEIGHT" }}</label>
+  <%= erb :part_workplan_toolbar %>
+
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
-    <!-- Set to width:100% cause overflow when toggle sidebar -->
-    <div style="display:flex;flex-flow: column nowrap;">
-      <div class="field_container">
-        <div class="field_header">Task CD</div>
-        <div class="field_value">
-          <!-- <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span> -->
-          <input v-model="dispTaskCd" type="text" style="width:80px" readonly>
-        </div>
-      </div>
-
-      <div class="field_container" style="width: 1000px">
-        <div class="field_header">Name</div>
-      </div>
-
-      <div class="field_container" style="width:100%;">
-        <div class="field_value" style="width:100%;">
-          <input v-model="row.name" type="text" style="width:100%">
-        </div>
-      </div>
-
-      <div class="field_container" style="width: 800px">
-        <div class="field_header">Solution</div>
-        <div class="field_value">
-          <select name="category" v-model="row.solution_cd">
-            <option v-for="category in key_value_solution" :value="category.value">
-              {{ category.text }}
-            </option>
-          </select>
-        </div>
-        <div class="field_header">Type</div>
-        <div class="field_value">
-          <select name="category" v-model="row.task_type">
-            <option v-for="category in key_value_task_type" :value="category.value">
-              {{ category.text }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field_container" style="width: 800px">
-        <div class="field_header">Assigned to</div>
-        <div class="field_value">
-          <select name="category" v-model="row.user_cd">
-            <option v-for="category in key_value_user" :value="category.value">
-              {{ category.text }}
-            </option>
-          </select>
-        </div>
-        <div class="field_header">Priority</div>
-        <div class="field_value">
-          <select name="category" v-model="row.priority_type">
-            <option v-for="category in key_value_task_priority_type" :value="category.value">
-              {{ category.text }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field_container" style="width: 1000px">
-        <div class="field_header">Status</div>
-        <div class="field_value">
-          <select name="category" v-model="row.status_type">
-            <option v-for="category in key_value_task_status_type" :value="category.value">
-              {{ category.text }}
-            </option>
-          </select>
-        </div>
-        <div class="field_header">Term</div>
-        <div class="field_value" style="width:500px">
-          <input id="dpStart" class="easyui-datetimebox" style="width:145px;">
-          <span> --- </span>
-          <input id="dpEnd" class="easyui-datetimebox" style="width:145px;">
-        </div>
-      </div>
-
-      <div class="field_container" style="width: 800px;height:55px;">
-        <div class="field_header" style="">Progress</div>
-        <div class="field_value" style="width:500px;">
-          <input class="easyui-slider" id="progress" style="width:300px;" 
-                 data-options="showTip:true, rule: [0,'|',25,'|',50,'|',75,'|',100], step: 5">
-        </div>
-      </div>
-
-      <div class="field_container">
-        <div class="field_header">Parent CD</div>
-        <div class="field_value">
-          <input v-model="row.parent_cd" type="text" style="width:140px">
-          <span class="icon icon-copy" id="btnCopyTaskCd" style="cursor: pointer;font-size:16px"></span>
-          <span class="icon icon-paste" id="btnPasteTaskCd" style="cursor: pointer;font-size:16px"></span>
-        </div>
-      </div>
-
-      <div class="field_container">
-        <div class="field_header">Description</div>
-        <div class="field_value">
-          <span class="icon icon-pencil" v-on:click="toggleDescriptionEdit"></span>
-        </div>
-      </div>
-
-      <div class="field_container" style="width:100%;height:auto" v-show="showDescriptionView">
-        <div class="field_value" style="width:100%">
-          <textarea v-show="showDescriptionView" id="taDesc" v-model="row.description" type="text" style="width:100%"> </textarea>
-        </div>
-      </div>
-
-      <div class="field_container" style="width:100%;height:auto">
-        <div class="field_value" style="width:100%">
-          <div class="easyui-panel descriptionView" v-html="markedDescription" style="padding:5px;width:100%;"> 
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <%= erb :part_workplan_form %>
   </div>
+
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
-    <input id="btnRegister" type="button" value="Register" class="input-register"/>
-    <input id="btnNew" type="button" value="New" class="input-register"/>
-    <input id="btnCopy" type="button" value="Copy" class="input-register"/>
-    <input id="btnDelete" type="button" value="Delete" class="input-register"/>
-    <!-- <input id="btnScaleDay" type="button" value="Scale Day" class="input-register"/> -->
-    <!-- <input id="btnScaleHour" type="button" value="Scale Hour" class="input-register"/> -->
-    <input id="btnSortUp" type="button" value="UP" class="input-register"/>
-    <input id="btnSortDown" type="button" value="DOWN" class="input-register"/>
-    <!-- <input id="btnCopyWorkNo" type="button" value="Copy WkNo" class="input-register"/> -->
+    <%= erb :part_basic_control %>
   </div>
 </div>
 
@@ -156,11 +28,6 @@
   $(document).ready(function() {
     autosize($('textarea'));
 
-    // $("#cbHideClosed").click(function() {
-    // 
-    // });
-
-    // $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
     $("#progress").slider({
       onChange : function(newval, oldval) {
         vue.row.progress = newval / 100.0;
@@ -267,19 +134,12 @@
       gantt.config.subscales = [
         {unit: "day", step: 1, date: "%d", css: daysStyle}
       ];
-      // gantt.config.start_date = moment().add(-2,"months");
       gantt.config.start_date = moment().add(-2,"months").startOf("day");
-      // gantt.config.end_date = moment().add(4,"months");
       gantt.config.end_date = moment().add(4,"months").startOf("day");
       gantt.config.min_column_width = 36;
 
       gantt.config.keep_grid_width = false;
       gantt.config.grid_resize = true;
-
-  // gantt.config.duration_unit = "hour";
-  // gantt.config.work_time = true; 
-  // gantt.config.skip_off_time = true; 
-  // gantt.setWorkTime({ hours:[9,18] });
 
       gantt.init("gantt_here");
       loadTask();
@@ -311,11 +171,6 @@
 
           gantt.config.keep_grid_width = false;
           gantt.config.grid_resize = true;
-
-  // gantt.config.duration_unit = "hour";
-  // gantt.config.work_time = true; 
-  // gantt.config.skip_off_time = true; 
-  // gantt.setWorkTime({ hours:[9,18] });
 
           gantt.init("gantt_here");
           loadTask();
@@ -431,34 +286,12 @@
     }
 
     $("#btnSortUp").click(function() {
-      //console.log("up");
-      //var index = gantt.getTaskIndex(vue.row.task_cd);
-      //var children = gantt.getChildren(vue.row.parent_cd);
-      //if(index > 0) {
-      //  console.log("can move up");
-      //  var row = children[index];
-      //  var target = children[index-1];
-      //  console.log("swap", row, target);
-      //}
       swapSortOrder(true, vue.row.task_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
     });
 
     $("#btnSortDown").click(function() {
-      //console.log("down");
-      //var index = gantt.getTaskIndex(vue.row.task_cd);
-      //var children = gantt.getChildren(vue.row.parent_cd);
-      //if(index < (children.length - 1)) {
-      //  console.log("can move down");
-      //  var row = children[index];
-      //  var target = children[index+1];
-      //  console.log("swap", row, target);
-      //}
       swapSortOrder(false, vue.row.task_cd, (vue.row.parent_cd !== "")? vue.row.parent_cd : 0);
     });
-
-    // $("#btnCopyWorkNo").click(function() {
-    //   execCopy(vue.row.task_cd);
-    // });
 
     $("#btnCopyTaskCd").click(function() {
       vue.currentParentCd = vue.row.task_cd;
@@ -930,38 +763,6 @@
       status_type : "TS01NW"
     };
   }
-  //
-  //function copyRecord() {
-  //  var source = vue.row;
-  //  var record = newRecord();
-  //  record.solution_cd = source.solution_cd;
-  //  record.task_cd2 = null;
-  //  record.task_type = source.task_type;
-  //  record.name = source.name;
-  //  record.status_type = "TS01NW";
-  //  record.priority_type = source.priority_type;
-  //  record.description = source.description;
-  //  record.parent_cd = source.parent_cd;
-  //  return record;
-  //}
-  //
-  //
-  //function blankRecordForBatchUpdate() {
-  //  return { 
-  //    solution_cd : "",
-  //    task_cd2 : "",
-  //    task_type : "",
-  //    name : "",
-  //    status_type : "",
-  //    description : "",
-  //    priority_type : "",
-  //    created: "",
-  //    created_by : "",
-  //    updated: "",
-  //    updated_by : "",
-  //    parent_cd : ""
-  //  };
-  //}
 
   var vue = new Vue({
     el: '#vue-main',
@@ -974,27 +775,15 @@
       key_value_user : <%= @key_value_user %>,
       key_value_work_type : <%= @key_value_work_type %>,
       row: newRecord(),
-      //descContent : "",
-      //multiRowSelected : false,
-      //rowSelections : null,
       showDescriptionView : false,
       currentParentCd : "",
       hideClosed : true,
       fixedHeight : true
-      //relTaskCd : "",
-      //relType : "TR01RR",
-      //contextRow : null
     },
     watch: {
       hideClosed: 'loadByChecked',
       fixedHeight: 'loadByChangeHeight'
     },
-    // methods: {
-    //     foo: function(){
-    //         alert(this.test);
-    //     }
-    // }
-
     methods: {
       loadByChecked : function() {
         loadTask();
@@ -1014,24 +803,6 @@
       toggleDescriptionEdit : function() {
         this.showDescriptionView = !(this.showDescriptionView);
       }
-      //,linkTask : function () {
-      //   $.ajax({
-      //     type: "POST",
-      //     url: "/link/task_task",
-      //     data: JSON.stringify({taskCdA:vue.row.task_cd2, taskCdB:vue.relTaskCd,relType:vue.relType}),
-      //     success: function(data, dataType) { 
-      //       if(data.success) {
-      //         messageUpdateSuccess(data.message);
-      //       } else {
-      //         messageUpdateError(data.message);
-      //       }
-      //       $("#dg").treegrid("reload");
-      //     },
-      //     error: function() {
-      //     },
-      //     dataType: "json"
-      //   });
-      // }
     },
     computed: {
       markedDescription: function () {
@@ -1044,28 +815,6 @@
       dispTaskCd: function() {
         return (this.row.task_cd)? this.row.task_cd : "NEW";
       }
-      //,
-      // taskRelation : function() {
-      //   if(this.row !== null) {
-      //     var infos = [];
-      //     if(this.row.parent_task != null) {
-      //       infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.parent_cd, t_task : this.row.parent_task, rel_type : "TR02PR"});
-      //     }
-      //     if(this.row.children_all && this.row.children_all.length > 0) {
-      //       for(var i = 0; i < this.row.children_all.length; i+=1) {
-      //         infos.push({task_cd2_a : this.row.task_cd2, task_cd2_b : this.row.children_all[i].task_cd2, t_task : this.row.children_all[i], rel_type : "TR03CH"});
-      //       }
-      //     }
-      //     if(this.row.t_task_task_rel != null) {
-      //       for(var i = 0; i < this.row.t_task_task_rel.length; i+=1) {
-      //         infos.push(this.row.t_task_task_rel[i]);
-      //       }
-      //     }
-      //     return infos;
-      //   } else {
-      //     return [];
-      //   }
-      // }
     },
     updated: function () {
       autosize.update($("textarea"))
@@ -1075,82 +824,6 @@
       // $("#dpEnd").datetimebox("setValue",  moment(vue.row.end_date, "DD-MM-YYYY HH:mm").format("MM/DD/YYYY HH:mm:ss"));
       $("#dpEnd").datetimebox("setValue",  vue.row.end_date);
     }
-
-    //,
-    //methods: {
-    //  //toggleDescriptionEdit : function() {
-    //  //  this.showDescriptionView = !(this.showDescriptionView);
-    //  //},
-    //  //linkTask : function () {
-    //  //  $.ajax({
-    //  //    type: "POST",
-    //  //    url: "/link/task_task",
-    //  //    data: JSON.stringify({taskCdA:vue.row.task_cd2, taskCdB:vue.relTaskCd,relType:vue.relType}),
-    //  //    success: function(data, dataType) { 
-    //  //      if(data.success) {
-    //  //        messageUpdateSuccess(data.message);
-    //  //      } else {
-    //  //        messageUpdateError(data.message);
-    //  //      }
-    //  //      $("#dg").treegrid("reload");
-    //  //    },
-    //  //    error: function() {
-    //  //    },
-    //  //    dataType: "json"
-    //  //  });
-    //  //},
-    //  //unlinkTask : function(taskCdA,taskCdB,relType) {
-    //  //  $.ajax({
-    //  //    type: "POST",
-    //  //    url: "/unlink/task_task",
-    //  //    data: JSON.stringify({taskCdA:taskCdA, taskCdB:taskCdB,relType:relType}),
-    //  //    success: function(data, dataType) { 
-    //  //      if(data.success) {
-    //  //        messageUpdateSuccess(data.message);
-    //  //      } else {
-    //  //        messageUpdateError(data.message);
-    //  //      }
-    //  //      $("#dg").treegrid("reload");
-    //  //    },
-    //  //    error: function() {
-    //  //    },
-    //  //    dataType: "json"
-    //  //  });
-    //  //},
-    //  //reloadTask : function(taskCd) {
-    //  //  console.log("****", taskCd);
-    //  //  var self = this;
-
-    //  //  $.ajax({
-    //  //    type: "GET",
-    //  //    url: "/tasks/"+taskCd,
-    //  //    success: function(data, dataType) { 
-    //  //      //if(data.success) {
-    //  //        self.multiRowSelected = false;
-    //  //        self.row = $.extend(true, {}, data);
-    //  //      //} else {
-    //  //      //  messageUpdateError("Retrieve information failed");
-    //  //      //}
-    //  //      console.log(data);
-    //  //    },
-    //  //    error: function() {
-    //  //      messageUpdateError("Request failed");
-    //  //    },
-    //  //    dataType: "json"
-    //  //  });
-    //  //},
-    //  //relationStyle : function(relType) {
-    //  //  if(relType == "TR01RR") {
-    //  //    return "icon icon-arrow-left";
-    //  //  }
-    //  //  if(relType == "TR02PR") {
-    //  //    return "icon icon-arrow-up-left";
-    //  //  }
-    //  //  if(relType == "TR03CH") {
-    //  //    return "icon icon-arrow-down-right";
-    //  //  }
-    //  //}
-    //},
   });
 </script>
 
