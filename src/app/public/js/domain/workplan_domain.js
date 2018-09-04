@@ -34,16 +34,16 @@ WorkplanDomain.prototype.getNewRecord = function() {
     start_date : moment().format("DD-MM-YYYY HH:mm"),
     end_date : moment().add(7,"days").format("DD-MM-YYYY HH:mm"),
     progress : 0.0,
-    user_cd : "000",
+    user_cd : Constants.DEFAULTS.DEFAULT_USER_CD,
     name : "",
     parent_cd : "",
     sort_order : 0,
-    work_type : "WT01PL",
-    solution_cd : "01",
-    task_type : "TT01TS",
+    work_type : Constants.WORKPLAN_TYPE.PLAN,
+    solution_cd : Constants.DEFAULTS.DEFAULT_SOLUTION_CD,
+    task_type : Constants.TASK_TYPE.TASK,
     description : "",
-    priority_type : "TP03NM",
-    status_type : "TS01NW"
+    priority_type : Constants.TASK_PRIORITY.MEDIUM,
+    status_type : Constants.TASK_STATUS.NEW
   };
 };
 
