@@ -1,0 +1,43 @@
+
+
+<div style="display:flex;flex-flow: column nowrap;">
+  <div class="field_container">
+    <div class="field_header">Solution CD</div>
+    <div class="field_value">
+      <input v-model="dispSolutionCd" type="text" style="width:80px" readonly>
+    </div>
+  </div>
+
+  <div class="field_container" style="width: 1000px">
+    <div class="field_header">Name</div>
+  </div>
+
+  <div class="field_container" style="width:100%;">
+    <div class="field_value" style="width:100%;">
+      <input v-model="row.name" type="text" style="width:100%">
+    </div>
+  </div>
+
+  <div class="field_container" style="width: 1000px">
+    <div class="field_header">Status</div>
+    <div class="field_value">
+      <select name="category" v-model="row.status_type">
+        <option v-for="category in status_types" :value="category.type_cd">
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field_container" style="width:1000px">
+    <div class="field_header">Created</div>
+    <div class="field_value" style="width:300px">
+      <span>{{row.created_by}}</span><span>&nbsp;</span><span>{{formatterDatetime(row.created)}}</span>
+    </div>
+    <div class="field_header">Updated</div>
+    <div class="field_value" style="width:300px">
+    <span>{{row.updated_by}}</span><span>&nbsp;</span><span>{{formatterDatetime(row.updated)}}</span>
+    </div>
+  </div>
+</div>
+

@@ -4,34 +4,7 @@
     <div id="dg" class="easyui-datagrid" style="width:100%;"></div>
   </div>
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
-    <table class="input-table" style="width:95%"> 
-      <tr>
-        <th style="width:100px">Solution CD</th>
-        <td><span>{{(row.solution_cd)? row.solution_cd : "NEW"}}</td>
-      </tr>
-      <tr>
-        <th>Status</th>
-        <td>
-          <select name="category" v-model="row.status_type">
-            <option v-for="category in status_types" :value="category.type_cd">
-              {{ category.name }}
-            </option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <th>Name</th>
-        <td><input v-model="row.name" type="text" style="width:100%"></td>
-      </tr>
-      <tr>
-        <th>Created</th>
-        <td><span>{{row.created_by}}</span><span>&nbsp;</span><span>{{row.created}}</span></td>
-      </tr>
-      <tr>
-        <th>Updated</th>
-        <td><span>{{row.updated_by}}</span><span>&nbsp;</span><span>{{row.updated}}</span></td>
-      </tr>
-    </table>
+    <%= erb :part_solutions_form %>
   </div>
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
     <input id="btnRegister" type="button" value="Register" class="input-register"/>
@@ -40,6 +13,11 @@
   </div>
 </div>
 <script type="text/javascript">
+
+  function formatterDatetime(value, row, index) {
+    return moment(value).format("YYYY/MM/DD HH:mm:ss");
+  }
+
   function genFormatter(_paths, _fn) {
     var paths = _paths;
     var fn = _fn;
@@ -190,6 +168,17 @@
       status_types : <%= @status_types %>,
       key_value_solution_status_type : <%= @key_value_solution_status_type %>,
       row: newRecord()
+    },
+    computed: {
+      dispSolutionCd: function() {
+        return (this.row.solution_cd)? this.row.solution_cd : "NEW";
+      }
+    },
+    methods: {
+      formatterDatetime : function(value) {
+        var m = moment(value);
+        return (m.isValid())? m.format("YYYY/MM/DD HH:mm:ss") : "";
+      }
     }
   });
 </script>
