@@ -773,6 +773,14 @@
       },
       dispTaskCd: function() {
         return (this.row.task_cd)? this.row.task_cd : "NEW";
+      },
+      hasTaskCd: function() {
+        var taskCd = this.row.task_cd;
+        if((taskCd == null) || (taskCd === undefined) || (taskCd === "")) {
+          return false;
+        } else {
+          return true;
+        }
       }
     },
     updated: function () {

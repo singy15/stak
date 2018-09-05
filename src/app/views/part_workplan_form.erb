@@ -22,7 +22,7 @@
   <div class="field_container" style="width: 800px">
     <div class="field_header">Solution</div>
     <div class="field_value">
-      <select name="category" v-model="row.solution_cd">
+      <select name="category" v-model="row.solution_cd" v-bind:disabled="hasTaskCd">
         <option v-for="category in key_value_solution" :value="category.value">
           {{ category.text }}
         </option>
