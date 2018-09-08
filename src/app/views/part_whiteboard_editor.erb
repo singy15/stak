@@ -1,0 +1,184 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grapheditor</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
+
+  <script type="text/javascript" src="/lib/jquery.js"></script>
+	<script type="text/javascript">
+		// Parses URL parameters. Supported parameters are:
+		// - lang=xy: Specifies the language of the user interface.
+		// - touch=1: Enables a touch-style user interface.
+		// - storage=local: Enables HTML5 local storage.
+		// - chrome=0: Chromeless mode.
+		var urlParams = (function(url)
+		{
+			var result = new Object();
+			var idx = url.lastIndexOf('?');
+	
+			if (idx > 0)
+			{
+				var params = url.substring(idx + 1).split('&');
+				
+				for (var i = 0; i < params.length; i++)
+				{
+					idx = params[i].indexOf('=');
+					
+					if (idx > 0)
+					{
+						result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+					}
+				}
+			}
+			
+			return result;
+		})(window.location.href);
+	
+		// Default resources are included in grapheditor resources
+		mxLoadResources = false;
+	</script>
+	<script type="text/javascript" src="js/Init.js"></script>
+	<script type="text/javascript" src="deflate/pako.min.js"></script>
+	<script type="text/javascript" src="deflate/base64.js"></script>
+	<script type="text/javascript" src="jscolor/jscolor.js"></script>
+	<script type="text/javascript" src="sanitizer/sanitizer.min.js"></script>
+	<script type="text/javascript" src="../../../lib/mxgraph/js/mxClient.js"></script>
+	<script type="text/javascript" src="js/EditorUi.js"></script>
+	<script type="text/javascript" src="js/Editor.js"></script>
+	<script type="text/javascript" src="js/Sidebar.js"></script>
+	<script type="text/javascript" src="js/Graph.js"></script>
+	<script type="text/javascript" src="js/Format.js"></script>
+	<script type="text/javascript" src="js/Shapes.js"></script>
+	<script type="text/javascript" src="js/Actions.js"></script>
+	<script type="text/javascript" src="js/Menus.js"></script>
+	<script type="text/javascript" src="js/Toolbar.js"></script>
+	<script type="text/javascript" src="js/Dialogs.js"></script>
+</head>
+<body class="geEditor">
+	<script type="text/javascript">
+// Extends EditorUi to update I/O action states based on availability of backend
+  var editor = null;
+		(function()
+		{
+			var editorUiInit = EditorUi.prototype.init;
+			
+			EditorUi.prototype.init = function()
+			{
+				editorUiInit.apply(this, arguments);
+				this.actions.get('export').setEnabled(false);
+
+				// Updates action states which require a backend
+				if (!Editor.useLocalStorage)
+				{
+					mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
+					{
+						var enabled = req.getStatus() != 404;
+						this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
+						this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
+						this.actions.get('save').setEnabled(enabled);
+						this.actions.get('saveAs').setEnabled(enabled);
+						this.actions.get('export').setEnabled(enabled);
+					}));
+				}
+			};
+			
+			// Adds required resources (disables loading of fallback properties, this can only
+			// be used if we know that all keys are defined in the language specific file)
+			mxResources.loadDefaultBundle = false;
+			var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
+				mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
+
+			// Fixes possible asynchronous requests
+			mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function(xhr)
+			{
+				// Adds bundle text to resources
+				mxResources.parse(xhr[0].getText());
+				
+				// Configures the default graph theme
+				var themes = new Object();
+				themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
+				
+        // Main
+        editor = new Editor(urlParams['chrome'] == '0', themes);
+        window.parent.editor = editor;
+
+        var mgr = new mxAutoSaveManager(editor.graph);
+        window.parent.autoSaveMng = mgr;
+        mgr.autoSaveThreshold = 0;
+        mgr.autoSaveDelay = 0;
+        mgr.autoSaveThrottle = 0;
+        mgr.save = function()
+        {
+          var encoder = new mxCodec();
+          var result = encoder.encode(editor.graph.getModel());
+          var xml = mxUtils.getXml(result);
+          window.parent.graphXmlOld = window.parent.graphXml;
+          window.parent.graphXml = xml;
+          // console.log(xml);
+
+
+          $.ajax({
+            type: "POST",
+            url: "/whiteboard/default",
+            data: JSON.stringify({content: xml}),
+            success: function(data, dataType) { 
+              console.log(data.content);
+              // editor.setGraphXml(mxUtils.parseXml(data.content).documentElement);
+              if(data.success) {
+                console.log("Save success.");
+
+                editor.setModified(false);
+              }
+            },
+            error: function() {
+              console.log("Save error!!!");
+            },
+            dataType: "json"
+          });
+
+
+          mxLog.show();
+          mxLog.debug('save ' + (new Date()));
+        };
+
+        new EditorUi(editor);
+
+        // Load default whiteboard
+        // $.ajax({
+        //   type: "GET",
+        //   url: "/whiteboard/default",
+        //   // data: JSON.stringify(vue[propNameSelectedRow]),
+        //   success: function(data, dataType) { 
+        //     console.log(data.content);
+        //     editor.setGraphXml(mxUtils.parseXml(data.content).documentElement);
+        //   },
+        //   error: function() {
+        //     console.log("Get default whiteboard error!!!");
+        //   },
+        //   dataType: "json"
+        // });
+        var onload = function(req)
+        {
+          // mxUtils.alert(req.getDocumentElement());
+          var response = JSON.parse(req.getText());
+          // console.log(response.content);
+          editor.setGraphXml(mxUtils.parseXml(response.content).documentElement);
+        }
+
+        var onerror = function(req)
+        {
+          mxUtils.alert('Error on loading default whiteboard');
+        }
+        new mxXmlRequest("/whiteboard/default", 'key=value', 'GET').send(onload, onerror);
+
+			}, function()
+			{
+				document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
+			});
+		})();
+	</script>
+</body>
+</html>

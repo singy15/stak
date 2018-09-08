@@ -3,3 +3,7 @@
 /src/app/Gemfile.lock
 /src/app/log/sql.log
 /src/app/log/sql.log.*
+/src/app/public/__del
+/src/app/public/view/__del
+/src/app/public/js/__del
+/src/app/views/__del

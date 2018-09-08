@@ -13,6 +13,10 @@ class BaseSvc
     select_all().default_order
   end
 
+  def select_first()
+    @entity.first
+  end
+
   def delete_by_cd(cd)
     @entity.delete(cd)
   end

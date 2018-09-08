@@ -32,6 +32,7 @@ Domain=gen_gantt_duration=integer
 Domain=gen_gantt_progress=numeric
 Domain=long_text_content=text
 Domain=version_string=text
+Domain=whiteboard_cd=varchar(10)
 LogicalView=1
 DecodeDomain=0
 ViewModePageIndividually=1
@@ -66,6 +67,23 @@ DefaultFkName=%0:s_FK%1:d
 SqlSeparator=0
 ShowTag=1
 ShowCommonAttributes=0
+
+[Entity]
+PName=t_whiteboard
+LName=t_whiteboard
+Comment=
+TableOption=
+Page=Main
+Left=1400
+Top=1500
+Field="whiteboard_cd","whiteboard_cd","*whiteboard_cd","NOT NULL",0,"","",$FFFFFFFF,""
+Field="task_cd","task_cd","*task_cd","NOT NULL",,"","",$FFFFFFFF,""
+Field="content","content","*long_text_content","NOT NULL",,"\q<mxGraphModel><root><mxCell id=\Q0\Q/><mxCell id=\Q1\Q parent=\Q0\Q/></root></mxGraphModel>\q","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20180908194818
+Position="Main",1400,1500
 
 [Entity]
 PName=c_version
