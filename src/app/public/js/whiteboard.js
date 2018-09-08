@@ -1,355 +1,344 @@
 
-var graphJSON = "";
 
-var graph = null;
-var paper = null;
-var toolsView = null;
+// var jointJSUtil = new JointJSUtil();
+// 
+// var graphJSON = "";
+// 
+// var graph = null;
+// var paper = null;
+// var toolsView = null;
 
 $(document).ready(function() {
-  // var board = new fabric.Canvas('board');
-  // board.isDrawingMode = vue.isFreehand;
-  // board.freeDrawingBrush.color = '#000000';
-  // board.freeDrawingBrush.width = 5;
+  var board = new fabric.Canvas('board');
+  board.isDrawingMode = vue.isFreehand;
+  board.freeDrawingBrush.color = '#000000';
+  board.freeDrawingBrush.width = 5;
 
-  // board.on('mouse:down', function(options) {
-  //   if (options.target) {
-  //     console.log('an object was clicked! ', options.target.type);
-  //     vue.selected = options.target;
-  //   }
-  // });
+  board.on('mouse:down', function(options) {
+    if (options.target) {
+      console.log('an object was clicked! ', options.target.type);
 
-  // board.on('mouse:over', function(element) {
-  //   if(vue.selected) {
-  //     vue.selected.set('active', true);
-  //     vue.selected.set('hasRotatingPoint', false);
-  //     vue.selected.set('hasBorders', false);
-  //     vue.selected.set('transparentCorners', false);
-  //     vue.selected.setControlsVisibility({ tl: false, tr: false, br: false, bl: false });
-  //   }
-  // });
+      options.target.set('fontSize', 12);
+      vue.selected = options.target;
+    }
+  });
 
-
-  // vue.board = board;
-
-
-  graph = new joint.dia.Graph;
-  paper = new joint.dia.Paper({ 
-　  el: $('#paper'), 
-　　width: 800, 
-    height: 800, 
-    gridSize: 10, 
-    model: graph,
-    gridSize: 10,
-    drawGrid: true,
-    // background: {
-    //     color: 'rgba(0, 255, 0, 0.3)'
+  board.on('mouse:over', function(element) {
+    // if(vue.selected) {
+    //   vue.selected.set('active', true);
+    //   vue.selected.set('hasRotatingPoint', false);
+    //   vue.selected.set('hasBorders', false);
+    //   vue.selected.set('transparentCorners', false);
+    //   vue.selected.setControlsVisibility({ tl: false, tr: false, br: false, bl: false });
     // }
   });
 
-  var verticesTool = new joint.linkTools.Vertices({
-      redundancyRemoval: true,
-      snapRadius: 10,
-      vertexAdding: true,
-  });
-  var segmentsTool = new joint.linkTools.Segments();
-  var sourceArrowheadTool = new joint.linkTools.SourceArrowhead();
-  var targetArrowheadTool = new joint.linkTools.TargetArrowhead();
-  var sourceAnchorTool = new joint.linkTools.SourceAnchor();
-  var targetAnchorTool = new joint.linkTools.TargetAnchor();
-  var boundaryTool = new joint.linkTools.Boundary();
-  var removeButton = new joint.linkTools.Remove();
 
-  toolsView = new joint.dia.ToolsView({
-      tools: [
-          verticesTool, segmentsTool,
-          sourceArrowheadTool, targetArrowheadTool,
-          sourceAnchorTool, targetAnchorTool,
-          boundaryTool, removeButton
-      ]
-  });
+  vue.board = board;
 
 
+  vue.selectedFrom = new fabric.Text("a", {left: 100, top: 100});
+  vue.board.add(vue.selectedFrom);
+
+  vue.selectedTo = new fabric.Text("b", {left: 200, top: 200});
+  vue.board.add(vue.selectedTo);
+
+
+  // graph = new joint.dia.Graph;
+  // paper = new joint.dia.Paper({ 
+　//   el: $('#paper'), 
+　// 　width: 800, 
+  //   height: 500, 
+  //   gridSize: 10, 
+  //   model: graph,
+  //   gridSize: 10,
+  //   drawGrid: true,
+  //   // background: {
+  //   //     color: 'rgba(0, 255, 0, 0.3)'
+  //   // }
+  // });
+
+  // // paper.scale(0.7, 0.7);
+  // // paper.translate(300, 50);
   // paper.scale(0.7, 0.7);
-  // paper.translate(300, 50);
-  paper.scale(0.7, 0.7);
-  paper.translate(0, 0);
+  // paper.translate(0, 0);
 
-  var info = new joint.shapes.standard.Rectangle();
-  info.position(200, 130);
-  info.resize(100, 40);
-  info.addTo(graph);
+  // var info = new joint.shapes.standard.Rectangle();
+  // info.position(200, 130);
+  // info.resize(100, 40);
+  // info.addTo(graph);
 
 
 
-  var rect = new joint.shapes.standard.Rectangle();
-  rect.position(100, 30);
-  rect.resize(100, 40);
-  rect.attr({
-      body: {
-          fill: 'white'
-      },
-      label: {
-          text: 'Hello',
-          fill: 'Black'
-      }
-  });
-  rect.addTo(graph);
-
-  var rect2 = rect.clone();
-  rect2.translate(300, 0);
-  rect2.attr('label/text', 'World!');
-  rect2.addTo(graph);
-
-  var link = new joint.shapes.standard.Link();
-  link.labels([{
-      attrs: {
-          text: {
-              text: 'Hello, World'
-          }
-      }
-  }]);
-  link.source(rect);
-  link.target(rect2);
-  link.addTo(graph);
-
-
-  var linkView = link.findView(paper);
-  linkView.addTools(toolsView);
-  linkView.hideTools();
-
-  function reset() {
-    var elements = paper.model.getElements();
-    for (var i = 0, ii = elements.length; i < ii; i++) {
-        var currentElement = elements[i];
-        currentElement.attr('body/stroke', 'black');
-        currentElement.attr('label/fill', 'black');
-        currentElement.findView(paper).hideTools();
-    }
-
-    var links = paper.model.getLinks();
-    for (var j = 0, jj = links.length; j < jj; j++) {
-        var currentLink = links[j];
-        currentLink.attr('line/stroke', 'black');
-        currentLink.label(0, {
-            attrs: {
-                body: {
-                    stroke: 'black'
-                },
-                label: {
-                    fill: 'black'
-                }
-            }
-        });
-        currentLink.findView(paper).hideTools();
-    }
-  }
-
-  paper.on({
-    'element:pointerdown': function(elementView, evt) {
-        evt.data = elementView.model.position();
-    },
-
-    'element:pointerup': function(elementView, evt, x, y) {
-      var coordinates = new g.Point(x, y);
-      var elementAbove = elementView.model;
-      var elementBelow = this.model.findModelsFromPoint(coordinates).find(function(el) {
-        return (el.id !== elementAbove.id);
-      });
-
-      // If the two elements are connected already, don't
-      // connect them again (this is application-specific though).
-      if (elementBelow && graph.getNeighbors(elementBelow).indexOf(elementAbove) === -1) {
-
-        // Move the element to the position before dragging.
-        elementAbove.position(evt.data.x, evt.data.y);
-
-        // Create a connection between elements.
-        var link = new joint.shapes.standard.Link();
-
-        link.source(elementAbove);
-        link.target(elementBelow);
-        link.addTo(graph);
-
-        // Add remove button to the link.
-        var tools = new joint.dia.ToolsView({
-            tools: [new joint.linkTools.Remove()]
-        });
-        link.findView(this).addTools(tools);
-
-        setDefaultLinkTool(link, paper);
-      }
-    }
-  });
-
-  // paper.on('link:mouseenter', function(linkView) {
-  //     linkView.showTools();
+  // var rect = new joint.shapes.standard.Rectangle();
+  // rect.position(100, 30);
+  // rect.resize(100, 40);
+  // rect.attr({
+  //     body: {
+  //         fill: 'white'
+  //     },
+  //     label: {
+  //         text: 'Hello',
+  //         fill: 'Black'
+  //     }
   // });
+  // rect.addTo(graph);
 
-  // paper.on('link:mouseleave', function(linkView) {
-  //     linkView.hideTools();
-  // });
-  //
-  
-  function selectElement(elementView) {
-    reset();
-    var currentElement = elementView.model;
-    currentElement.attr('body/stroke', 'orange')
-    currentElement.attr('label/fill', 'orange')
-    elementView.showTools();
-    vue.selected = currentElement;
-    vue.selectedType = "element";
-  }
+  // var rect2 = rect.clone();
+  // rect2.translate(300, 0);
+  // rect2.attr('label/text', 'World!');
+  // rect2.addTo(graph);
 
-  function selectLink(linkView) {
-    reset();
-    var currentLink = linkView.model;
-    currentLink.attr('line/stroke', 'orange')
-    currentLink.label(0, {
-      attrs: {
-        body: {
-          stroke: 'orange'
-        },
-        label: {
-          fill: 'orange'
-        }
-      }
-    });
-    linkView.showTools();
-    vue.selected = currentLink;
-    vue.selectedType = "link";
-  }
-
-  function deselect() {
-    reset();
-    vue.selected = null;
-    vue.selectedType = null;
-  }
-
-  paper.on('element:pointerclick', function(elementView) {
-    selectElement(elementView);
-  });
-
-  paper.on('link:pointerclick', function(linkView) {
-    selectLink(linkView);
-  });
-
-  paper.on('blank:pointerclick', function() {
-    deselect();
-  });
-
-  // paper.on('blank:pointerdblclick', function() {
-  //     resetAll(this);
-
-  //     info.attr('body/visibility', 'hidden');
-  //     info.attr('label/visibility', 'hidden');
-
-  //     this.drawBackground({
-  //         color: 'orange'
-  //     })
-  // });
-
-  // paper.on('blank:pointerdblclick', function() {
-  //     resetAll(this);
-
-  //     info.attr('body/visibility', 'hidden');
-  //     info.attr('label/visibility', 'hidden');
-
-  //     this.drawBackground({
-  //         color: 'orange'
-  //     })
-  // });
-
-  // paper.on('element:pointerdblclick', function(elementView) {
-  //     resetAll(this);
-
-  //     var currentElement = elementView.model;
-  //     currentElement.attr('body/stroke', 'orange')
-  // });
-
-  // paper.on('link:pointerdblclick', function(linkView) {
-  //     resetAll(this);
-
-  //     var currentLink = linkView.model;
-  //     currentLink.attr('line/stroke', 'orange')
-  //     currentLink.label(0, {
-  //         attrs: {
-  //             body: {
-  //                 stroke: 'orange'
-  //             }
+  // var link = new joint.shapes.standard.Link();
+  // link.labels([{
+  //     attrs: {
+  //         text: {
+  //             text: 'Hello, World'
   //         }
-  //     })
-  // });
-
-  // paper.on('cell:pointerdblclick', function(cellView) {
-  //     var isElement = cellView.model.isElement();
-  //     var message = (isElement ? 'Element' : 'Link') + ' clicked';
-  //     info.attr('label/text', message);
-
-  //     info.attr('body/visibility', 'visible');
-  //     info.attr('label/visibility', 'visible');
-  // });
-
-  // function resetAll(paper) {
-  //     paper.drawBackground({
-  //         color: 'white'
-  //     })
-
-  //     var elements = paper.model.getElements();
-  //     for (var i = 0, ii = elements.length; i < ii; i++) {
-  //         var currentElement = elements[i];
-  //         currentElement.attr('body/stroke', 'black');
   //     }
+  // }]);
+  // link.source(rect);
+  // link.target(rect2);
+  // link.addTo(graph);
 
-  //     var links = paper.model.getLinks();
-  //     for (var j = 0, jj = links.length; j < jj; j++) {
-  //         var currentLink = links[j];
-  //         currentLink.attr('line/stroke', 'black');
-  //         currentLink.label(0, {
-  //             attrs: {
-  //                 body: {
-  //                     stroke: 'black'
-  //                 }
-  //             }
-  //         })
-  //     }
+
+  // var linkView = link.findView(paper);
+  // // linkView.addTools(toolsView);
+  // // linkView.hideTools();
+
+  // function reset() {
+  //   var elements = paper.model.getElements();
+  //   for (var i = 0, ii = elements.length; i < ii; i++) {
+  //       var currentElement = elements[i];
+  //       currentElement.attr('body/stroke', 'black');
+  //       currentElement.attr('label/fill', 'black');
+  //       currentElement.findView(paper).hideTools();
+  //   }
+
+  //   var links = paper.model.getLinks();
+  //   for (var j = 0, jj = links.length; j < jj; j++) {
+  //       var currentLink = links[j];
+  //       currentLink.attr('line/stroke', 'black');
+  //       currentLink.label(0, {
+  //           attrs: {
+  //               body: {
+  //                   stroke: 'black'
+  //               },
+  //               label: {
+  //                   fill: 'black'
+  //               }
+  //           }
+  //       });
+  //       currentLink.findView(paper).hideTools();
+  //   }
   // }
 
-  // graph.on('change:position', function(cell) {
-  //     var center = cell.getBBox().center();
-  //     var label = center.toString();
-  //     cell.attr('label/text', label);
-  // });
+  // paper.on({
+  //   'element:pointerdown': function(elementView, evt) {
+  //       evt.data = elementView.model.position();
+  //   },
 
+  //   'element:pointerup': function(elementView, evt, x, y) {
+  //     var coordinates = new g.Point(x, y);
+  //     var elementAbove = elementView.model;
+  //     var elementBelow = this.model.findModelsFromPoint(coordinates).find(function(el) {
+  //       return (el.id !== elementAbove.id);
+  //     });
 
-  // // 初期から出ているbox
-  // var el1 = new joint.shapes.html.Element({
-  //   position: { x: 80, y: 80 },
-  //   size: { width: 170, height: 80 },
-  //   divName: 'Atrae',
-  //   isCompany: true
-  // });
+  //     // If the two elements are connected already, don't
+  //     // connect them again (this is application-specific though).
+  //     if (elementBelow && graph.getNeighbors(elementBelow).indexOf(elementAbove) === -1) {
 
-  // graph.addCells([el1]);
+  //       // Move the element to the position before dragging.
+  //       elementAbove.position(evt.data.x, evt.data.y);
 
-  // paper.on('cell:pointerup', function(cellView, evt, x, y) {
-  //   var elementBelow = graph.get('cells').find(function(cell) {
-  //     if (cell instanceof joint.dia.Link) return false;
-  //     if (cell.id === cellView.model.id) return false;
-  //     if (cell.getBBox().containsPoint(g.point(x, y))) return true;
-  //     return false;
-  //   });                                                                                                                                                        
+  //       // Create a connection between elements.
+  //       var link = new joint.shapes.standard.Link();
 
-  //   if (elementBelow && !_.contains(graph.getNeighbors(elementBelow), cellView.model)) {
-  //     graph.addCell(new joint.shapes.org.Arrow({
-  //       source: { id: cellView.model.id },
-  //       target: { id: elementBelow.id }
-  //     }));
-  //     cellView.model.translate(-200, 0);
+  //       link.source(elementAbove);
+  //       link.target(elementBelow);
+  //       link.addTo(graph);
+
+  //       // var tools = new joint.dia.ToolsView({
+  //       //     tools: [new joint.linkTools.Remove()]
+  //       // });
+  //       var tools = jointJSUtil.createDefaultLinkToolsView();
+  //       link.findView(this).addTools(tools);
+
+  //       // setDefaultLinkTool(link, paper);
+  //     }
   //   }
   // });
 
-  graphJSON = graph.toJSON();
-  console.log(graphJSON);
+  // // paper.on('link:mouseenter', function(linkView) {
+  // //     linkView.showTools();
+  // // });
+
+  // // paper.on('link:mouseleave', function(linkView) {
+  // //     linkView.hideTools();
+  // // });
+  // //
+  // 
+  // function selectElement(elementView) {
+  //   reset();
+  //   var currentElement = elementView.model;
+  //   currentElement.attr('body/stroke', 'orange')
+  //   currentElement.attr('label/fill', 'orange')
+  //   elementView.showTools();
+  //   vue.selected = currentElement;
+  //   vue.selectedType = "element";
+  // }
+
+  // function selectLink(linkView) {
+  //   reset();
+  //   var currentLink = linkView.model;
+  //   currentLink.attr('line/stroke', 'orange')
+  //   currentLink.label(0, {
+  //     attrs: {
+  //       body: {
+  //         stroke: 'orange'
+  //       },
+  //       label: {
+  //         fill: 'orange'
+  //       }
+  //     }
+  //   });
+  //   linkView.showTools();
+  //   vue.selected = currentLink;
+  //   vue.selectedType = "link";
+  // }
+
+  // function deselect() {
+  //   reset();
+  //   vue.selected = null;
+  //   vue.selectedType = null;
+  // }
+
+  // paper.on('element:pointerclick', function(elementView) {
+  //   selectElement(elementView);
+  // });
+
+  // paper.on('link:pointerclick', function(linkView) {
+  //   selectLink(linkView);
+  // });
+
+  // paper.on('blank:pointerclick', function() {
+  //   deselect();
+  // });
+
+  // // paper.on('blank:pointerdblclick', function() {
+  // //     resetAll(this);
+
+  // //     info.attr('body/visibility', 'hidden');
+  // //     info.attr('label/visibility', 'hidden');
+
+  // //     this.drawBackground({
+  // //         color: 'orange'
+  // //     })
+  // // });
+
+  // // paper.on('blank:pointerdblclick', function() {
+  // //     resetAll(this);
+
+  // //     info.attr('body/visibility', 'hidden');
+  // //     info.attr('label/visibility', 'hidden');
+
+  // //     this.drawBackground({
+  // //         color: 'orange'
+  // //     })
+  // // });
+
+  // // paper.on('element:pointerdblclick', function(elementView) {
+  // //     resetAll(this);
+
+  // //     var currentElement = elementView.model;
+  // //     currentElement.attr('body/stroke', 'orange')
+  // // });
+
+  // // paper.on('link:pointerdblclick', function(linkView) {
+  // //     resetAll(this);
+
+  // //     var currentLink = linkView.model;
+  // //     currentLink.attr('line/stroke', 'orange')
+  // //     currentLink.label(0, {
+  // //         attrs: {
+  // //             body: {
+  // //                 stroke: 'orange'
+  // //             }
+  // //         }
+  // //     })
+  // // });
+
+  // // paper.on('cell:pointerdblclick', function(cellView) {
+  // //     var isElement = cellView.model.isElement();
+  // //     var message = (isElement ? 'Element' : 'Link') + ' clicked';
+  // //     info.attr('label/text', message);
+
+  // //     info.attr('body/visibility', 'visible');
+  // //     info.attr('label/visibility', 'visible');
+  // // });
+
+  // // function resetAll(paper) {
+  // //     paper.drawBackground({
+  // //         color: 'white'
+  // //     })
+
+  // //     var elements = paper.model.getElements();
+  // //     for (var i = 0, ii = elements.length; i < ii; i++) {
+  // //         var currentElement = elements[i];
+  // //         currentElement.attr('body/stroke', 'black');
+  // //     }
+
+  // //     var links = paper.model.getLinks();
+  // //     for (var j = 0, jj = links.length; j < jj; j++) {
+  // //         var currentLink = links[j];
+  // //         currentLink.attr('line/stroke', 'black');
+  // //         currentLink.label(0, {
+  // //             attrs: {
+  // //                 body: {
+  // //                     stroke: 'black'
+  // //                 }
+  // //             }
+  // //         })
+  // //     }
+  // // }
+
+  // // graph.on('change:position', function(cell) {
+  // //     var center = cell.getBBox().center();
+  // //     var label = center.toString();
+  // //     cell.attr('label/text', label);
+  // // });
+
+
+  // // // 初期から出ているbox
+  // // var el1 = new joint.shapes.html.Element({
+  // //   position: { x: 80, y: 80 },
+  // //   size: { width: 170, height: 80 },
+  // //   divName: 'Atrae',
+  // //   isCompany: true
+  // // });
+
+  // // graph.addCells([el1]);
+
+  // // paper.on('cell:pointerup', function(cellView, evt, x, y) {
+  // //   var elementBelow = graph.get('cells').find(function(cell) {
+  // //     if (cell instanceof joint.dia.Link) return false;
+  // //     if (cell.id === cellView.model.id) return false;
+  // //     if (cell.getBBox().containsPoint(g.point(x, y))) return true;
+  // //     return false;
+  // //   });                                                                                                                                                        
+
+  // //   if (elementBelow && !_.contains(graph.getNeighbors(elementBelow), cellView.model)) {
+  // //     graph.addCell(new joint.shapes.org.Arrow({
+  // //       source: { id: cellView.model.id },
+  // //       target: { id: elementBelow.id }
+  // //     }));
+  // //     cellView.model.translate(-200, 0);
+  // //   }
+  // // });
+
+  // graphJSON = graph.toJSON();
+  // console.log(graphJSON);
 });
 
 
@@ -451,9 +440,32 @@ function addTextbox(context, content, pLeft, pTop) {
     left: pLeft, 
     top: pTop, 
     fontFamily: 'ＭＳ ゴシック',
-    fontSize: 12
+    fontSize: 12,
+    lineHeight: 1
   });
   context.add(textbox);
+}
+
+
+function addLine(context, x, y, x2, y2) {
+  var line = new fabric.Line([x, y, x2, y2], {
+    fill: 'black',
+    stroke: 'black',
+    strokeWidth: 1,
+    selectable: true
+  });
+  context.add(line);
+}
+
+function addConnector(context, from, to) {
+  var con = new fabric.Line([from.left, from.top, to.left, to.top], {
+    fill: 'black',
+    stroke: 'black',
+    strokeWidth: 2,
+    selectable: true,
+    angle : 90
+  });
+  context.add(con);
 }
 
 function addRect(context, content, width, height, pLeft, pTop) {
@@ -493,7 +505,9 @@ var vue = new Vue({
     isFreehand : false,
     editText : "",
     selected : null,
-    selectedType : null
+    selectedType : null,
+    selectedFrom : null,
+    selectedTo : null
   },
   watch: {
     selected : 'onChangeSelected'
@@ -511,6 +525,12 @@ var vue = new Vue({
     },
     onClickBtnAddRect : function() {
       addRect(this.board, "abc", 100, 40, 200, 200);
+    },
+    onClickBtnAddLine : function() {
+      addLine(this.board, 100, 100, 200, 200);
+    },
+    onClickBtnAddConnector : function() {
+      addConnector(this.board, this.selectedFrom, this.selectedTo);
     },
     onChangeSelected : function() {
       if((this.selected) && (this.selectedType === "element")) {

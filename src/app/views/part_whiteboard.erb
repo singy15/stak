@@ -1,10 +1,11 @@
 
-<!-- <script type="text/javascript" src="/lib/fabric.js"></script> -->
+<script type="text/javascript" src="/lib/fabric.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/lib/joint.css"/>
-<script src="/lib/lodash.js"></script>
-<script src="/lib/backbone.js"></script>
-<script src="/lib/joint.js"></script>
+<!-- <link rel="stylesheet" type="text/css" href="/lib/joint.css"/> -->
+<!-- <script src="/lib/lodash.js"></script> -->
+<!-- <script src="/lib/backbone.js"></script> -->
+<!-- <script src="/lib/joint.js"></script> -->
+<!-- <script src="/js/jointjs_util.js"></script> -->
 
 <style>
 canvas {
@@ -101,8 +102,8 @@ canvas {
 
 <div id="vue-main" class="vue-component">
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
-    <!-- <canvas id="board" width="800px" height="400px"></canvas> -->
-    <div id="paper"></div>
+    <canvas id="board" width="800px" height="400px"></canvas>
+    <!-- <div id="paper"></div> -->
   </div>
 
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
@@ -111,22 +112,27 @@ canvas {
 
   <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
     <div style="display:flex;flex-flow: column nowrap;">
-      <div class="field_container" style="width: 1000px">
+      <div class="field_container">
         <div class="field_header">Shapes</div>
         <div class="field_value">
           <input id="btnAddRect" type="button" class="input-register" value="Rect" v-on:click="onClickBtnAddRect" />
         </div>
-        <!--
         <div class="field_value">
           <input id="btnText" type="button" class="input-register" value="Text" v-on:click="onClickBtnText" />
         </div>
         <div class="field_value">
           <input id="btnTextbox" type="button" class="input-register" value="Textbox" v-on:click="onClickBtnTextbox" />
         </div>
-        -->
+        <div class="field_value">
+          <input id="btnAddLine" type="button" class="input-register" value="Line" v-on:click="onClickBtnAddLine" />
+        </div>
+        <div class="field_value">
+          <input id="btnAddConnector" type="button" class="input-register" value="Connector" v-on:click="onClickBtnAddConnector" />
+        </div>
       </div>
 
-      <div class="field_container" style="width: 1000px">
+
+      <div class="field_container" >
         <div class="field_header">Text</div>
       </div>
 
@@ -136,7 +142,7 @@ canvas {
         </div>
       </div>
 
-      <div class="field_container" style="width: 1000px">
+      <div class="field_container">
         <div class="field_value">
           <input id="btnSetText" type="button" class="input-register" value="Set" v-on:click="onClickBtnSetText" />
         </div>
