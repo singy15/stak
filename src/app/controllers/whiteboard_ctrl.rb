@@ -6,7 +6,13 @@ get '/view/whiteboard' do
     @whiteboard_cd = "00-0000"
   end
 
-  @view_title = "Whiteboard (pre-alpha)"
+  if(@whiteboard_cd === "00-0000")
+    suffix = "GLOBAL" 
+  else
+    suffix = @whiteboard_cd
+  end
+
+  @view_title = "Whiteboard (alpha) / " + suffix
   @view_subtitle = ""
 
   @view_content = erb :part_whiteboard
