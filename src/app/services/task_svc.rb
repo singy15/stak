@@ -181,6 +181,12 @@ class TaskSvc < BaseSvc
     # return tasks.to_json()
   end
 
+  def select_by_cd_no_json(cd)
+    TTask.set_order_prm("")
+    TTask.set_where_prm(nil)
+    return TTask.with_rels().find_by(task_cd: cd)
+  end
+
   def select_by_cd(cd)
     TTask.set_order_prm("")
     TTask.set_where_prm(nil)
@@ -195,9 +201,11 @@ class TaskSvc < BaseSvc
   end
 
   def delete_by_cd(cd)
+    whiteboard_svc = WhiteboardSvc.new()
     task = TTask.with_rels().find(cd)
     recursive_delete(task.children_all)
     TTask.delete(cd)
+    whiteboard_svc.delete_by_cd_if_exist(cd)
     TTaskTaskRel.where(task_cd_a: cd).delete_all()
     TTaskTaskRel.where(task_cd_b: cd).delete_all()
   end

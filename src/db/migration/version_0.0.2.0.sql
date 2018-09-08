@@ -5,7 +5,7 @@
 drop table if exists t_whiteboard cascade;
 
 create table t_whiteboard (
-  whiteboard_cd varchar(10) not null
+  whiteboard_cd varchar(7) not null
   , task_cd varchar(7) not null
   , content text default '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel>' not null
   , created timestamp default now() not null
@@ -26,7 +26,7 @@ comment on column t_whiteboard.updated is 'updated';
 comment on column t_whiteboard.updated_by is 'updated_by';
 comment on column t_whiteboard.version is 'version';
 
-INSERT INTO public.t_whiteboard(whiteboard_cd, task_cd, content) VALUES ('00-0000-00', '00-0000', '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel>');
+INSERT INTO public.t_whiteboard(whiteboard_cd, task_cd, content) VALUES ('00-0000', '00-0000', '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel>');
 
 UPDATE c_version SET version = '0.0.2.0';
 

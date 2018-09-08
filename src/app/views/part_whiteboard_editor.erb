@@ -58,8 +58,10 @@
 	<script type="text/javascript" src="js/Dialogs.js"></script>
 </head>
 <body class="geEditor">
+  <span><%= @whiteboard_cd %></span>
 	<script type="text/javascript">
 // Extends EditorUi to update I/O action states based on availability of backend
+  var whiteboard_cd = '<%= @whiteboard_cd %>';
   var editor = null;
 		(function()
 		{
@@ -122,7 +124,7 @@
 
           $.ajax({
             type: "POST",
-            url: "/whiteboard/default",
+            url: "/whiteboard/" + whiteboard_cd,
             data: JSON.stringify({content: xml}),
             success: function(data, dataType) { 
               console.log(data.content);
@@ -162,17 +164,20 @@
         // });
         var onload = function(req)
         {
-          // mxUtils.alert(req.getDocumentElement());
           var response = JSON.parse(req.getText());
-          // console.log(response.content);
-          editor.setGraphXml(mxUtils.parseXml(response.content).documentElement);
+          if(response.success) {
+            // console.log(response.content);
+            editor.setGraphXml(mxUtils.parseXml(response.data.content).documentElement);
+          } else {
+            mxUtils.alert("load failed!");
+          }
         }
 
         var onerror = function(req)
         {
           mxUtils.alert('Error on loading default whiteboard');
         }
-        new mxXmlRequest("/whiteboard/default", 'key=value', 'GET').send(onload, onerror);
+        new mxXmlRequest("/whiteboard/" + whiteboard_cd, 'key=value', 'GET').send(onload, onerror);
 
 			}, function()
 			{

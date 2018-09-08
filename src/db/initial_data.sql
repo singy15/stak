@@ -59,4 +59,7 @@ INSERT INTO c_version (version) VALUES ('1');
 DELETE FROM t_solution;
 INSERT INTO t_solution (solution_cd,name,status_type,name) VALUES ('01','DEFAULT','SS02AC');
 
+-- t_whiteboard
+DELETE FROM t_whiteboard;
+INSERT INTO public.t_whiteboard(whiteboard_cd, task_cd, content) VALUES ('00-0000', '00-0000', '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel>');
 

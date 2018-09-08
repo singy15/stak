@@ -764,6 +764,14 @@
       }
     },
     computed: {
+      whiteboardAddress : function() {
+        var task_cd = this.row.task_cd;
+        if((task_cd != null) && (task_cd !== undefined) && (task_cd !== "")) {
+          return "/view/whiteboard?whiteboard_cd=" + this.row.task_cd;
+        } else {
+          return "/view/whiteboard";
+        }
+      },
       markedDescription: function () {
         if(this.row) {
           return marked(this.row.description);
