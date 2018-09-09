@@ -3,10 +3,10 @@ get '/view/whiteboard' do
   if(params["whiteboard_cd"]) 
     @whiteboard_cd = params["whiteboard_cd"]
   else
-    @whiteboard_cd = "00-0000"
+    @whiteboard_cd = ConstDefaults::DEFAULT_WHITEBOARD_CD
   end
 
-  if(@whiteboard_cd === "00-0000")
+  if(@whiteboard_cd === ConstDefaults::DEFAULT_WHITEBOARD_CD)
     suffix = "GLOBAL" 
   else
     suffix = @whiteboard_cd
@@ -19,20 +19,11 @@ get '/view/whiteboard' do
   erb :template
 end
 
-get '/view/whiteboard/sub' do
-  if(params["whiteboard_cd"]) 
-    @whiteboard_cd = params["whiteboard_cd"]
-  else
-    @whiteboard_cd = "00-0000"
-  end
-  erb :layouteditor
-end
-
 get '/view/whiteboard/editor' do
   if(params["whiteboard_cd"]) 
     @whiteboard_cd = params["whiteboard_cd"]
   else
-    @whiteboard_cd = "00-0000"
+    @whiteboard_cd = ConstDefaults::DEFAULT_WHITEBOARD_CD
   end
   erb :part_whiteboard_editor
 end
@@ -40,11 +31,10 @@ end
 get '/whiteboard/:cd' do
   task_svc = TaskSvc.new()
   task = task_svc.select_by_cd_no_json(params[:cd])
-  if((task == nil) && (params[:cd] != "00-0000")) 
+  if((task == nil) && (params[:cd] != ConstDefaults::DEFAULT_WHITEBOARD_CD)) 
     {success: false, message: "Task not exists", data: nil}.to_json
   else
     whiteboardSvc = WhiteboardSvc.new()
-    # TWhiteboard.json(whiteboardSvc.select_by_cd(params[:cd]))
     {success: true, message: "", data: whiteboardSvc.select_insert_by_cd(params[:cd])}.to_json
   end
 end

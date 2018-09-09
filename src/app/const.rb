@@ -8,3 +8,7 @@ class ConstTypeCategory
   SOLUTION_STATUS = "SS"
 end
 
+class ConstDefaults
+  DEFAULT_WHITEBOARD_CD = "00-0000"
+end
+

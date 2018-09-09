@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Grapheditor</title>
+  <title>Grapheditor</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
+  <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
 
   <script type="text/javascript" src="/lib/jquery.js"></script>
 	<script type="text/javascript">
@@ -58,132 +58,111 @@
 	<script type="text/javascript" src="js/Dialogs.js"></script>
 </head>
 <body class="geEditor">
-  <span><%= @whiteboard_cd %></span>
 	<script type="text/javascript">
-// Extends EditorUi to update I/O action states based on availability of backend
-  var whiteboard_cd = '<%= @whiteboard_cd %>';
-  var editor = null;
-		(function()
-		{
-			var editorUiInit = EditorUi.prototype.init;
-			
-			EditorUi.prototype.init = function()
-			{
-				editorUiInit.apply(this, arguments);
-				this.actions.get('export').setEnabled(false);
-
-				// Updates action states which require a backend
-				if (!Editor.useLocalStorage)
-				{
-					mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
-					{
-						var enabled = req.getStatus() != 404;
-						this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
-						this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
-						this.actions.get('save').setEnabled(enabled);
-						this.actions.get('saveAs').setEnabled(enabled);
-						this.actions.get('export').setEnabled(enabled);
-					}));
-				}
-			};
-			
-			// Adds required resources (disables loading of fallback properties, this can only
-			// be used if we know that all keys are defined in the language specific file)
-			mxResources.loadDefaultBundle = false;
-			var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
-				mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
-
-			// Fixes possible asynchronous requests
-			mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function(xhr)
-			{
-				// Adds bundle text to resources
-				mxResources.parse(xhr[0].getText());
-				
-				// Configures the default graph theme
-				var themes = new Object();
-				themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
-				
-        // Main
-        editor = new Editor(urlParams['chrome'] == '0', themes);
-        window.parent.editor = editor;
-
-        var mgr = new mxAutoSaveManager(editor.graph);
-        window.parent.autoSaveMng = mgr;
-        mgr.autoSaveThreshold = 0;
-        mgr.autoSaveDelay = 0;
-        mgr.autoSaveThrottle = 0;
-        mgr.save = function()
+    // Extends EditorUi to update I/O action states based on availability of backend
+    var whiteboard_cd = '<%= @whiteboard_cd %>';
+    var editor = null;
+      (function()
+      {
+        var editorUiInit = EditorUi.prototype.init;
+        
+        EditorUi.prototype.init = function()
         {
-          var encoder = new mxCodec();
-          var result = encoder.encode(editor.graph.getModel());
-          var xml = mxUtils.getXml(result);
-          window.parent.graphXmlOld = window.parent.graphXml;
-          window.parent.graphXml = xml;
-          // console.log(xml);
+          editorUiInit.apply(this, arguments);
+          this.actions.get('export').setEnabled(false);
 
-
-          $.ajax({
-            type: "POST",
-            url: "/whiteboard/" + whiteboard_cd,
-            data: JSON.stringify({content: xml}),
-            success: function(data, dataType) { 
-              console.log(data.content);
-              // editor.setGraphXml(mxUtils.parseXml(data.content).documentElement);
-              if(data.success) {
-                console.log("Save success.");
-
-                editor.setModified(false);
-              }
-            },
-            error: function() {
-              console.log("Save error!!!");
-            },
-            dataType: "json"
-          });
-
-
-          mxLog.show();
-          mxLog.debug('save ' + (new Date()));
-        };
-
-        new EditorUi(editor);
-
-        // Load default whiteboard
-        // $.ajax({
-        //   type: "GET",
-        //   url: "/whiteboard/default",
-        //   // data: JSON.stringify(vue[propNameSelectedRow]),
-        //   success: function(data, dataType) { 
-        //     console.log(data.content);
-        //     editor.setGraphXml(mxUtils.parseXml(data.content).documentElement);
-        //   },
-        //   error: function() {
-        //     console.log("Get default whiteboard error!!!");
-        //   },
-        //   dataType: "json"
-        // });
-        var onload = function(req)
-        {
-          var response = JSON.parse(req.getText());
-          if(response.success) {
-            // console.log(response.content);
-            editor.setGraphXml(mxUtils.parseXml(response.data.content).documentElement);
-          } else {
-            mxUtils.alert("load failed!");
+          // Updates action states which require a backend
+          if (!Editor.useLocalStorage)
+          {
+            mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
+            {
+              var enabled = req.getStatus() != 404;
+              this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
+              this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
+              this.actions.get('save').setEnabled(enabled);
+              this.actions.get('saveAs').setEnabled(enabled);
+              this.actions.get('export').setEnabled(enabled);
+            }));
           }
-        }
+        };
+        
+        // Adds required resources (disables loading of fallback properties, this can only
+        // be used if we know that all keys are defined in the language specific file)
+        mxResources.loadDefaultBundle = false;
+        var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
+          mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
 
-        var onerror = function(req)
+        // Fixes possible asynchronous requests
+        mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function(xhr)
         {
-          mxUtils.alert('Error on loading default whiteboard');
-        }
-        new mxXmlRequest("/whiteboard/" + whiteboard_cd, 'key=value', 'GET').send(onload, onerror);
+          // Adds bundle text to resources
+          mxResources.parse(xhr[0].getText());
+          
+          // Configures the default graph theme
+          var themes = new Object();
+          themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
+          
+          // Main
+          editor = new Editor(urlParams['chrome'] == '0', themes);
+          window.parent.editor = editor;
 
-			}, function()
-			{
-				document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
-			});
-		})();
+          var mgr = new mxAutoSaveManager(editor.graph);
+          window.parent.autoSaveMng = mgr;
+          mgr.autoSaveThreshold = 0;
+          mgr.autoSaveDelay = 0;
+          mgr.autoSaveThrottle = 0;
+          mgr.save = function()
+          {
+            var encoder = new mxCodec();
+            var result = encoder.encode(editor.graph.getModel());
+            var xml = mxUtils.getXml(result);
+
+            $.ajax({
+              type: "POST",
+              url: "/whiteboard/" + whiteboard_cd,
+              data: JSON.stringify({content: xml}),
+              success: function(data, dataType) { 
+                console.log(data.content);
+                if(data.success) {
+                  console.log("Save success.");
+                  editor.setModified(false);
+                }
+              },
+              error: function() {
+                mxUtils.alert('Save error !!! : Open Menu > Extra > Edit Diagram to preserve progress!');
+              },
+              dataType: "json"
+            });
+
+
+            mxLog.show();
+            mxLog.debug('save ' + (new Date()));
+          };
+
+          new EditorUi(editor);
+
+          // Load default whiteboard
+          var onload = function(req)
+          {
+            var response = JSON.parse(req.getText());
+            if(response.success) {
+              editor.setGraphXml(mxUtils.parseXml(response.data.content).documentElement);
+            } else {
+              mxUtils.alert("load failed!");
+            }
+          }
+
+          var onerror = function(req)
+          {
+            mxUtils.alert('Error on loading default whiteboard');
+          }
+          new mxXmlRequest("/whiteboard/" + whiteboard_cd, 'key=value', 'GET').send(onload, onerror);
+
+        }, function()
+        {
+          document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
+        });
+    })();
 	</script>
 </body>
 </html>

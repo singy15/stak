@@ -1,103 +1,5 @@
 
-<!-- <script type="text/javascript" src="/lib/fabric.js"></script> -->
-
-<!-- <link rel="stylesheet" type="text/css" href="/lib/joint.css"/> -->
-<!-- <script src="/lib/lodash.js"></script> -->
-<!-- <script src="/lib/backbone.js"></script> -->
-<!-- <script src="/lib/joint.js"></script> -->
-<!-- <script src="/js/jointjs_util.js"></script> -->
-
 <style>
-canvas {
-  border : solid 1px;
-}
-
-.port_body {
-  background-color: red;
-}
-
-#paper {
-   position: relative;
-   border: 1px solid gray;
-   display: inline-block;
-   background: transparent;
-   overflow: hidden;
-}
-#paper svg {
-   background: transparent;
-}
-#paper svg .link {
-   z-index: 2;
-}
-.html-element {
-   position: absolute;                                                                                                                                         
-   background: #3498DB;
-   /* Make sure events are propagated to the JointJS element so, e.g. dragging works.*/
-   pointer-events: none;
-   -webkit-user-select: none;
-   border-radius: 4px;
-   border: 2px solid #2980B9;
-   box-shadow: inset 0 0 5px black, 2px 2px 1px gray;
-   padding: 5px;
-   box-sizing: border-box;
-   z-index: 2;
-}
-.html-element select,
-.html-element input,
-.html-element button {
-   /* Enable interacting with inputs only. */
-   pointer-events: auto;
-}
-.html-element button.delete {
-   color: white;
-   border: none;
-   background-color: #C0392B;
-   border-radius: 20px;
-   width: 15px;
-   height: 15px;
-   line-height: 15px;
-   text-align: middle;
-   position: absolute;
-   top: -15px;
-   left: -15px;
-   padding: 0;
-   margin: 0;
-   font-weight: bold;
-   cursor: pointer;
-}
-.html-element button.delete:hover {
-   width: 20px;
-   height: 20px;
-   line-height: 20px;
-}
-.html-element select {
-   position: absolute;
-   right: 2px;
-   bottom: 28px;
-}
-.html-element input {
-   position: absolute;
-   bottom: 0;
-   left: 0;
-   right: 0;
-   border: none;
-   color: #333;
-   padding: 5px;
-   height: 16px;
-}
-.html-element label {
-   color: #333;
-   text-shadow: 1px 0 0 lightgray;
-   font-weight: bold;
-}
-.html-element span {
-   position: absolute;
-   top: 2px;
-   right: 9px;
-   color: white;
-   font-size: 10px;
-}
-
 html {
   width : 100%;
   height : 100%;
@@ -118,119 +20,24 @@ body {
   height : 100%;
 }
 
-/*
-.w3-container {
-  height: -webkit-calc(100% - 60px);
+iframe {
   width : 100%;
+  height : 100%;
+  border : solid 1px;
+  margin-left : -16px;
+  margin-top : -10px;
+  margin-right : -16px
 }
-    */
+
+#vue-main {
+  width : 100%;
+  height : 100%;
+}
 </style>
 
-<!--
-	<style type="text/css" media="screen">
-		div.base {
-      /*position: absolute;*/
-      height:700px;
-			overflow: hidden;
-			font-family: Arial;
-			font-size: 8pt;
-		}
-		div.base#graph {
-			border-style: solid;
-			border-color: #F2F2F2;
-			border-width: 1px;
-			background: url('images/grid.gif');
-    }
-    .mxWindowPane {
-      padding: 8px 0px 5px 5px;
-    }
-	</style>
-  -->
-
-
-  <!-- <script type="text/javascript"> -->
-<!-- mxBasePath = '/mxgraph'; -->
-  <!-- window.onbeforeunload = function() { return mxResources.get('changesLost'); }; -->
-  <!-- </script> -->
-  <!-- <script type="text/javascript" src="/mxgraph/js/mxClient.js"></script> -->
-  <!-- <script type="text/javascript" src="/js/app.js"></script> -->
-
-<div id="vue-main" class="vue-component" style="width:100%;height:100%;">
-
-  <iframe id="editor" style="width:100%;height:100%;border:solid 1px;margin-left:-16px;margin-top:-10px;margin-right:-16px" src="/view/whiteboard/editor?whiteboard_cd=<%= @whiteboard_cd %>"></iframe>
-
-  <!-- <div style="background-color:red;width:100%;height:100%;"></div> -->
-
-  <!-- worked -->
-  <!-- <iframe style="width:100%;height:700px;border:solid 1px;" src="/view/whiteboard/sub"></iframe> -->
-
-
-  <!--
-    <div id="graph" class="base">
-    </div>
-    <div id="status" class="base" align="right" style="white-space:nowrap;">
-      Done
-    </div>
-  -->
-
-
-  <!-- <iframe style="width:100%;height:700px" src="https://jgraph.github.io/mxgraph/javascript/examples/grapheditor/www/index.html"></iframe> -->
-  <!-- <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;" data-options="src:'https://jgraph.github.io/mxgraph/javascript/examples/grapheditor/www/index.html'"> -->
-  <!-- </div> -->
-  <!-- <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;"> -->
-  <!-- <canvas id="board" width="800px" height="400px"></canvas> -->
-    <!-- <div id="paper"></div> -->
-    <!-- </div> -->
-
-  <!--
-  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
-    <input id="btnToggleFreehand" type="button" class="input-register" v-on:click="toggleFreehand" v-bind:value="textBtnToggleFreehand"/>
-  </div>
-
-  <div class="easyui-panel" style="width:100%;padding:5px;margin-bottom:5px;">
-    <div style="display:flex;flex-flow: column nowrap;">
-      <div class="field_container">
-        <div class="field_header">Shapes</div>
-        <div class="field_value">
-          <input id="btnAddRect" type="button" class="input-register" value="Rect" v-on:click="onClickBtnAddRect" />
-        </div>
-        <div class="field_value">
-          <input id="btnText" type="button" class="input-register" value="Text" v-on:click="onClickBtnText" />
-        </div>
-        <div class="field_value">
-          <input id="btnTextbox" type="button" class="input-register" value="Textbox" v-on:click="onClickBtnTextbox" />
-        </div>
-        <div class="field_value">
-          <input id="btnAddLine" type="button" class="input-register" value="Line" v-on:click="onClickBtnAddLine" />
-        </div>
-        <div class="field_value">
-          <input id="btnAddConnector" type="button" class="input-register" value="Connector" v-on:click="onClickBtnAddConnector" />
-        </div>
-      </div>
-
-
-      <div class="field_container" >
-        <div class="field_header">Text</div>
-      </div>
-
-      <div class="field_container" style="width:100%;height:auto">
-        <div class="field_value" style="width:100%;height:auto">
-          <textarea v-model="editText" type="text" style="width:100%"></textarea>
-        </div>
-      </div>
-
-      <div class="field_container">
-        <div class="field_value">
-          <input id="btnSetText" type="button" class="input-register" value="Set" v-on:click="onClickBtnSetText" />
-        </div>
-      </div>
-    </div>
-  </div>
-  -->
+<div id="vue-main" class="vue-component" >
+  <iframe id="editor" src="/view/whiteboard/editor?whiteboard_cd=<%= @whiteboard_cd %>"></iframe>
 </div>
-
-<script type="text/javascript" src="/js/ex_datetimebox.js"></script>
-<script type="text/javascript" src="/js/core_util.js"></script>
 
 <script type="text/javascript" src="/js/whiteboard.js"></script>
 
