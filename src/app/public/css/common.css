@@ -65,3 +65,11 @@ select {
   width: 100%;
 }
 
+.w3-bottom {
+  opacity : 0.0;
+}
+
+.w3-bottom:hover {
+  opacity : 1.0;
+}
+
