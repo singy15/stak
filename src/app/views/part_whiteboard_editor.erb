@@ -121,6 +121,7 @@
               type: "POST",
               url: "/whiteboard/" + whiteboard_cd,
               data: JSON.stringify({content: xml}),
+              contentType: 'charset=utf-8',
               success: function(data, dataType) { 
                 console.log(data.content);
                 if(data.success) {
