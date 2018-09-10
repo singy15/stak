@@ -73,3 +73,8 @@ select {
   opacity : 1.0;
 }
 
+.whiteboard_button {
+  cursor: pointer;
+  font-size:16px;
+}
+

@@ -61,7 +61,7 @@
           <input v-model="dispTaskCd" type="text" style="width:80px" readonly>
         </div>
         <div class="field_value">
-          <a class="icon icon-stats-dots" v-bind:href="whiteboardAddress" style="cursor: pointer;font-size:16px"></a>
+          <a id="btnWhiteboard" class="icon icon-stats-dots whiteboard_button" v-bind:href="whiteboardAddress" style="opacity:0.3"></a>
         </div>
       </div>
 
@@ -831,6 +831,25 @@
 
       $("#dpStart").datetimebox("setValue", vue.row.start_dt);
       $("#dpEnd").datetimebox("setValue",  vue.row.end_dt);
+
+      $("#btnWhiteboard").css("display", "none");
+      $.ajax({
+        type: "GET",
+        url: "/whiteboard/" + vue.row.task_cd + "/exist",
+        contentType: 'charset=utf-8',
+        success: function(data, dataType) { 
+          // console.log(data);
+          if(data.success) {
+            $("#btnWhiteboard").css("display", "inherit");
+            if(data.data) {
+              $("#btnWhiteboard").css("opacity", "1.0");
+            } else {
+              $("#btnWhiteboard").css("opacity", "0.3");
+            }
+          }
+        },
+        dataType: "json"
+      });
     }
   });
 </script>
