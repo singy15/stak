@@ -47,3 +47,10 @@ post '/whiteboard/:cd', provides: :json do
   {success: true, message: "Register success", data: ""}.to_json
 end
 
+get '/whiteboard/:cd/exist', provides: :json do
+  svc = WhiteboardSvc.new()
+  is_exist = svc.select_exist_by_cd(params[:cd])
+
+  {success: true, message: "", data: is_exist}.to_json
+end
+

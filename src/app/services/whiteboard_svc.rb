@@ -18,6 +18,14 @@ class WhiteboardSvc < BaseSvc
     @entity.find(cd)
   end
 
+  def select_exist_by_cd(cd)
+    if(@entity.find_by(whiteboard_cd: cd))
+      true
+    else
+      false
+    end
+  end
+
   def delete_by_cd_if_exist(cd)
     r = @entity.find_by(whiteboard_cd: cd)
     if(r != nil)

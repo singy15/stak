@@ -69,3 +69,8 @@ td,th {
   padding-left: 5px;
 }
 
+.whiteboard_button {
+  cursor: pointer;
+  font-size:16px;
+}
+
