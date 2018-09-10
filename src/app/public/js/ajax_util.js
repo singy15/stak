@@ -8,7 +8,8 @@ function ajax(type, url, data, success, error, opts) {
         dataType : 'json',
         success : success,
         error : error,
-        data : (data !== undefined)? JSON.stringify(data) : undefined
+        data : (data !== undefined)? JSON.stringify(data) : undefined,
+        contentType: 'charset=utf-8'
       }, 
       (opts !== undefined && opts !== null)? opts : {}
   ));

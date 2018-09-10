@@ -53,6 +53,7 @@ function singleInsUpd(vue, propNameSelectedRow, treegrid, fnNewRecord, partUrl, 
     type: "POST",
     url: "/"+partUrl,
     data: JSON.stringify(vue[propNameSelectedRow]),
+    contentType: 'charset=utf-8',
     success: function(data, dataType) { 
       defaultUpdtSuccessCallback(data, dataType);
       if(data.success) {
@@ -74,6 +75,7 @@ function singleDel(vue, partUrl, propNameSelected, propNameCd, treegrid, fnNewRe
     type: "DELETE",
     url: "/"+partUrl+"/" + vue[propNameSelected][propNameCd],
     data: JSON.stringify(vue[propNameSelected]),
+    contentType: 'charset=utf-8',
     success: function(data, dataType) { 
       defaultUpdtSuccessCallback(data, dataType);
 
@@ -90,6 +92,7 @@ function batchUpd(vue, propNameDiff, propNameSelections, treegrid, fnNewRecord, 
     type: "POST",
     url: "/batch/" + partUrl,
     data: JSON.stringify({rows : vue[propNameSelections], diff : vue[propNameDiff]}),
+    contentType: 'charset=utf-8',
     success: function(data, dataType) { 
       defaultUpdtSuccessCallback(data, dataType);
 
@@ -106,6 +109,7 @@ function batchDel(vue, propNameSelected, propNameSelections, treegrid, fnNewReco
     type: "DELETE",
     url: "/batch/" + partUrl,
     data: JSON.stringify({rows : vue[propNameSelections]}),
+    contentType: 'charset=utf-8',
     success: function(data, dataType) { 
       defaultUpdtSuccessCallback(data, dataType);
 
@@ -122,6 +126,7 @@ function batchManualUpd(partUrl, treegrid, rows, diff) {
     type: "POST",
     url: "/batch/" + partUrl,
     data: JSON.stringify({rows : rows, diff : diff}),
+    contentType: 'charset=utf-8',
     success: function(data, dataType) { 
       defaultUpdtSuccessCallback(data, dataType);
       treegrid.treegrid("reload");

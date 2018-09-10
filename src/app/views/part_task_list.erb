@@ -713,6 +713,7 @@
           type: "POST",
           url: "/link/task_task",
           data: JSON.stringify({taskCdA:vue.row.task_cd, taskCdB:vue.relTaskCd,relType:vue.relType}),
+          contentType: 'charset=utf-8',
           success: function(data, dataType) { 
             if(data.success) {
               messageUpdateSuccess(data.message);
@@ -731,6 +732,7 @@
           type: "POST",
           url: "/unlink/task_task",
           data: JSON.stringify({taskCdA:taskCdA, taskCdB:taskCdB,relType:relType}),
+          contentType: 'charset=utf-8',
           success: function(data, dataType) { 
             if(data.success) {
               messageUpdateSuccess(data.message);
@@ -751,6 +753,7 @@
         $.ajax({
           type: "GET",
           url: "/tasks/"+taskCd,
+          contentType: 'charset=utf-8',
           success: function(data, dataType) { 
             //if(data.success) {
               self.multiRowSelected = false;

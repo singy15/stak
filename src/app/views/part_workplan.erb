@@ -99,6 +99,7 @@
         // url: "/workplans/" + vue.row.task_cd,
         url: "/tasks/" + vue.row.task_cd,
         data: JSON.stringify(vue.row),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
 
@@ -132,6 +133,7 @@
         type: "POST",
         url: "/workplans",
         data: JSON.stringify(vue.row),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
 
@@ -178,6 +180,7 @@
         type: "GET",
         url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
         data: JSON.stringify({}),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
           var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
@@ -252,6 +255,7 @@
             type: "POST",
             url: "/workplans",
             data: JSON.stringify(task1),
+            contentType: 'charset=utf-8',
             success: function(data, dataType) { 
               // defaultUpdtSuccessCallback(data, dataType);
 
@@ -267,6 +271,7 @@
             type: "POST",
             url: "/workplans",
             data: JSON.stringify(task2),
+            contentType: 'charset=utf-8',
             success: function(data, dataType) { 
               // defaultUpdtSuccessCallback(data, dataType);
 
@@ -510,6 +515,7 @@
         type: "POST",
         url: "/workplans",
         data: JSON.stringify(task1),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
 
@@ -525,6 +531,7 @@
         type: "POST",
         url: "/workplans",
         data: JSON.stringify(task2),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           // defaultUpdtSuccessCallback(data, dataType);
 
@@ -629,6 +636,7 @@
       type: "POST",
       url: "/workplans",
       data: JSON.stringify(diff),
+      contentType: 'charset=utf-8',
       success: function(data, dataType) { 
         // defaultUpdtSuccessCallback(data, dataType);
 
@@ -681,6 +689,7 @@
       type: "GET",
       url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
       data: JSON.stringify({}),
+      contentType: 'charset=utf-8',
       success: function(data, dataType) { 
         // defaultUpdtSuccessCallback(data, dataType);
 
