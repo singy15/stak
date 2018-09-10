@@ -56,6 +56,7 @@
         type: "DELETE",
         url: "/solutions/" + vue.row.solution_cd,
         data: JSON.stringify(vue.row),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           console.log("success");
           console.log(data);
@@ -89,6 +90,7 @@
         type: "PUT",
         url: "/solutions",
         data: JSON.stringify(vue.row),
+        contentType: 'charset=utf-8',
         success: function(data, dataType) { 
           console.log("success");
           console.log(data);
