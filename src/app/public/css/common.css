@@ -51,3 +51,17 @@ select {
   padding: 0px;
   margin-bottom: 2px;
 }
+
+.flex-box {
+  display: -webkit-box;
+  display: box;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.flex-box div {
+  display:block;
+  -webkit-box-flex: 1;
+  box-flex: 1;
+  width: 100%;
+}
+

@@ -7,6 +7,7 @@ get '/view/solutions' do
   typeSvc = TypeSvc.new()
   @key_value_solution_status_type = typeSvc.kv_solution_status_type()
   @view_content = erb :part_solution_list
+  @view_content_bottom = erb :part_solution_bottom
   erb :template
 end
 

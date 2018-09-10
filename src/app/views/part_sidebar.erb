@@ -37,8 +37,10 @@
     updated: function () {
       if(this.sidebarShown) {
         $("#pageContent").css("margin-left","150px");
+        $(".w3-bottom").css('width', '100%').css('width', '-=150px');
       } else {
         $("#pageContent").css("margin-left","35px");
+        $(".w3-bottom").css('width', '100%').css('width', '-=35px');
       }
 
       $(window).resize();

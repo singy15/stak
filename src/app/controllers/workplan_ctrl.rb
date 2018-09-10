@@ -13,6 +13,7 @@ get '/view/workplan' do
   @key_value_solution = typeSvc.kv_solution()
 
   @view_content = erb :part_workplan
+  @view_content_bottom = erb :part_workplan_bottom
   erb :template
 end
 

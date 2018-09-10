@@ -4,6 +4,7 @@ get '/view/users' do
   @view_subtitle = ""
   # @users = 
   @view_content = erb :part_user_list
+  @view_content_bottom = erb :part_user_list_bottom
   erb :template
 end
 
