@@ -181,6 +181,8 @@
         <div class="field_header">Description</div>
         <div class="field_value">
           <span class="icon icon-pencil" v-on:click="toggleDescriptionEdit"></span>
+          &nbsp;
+          <span class="icon icon-stopwatch" style="cursor: pointer;" v-on:click="copyTimestamp"></span>
         </div>
       </div>
 
@@ -806,6 +808,9 @@
       formatterDatetime : function(value) {
         var m = moment(value);
         return (m.isValid())? m.format("YYYY/MM/DD HH:mm:ss") : "";
+      },
+      copyTimestamp : function() {
+        execCopy(moment().format("YYYY-MM-DD HH:mm:ss"));
       }
     },
     computed: {

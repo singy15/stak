@@ -793,6 +793,9 @@
       },
       toggleDescriptionEdit : function() {
         this.showDescriptionView = !(this.showDescriptionView);
+      },
+      copyTimestamp : function() {
+        execCopy(moment().format("YYYY-MM-DD HH:mm:ss"));
       }
     },
     computed: {
