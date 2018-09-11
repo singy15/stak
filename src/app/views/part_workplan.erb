@@ -752,9 +752,30 @@
     },
     watch: {
       hideClosed: 'loadByChecked',
-      fixedHeight: 'loadByChangeHeight'
+      fixedHeight: 'loadByChangeHeight',
+      row : 'setWhiteboardBtn',
     },
     methods: {
+      setWhiteboardBtn : function() {
+        $("#btnWhiteboard").css("display", "none");
+        $.ajax({
+          type: "GET",
+          url: "/whiteboard/" + vue.row.task_cd + "/exist",
+          contentType: 'charset=utf-8',
+          success: function(data, dataType) { 
+            // console.log(data);
+            if(data.success) {
+              $("#btnWhiteboard").css("display", "inherit");
+              if(data.data) {
+                $("#btnWhiteboard").css("opacity", "1.0");
+              } else {
+                $("#btnWhiteboard").css("opacity", "0.3");
+              }
+            }
+          },
+          dataType: "json"
+        });
+      },
       loadByChecked : function() {
         loadTask();
       },
@@ -807,25 +828,6 @@
       $("#progress").slider("setValue", Math.round(vue.row.progress * 100.0));
       $("#dpStart").datetimebox("setValue", vue.row.start_date);
       $("#dpEnd").datetimebox("setValue",  vue.row.end_date);
-
-      $("#btnWhiteboard").css("display", "none");
-      $.ajax({
-        type: "GET",
-        url: "/whiteboard/" + vue.row.task_cd + "/exist",
-        contentType: 'charset=utf-8',
-        success: function(data, dataType) { 
-          // console.log(data);
-          if(data.success) {
-            $("#btnWhiteboard").css("display", "inherit");
-            if(data.data) {
-              $("#btnWhiteboard").css("opacity", "1.0");
-            } else {
-              $("#btnWhiteboard").css("opacity", "0.3");
-            }
-          }
-        },
-        dataType: "json"
-      });
     }
   });
 </script>
