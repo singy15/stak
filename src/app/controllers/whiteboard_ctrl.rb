@@ -12,7 +12,7 @@ get '/view/whiteboard' do
     suffix = @whiteboard_cd
   end
 
-  @view_title = "Whiteboard (alpha) / " + suffix
+  @view_title = "Whiteboard (beta) / " + suffix
   @view_subtitle = ""
 
   @view_content = erb :part_whiteboard
