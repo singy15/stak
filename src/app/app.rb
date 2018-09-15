@@ -19,7 +19,6 @@ configure :development do |c|
   c.also_reload "./services/base/*.rb" 
   c.also_reload "./services/*.rb" 
   c.also_reload "./controllers/*.rb" 
-  # c.also_reload "./init/*.rb" 
 end
 
 

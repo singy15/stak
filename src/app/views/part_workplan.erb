@@ -751,8 +751,8 @@
       fixedHeight : true
     },
     watch: {
-      hideClosed: 'loadByChecked',
-      fixedHeight: 'loadByChangeHeight',
+      //hideClosed: 'loadByChecked',
+      // fixedHeight: 'loadByChangeHeight',
       row : 'setWhiteboardBtn',
     },
     methods: {
@@ -776,10 +776,12 @@
           dataType: "json"
         });
       },
-      loadByChecked : function() {
+      loadByChecked : function(toggleState) {
+        this.hideClosed = toggleState;
         loadTask();
       },
-      loadByChangeHeight : function() {
+      loadByChangeHeight : function(toggleState) {
+        this.fixedHeight = toggleState;
         if(vue.fixedHeight) {
           gantt.config.autosize = false;
         } else {
@@ -796,6 +798,34 @@
       },
       copyTimestamp : function() {
         execCopy(moment().format("YYYY-MM-DD HH:mm:ss"));
+      },
+      refreshTask : function() {
+        loadTask();
+      },
+      toScaleDay : function() {
+        var st = moment().add(-2,"months").startOf("day");
+        var ed = moment().add(4,"months").startOf("day");
+        initGantt("gantt_here", getSubScale("day"), st, ed, 36);
+        loadTask();
+      },
+      toScaleHour : function() {
+        $.ajax({
+          type: "GET",
+          url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
+          data: JSON.stringify({}),
+          contentType: 'charset=utf-8',
+          success: function(data, dataType) { 
+            var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
+            var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
+            initGantt("gantt_here", getSubScale("hour"), st, ed, 18);
+            loadTask();
+          },
+          // error: defaultUpdtErrorCallback,
+          dataType: "json"
+        });
+      },
+      test : function() {
+        console.log("ok");
       }
     },
     computed: {

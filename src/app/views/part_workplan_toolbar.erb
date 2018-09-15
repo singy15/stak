@@ -1,8 +1,5 @@
-
-<span class="icon icon-spinner9" id="btnRefresh" style="cursor: pointer"></span>
-<span class="icon icon-calendar" id="btnScaleDay" style="cursor: pointer"></span>
-<span class="icon icon-clock" id="btnScaleHour" style="cursor: pointer"></span>
-<input type="checkbox" style="width:12px;height:12px" id="cbHideClosed" v-model="hideClosed">
-<label for="cbHideClosed" style="font-size:0.5em; vertical-align:middle;">{{ (hideClosed)? "HIDE CLOSED" : "SHOW CLOSED" }}</label>
-<input type="checkbox" style="width:12px;height:12px" id="cbFixedHeight" v-model="fixedHeight">
-<label for="cbFixedHeight" style="font-size:0.5em; vertical-align:middle;">{{ (fixedHeight)? "FIXED HEIGHT" : "AUTO HEIGHT" }}</label>
+<icon-button v-on:on-click="refreshTask" icon="icon-spinner9"></icon-button>
+<icon-button v-on:on-click="toScaleDay" icon="icon-calendar"></icon-button>
+<icon-button v-on:on-click="toScaleHour" icon="icon-clock"></icon-button>
+<toggle-checkbox text-on="HIDE CLOSED" text-off="SHOW CLOSED" v-on:on-click="loadByChecked"></toggle-checkbox>
+<toggle-checkbox text-on="FIXED HEIGHT" text-off="AUTO HEIGHT" v-on:on-click="loadByChangeHeight"></toggle-checkbox>
