@@ -56,4 +56,19 @@ Vue.component('toggle-checkbox', {
   `
 });
 
+// footer-button
+Vue.component('footer-button', {
+  data: function () { 
+    return {
+    };
+  },
+  props : {
+    text : String,
+    id : String
+  },
+  template: 
+  `
+    <div v-bind:id="id" class="w3-button">{{ text }}</div>
+  `
+});
 
