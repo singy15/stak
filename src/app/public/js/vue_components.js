@@ -25,13 +25,21 @@ Vue.component('icon-button', {
   //   {{ text }}
   // </span>
   // `
-  ''
-  + '<span '
-    + 'v-bind:class="getCss()" '
-    + 'v-on:click="onClick" '
-    + 'style="cursor: pointer">'
-    + '{{ text }}'
-  + '</span>'
+  // ''
+  // + '<span '
+  //   + 'v-bind:class="getCss()" '
+  //   + 'v-on:click="onClick" '
+  //   + 'style="cursor: pointer">'
+  //   + '{{ text }}'
+  // + '</span>'
+'\
+<span \
+  v-bind:class="getCss()"\
+  v-on:click="onClick"\
+  style="cursor: pointer">\
+  {{ text }}\
+</span>\
+'
 });
 
 // toggle-checkbox
