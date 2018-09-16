@@ -2,117 +2,116 @@
 <!-- Set to width:100% cause overflow when toggle sidebar -->
 <div style="display:flex;flex-flow: column nowrap;">
   <div class="field_container">
-    <div class="field_header">Task CD</div>
-    <div class="field_value" style="width: 85px;">
-      <!-- <span>{{(row.task_cd)? row.task_cd : "NEW"}}</span> -->
-      <input v-model="dispTaskCd" type="text" style="width:80px" readonly>
-    </div>
-    <div class="field_value">
+    <field-header>Task CD</field-header>
+    <field-value style="width: 85px">
+      <input-cd v-model="row.task_cd" v-bind:size=8></input-cd>
+    </field-value>
+    <field-value>
       <a id="btnWhiteboard" class="icon icon-stats-dots whiteboard_button" v-bind:href="whiteboardAddress" style="opacity:0.3"></a>
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width: 1000px">
-    <div class="field_header">Name</div>
+    <field-header>Name</field-header>
   </div>
 
   <div class="field_container" style="width:100%;">
-    <div class="field_value" style="width:100%;">
+    <field-value style="width:100%">
       <input v-model="row.name" type="text" style="width:100%">
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width: 800px">
-    <div class="field_header">Solution</div>
-    <div class="field_value">
+    <field-header>Solution</field-header>
+    <field-value>
       <select name="category" v-model="row.solution_cd" v-bind:disabled="hasTaskCd">
         <option v-for="category in key_value_solution" :value="category.value">
           {{ category.text }}
         </option>
       </select>
-    </div>
-    <div class="field_header">Type</div>
-    <div class="field_value">
+    </field-value>
+    <field-header>Type</field-header>
+    <field-value>
       <select name="category" v-model="row.task_type">
         <option v-for="category in key_value_task_type" :value="category.value">
           {{ category.text }}
         </option>
       </select>
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width: 800px">
-    <div class="field_header">Assigned to</div>
-    <div class="field_value">
+    <field-header>Assigned to</field-header>
+    <field-value>
       <select name="category" v-model="row.user_cd">
         <option v-for="category in key_value_user" :value="category.value">
           {{ category.text }}
         </option>
       </select>
-    </div>
-    <div class="field_header">Priority</div>
-    <div class="field_value">
+    </field-value>
+    <field-header>Priority</field-header>
+    <field-value>
       <select name="category" v-model="row.priority_type">
         <option v-for="category in key_value_task_priority_type" :value="category.value">
           {{ category.text }}
         </option>
       </select>
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width: 1000px">
-    <div class="field_header">Status</div>
-    <div class="field_value">
+    <field-header>Status</field-header>
+    <field-value>
       <select name="category" v-model="row.status_type">
         <option v-for="category in key_value_task_status_type" :value="category.value">
           {{ category.text }}
         </option>
       </select>
-    </div>
-    <div class="field_header">Term</div>
-    <div class="field_value" style="width:500px">
+    </field-value>
+    <field-header>Term</field-header>
+    <field-value style="width:500px">
       <input id="dpStart" class="easyui-datetimebox" style="width:145px;">
       <span> --- </span>
       <input id="dpEnd" class="easyui-datetimebox" style="width:145px;">
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width: 800px;height:55px;">
-    <div class="field_header" style="">Progress</div>
-    <div class="field_value" style="width:500px;">
+    <field-header>Progress</field-header>
+    <field-value style="width:500px;">
       <input class="easyui-slider" id="progress" style="width:300px;" 
              data-options="showTip:true, rule: [0,'|',25,'|',50,'|',75,'|',100], step: 5">
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container">
-    <div class="field_header">Parent CD</div>
-    <div class="field_value">
+    <field-header>Parent CD</field-header>
+    <field-value>
       <input v-model="row.parent_cd" type="text" style="width:140px">
       <span class="icon icon-copy" id="btnCopyTaskCd" style="cursor: pointer;font-size:16px"></span>
       <span class="icon icon-paste" id="btnPasteTaskCd" style="cursor: pointer;font-size:16px"></span>
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container">
-    <div class="field_header">Description</div>
-    <div class="field_value">
+    <field-header>Description</field-header>
+    <field-value>
       <span class="icon icon-pencil" style="cursor: pointer;" v-on:click="toggleDescriptionEdit"></span>
       &nbsp;
       <span class="icon icon-stopwatch" style="cursor: pointer;" v-on:click="copyTimestamp"></span>
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width:100%;height:auto" v-show="showDescriptionView">
-    <div class="field_value" style="width:100%">
+    <field-value style="width:100%">
       <textarea v-show="showDescriptionView" id="taDesc" v-model="row.description" type="text" style="width:100%"> </textarea>
-    </div>
+    </field-value>
   </div>
 
   <div class="field_container" style="width:100%;height:auto">
-    <div class="field_value" style="width:100%">
+    <field-value style="width:100%">
       <div class="easyui-panel descriptionView" v-html="markedDescription" style="padding:5px;width:100%;"> 
       </div>
-    </div>
+    </field-value>
   </div>
 </div>

@@ -72,3 +72,41 @@ Vue.component('footer-button', {
   `
 });
 
+// input-cd
+Vue.component('input-cd', {
+  props : { 
+    value : String,
+    size : Number
+  },
+  computed : {
+    disp : function() {
+      return ((this.value == null) || (this.value === undefined) || (this.value === ""))? "NEW" : this.value;
+    },
+    style : function() {
+      return {
+        width : (10 * this.size).toString() + "px"
+      };
+    }
+  },
+  template: 
+  `
+    <input v-bind:style="style" readonly v-bind:value="disp" v-on:input="$emit('input', $event.target.value)" >
+  `
+});
+
+// field-value
+Vue.component('field-value', {
+  template: 
+  `
+    <div class="field_value"><slot></slot></div>
+  `
+});
+
+// field-header
+Vue.component('field-header', {
+  template: 
+  `
+    <div class="field_header"><slot></slot></div>
+  `
+});
+
