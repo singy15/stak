@@ -353,5 +353,154 @@ class TaskSvc < BaseSvc
     recursive_path_update(task.task_cd, task.children_all)
   end
 
+  def batch_delete(params)
+    params.each do |e|
+      TTask.destroy(e["task_cd"])
+      TTaskTaskRel.where(task_cd_a: e["task_cd"]).delete_all()
+      TTaskTaskRel.where(task_cd_b: e["task_cd"]).delete_all()
+    end
+  end
+
+  def batch_update(target)
+    target["rows"].each do |e|
+      task = TTask.find(e["task_cd"])
+      if((target["diff"]["task_type"] != nil) && (target["diff"]["task_type"] != ""))
+        task.task_type = target["diff"]["task_type"]
+      end
+      if((target["diff"]["status_type"] != nil) && (target["diff"]["status_type"] != ""))
+        task.status_type = target["diff"]["status_type"]
+      end
+      if((target["diff"]["name"] != nil) && (target["diff"]["name"] != ""))
+        task.name = target["diff"]["name"]
+      end
+      if((target["diff"]["description"] != nil) && (target["diff"]["description"] != ""))
+        task.description = target["diff"]["description"]
+      end
+      if((target["diff"]["priority_type"] != nil) && (target["diff"]["priority_type"] != ""))
+        task.priority_type = target["diff"]["priority_type"]
+      end
+      if((target["diff"]["start_dt"] != nil) && (target["diff"]["start_dt"] != ""))
+        task.start_dt = target["diff"]["start_dt"]
+      end
+      if((target["diff"]["end_dt"] != nil) && (target["diff"]["end_dt"] != ""))
+        task.end_dt = target["diff"]["end_dt"]
+      end
+      task.save()
+    end
+  end
+
+  def upsert(target)
+    if (target["solution_cd"] == nil) || (target["solution_cd"] == "")
+      return ControllerUtil.response(false, "Solution is not designated.", target)
+    end
+
+    p target
+    task = TTask.where(task_cd: target["task_cd"])
+
+    if(task.length == 0) 
+      task = TTask.new()
+
+      task["task_cd"] = fetch_new_cd(target["solution_cd"])
+      task["created"] = Time.now
+      task["updated"] = Time.now
+      task["created_by"] = ""
+      task["updated_by"] = ""
+    else
+      task = task[0]
+    end
+
+
+    task["solution_cd"] = target["solution_cd"]
+    task["task_type"] = target["task_type"]
+    task["name"] = target["name"]
+    task["status_type"] = target["status_type"]
+    task["priority_type"] = target["priority_type"]
+    task["description"] = target["description"]
+    task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
+    task["root_parent_cd"] = ""
+    task["path"] = ""
+    task["start_dt"] = target["start_dt"]
+    task["end_dt"] = target["end_dt"]
+    task["user_cd"] = target["user_cd"]
+
+    task.save()
+    if(task.parent_cd != "")
+      link(task.task_cd, task.parent_cd, "TR02PR")
+    else
+      set_parent_root(task.task_cd)
+    end
+
+    return ControllerUtil.response(true, "Register success", task)
+  end
+
+  def select_workplans_by_task(hideClosed)
+    con = ActiveRecord::Base.connection
+    sql = ""
+    sql += "select"
+    sql += " pl.*,"
+    sql += " task_cd as id,"
+    sql += " task_cd as work_plan_cd,"
+    sql += " parent_cd as parent,"
+    sql += " pl.name as text,"
+    sql += " pl.name as name,"
+    sql += " start_dt as start_date,"
+    sql += " end_dt as end_date,"
+    sql += " pl.sort_order as sort_order"
+    sql += " from t_task pl"
+    if(hideClosed)
+      sql += " where pl.status_type <> 'TS06CL'"
+    end
+    sql += " order by pl.sort_order asc"
+    rows = con.select_all(sql)
+    rows
+  end
+
+  def upsert_workplan(target)
+    p target
+    task = TTask.where(task_cd: target["task_cd"])
+
+    if(task.length == 0) 
+      task = TTask.new()
+
+      task["task_cd"] = fetch_new_cd(target["solution_cd"])
+      task["created"] = Time.now
+      task["updated"] = Time.now
+      task["created_by"] = ""
+      task["updated_by"] = ""
+    else
+      task = task[0]
+    end
+
+    task["solution_cd"] = target["solution_cd"]
+    # task["task_type"] = "TT01TS"
+    task["task_type"] = target["task_type"]
+    task["name"] = target["name"]
+    task["status_type"] = target["status_type"]
+    task["priority_type"] = target["priority_type"]
+    task["description"] = ""
+    task["parent_cd"] = (target["parent_cd"] != nil)? target["parent_cd"] : ""
+    task["root_parent_cd"] = ""
+    task["path"] = ""
+    task["start_dt"] = target["start_date"]
+    task["end_dt"] = target["end_date"]
+    if ((target["task_cd"] != nil) && (target["task_cd"] != ""))
+      task.sort_order = target["sort_order"]
+    end
+    task["progress"] = target["progress"]
+    task["user_cd"] = target["user_cd"]
+    task["description"] = target["description"]
+
+    task.save()
+    if(task.parent_cd != "")
+      link(task.task_cd, task.parent_cd, "TR02PR")
+    else
+      set_parent_root(task.task_cd)
+    end
+
+    {success: true, message: "Register success", data: task}.to_json
+
+    # target.to_json()
+    task.to_json()
+  end
 end
 
