@@ -30,7 +30,7 @@ end
 delete '/tasks/:cd' do
   taskSvc = TaskSvc.new()
   taskSvc.delete_by_cd(params[:cd])
-  {success: true, message: "Delete success", data: nil}.to_json
+  ControllerUtil.response(true, "Delete success", nil)
 end
 
 delete '/batch/tasks' do
@@ -42,7 +42,7 @@ delete '/batch/tasks' do
     TTaskTaskRel.where(task_cd_b: e["task_cd"]).delete_all()
   end
 
-  {success: true, message: "Delete success", data: target}.to_json
+  ControllerUtil.response(true, "Delete success", target)
 end
 
 post '/batch/tasks' do
@@ -74,7 +74,7 @@ post '/batch/tasks' do
     task.save()
   end
 
-  {success: true, message: "Batch update success", data: target}.to_json
+  ControllerUtil.response(true, "Batch update success", target)
 end
 
 
@@ -123,7 +123,7 @@ post '/tasks', provides: :json do
     svc.set_parent_root(task.task_cd)
   end
 
-  {success: true, message: "Register success", data: task}.to_json
+  ControllerUtil.response(true, "Register success", task)
 end
 
 post '/link/task_task' do
@@ -132,7 +132,7 @@ post '/link/task_task' do
   taskSvc = TaskSvc.new()
   taskSvc.link(target["taskCdA"], target["taskCdB"], target["relType"])
 
-  {success: true, message: "Link success.", data: target}.to_json
+  ControllerUtil.response(true, "Link success.", target)
 end
 
 post '/unlink/task_task' do
@@ -141,7 +141,7 @@ post '/unlink/task_task' do
   taskSvc = TaskSvc.new()
   taskSvc.unlink(target["taskCdA"], target["taskCdB"], target["relType"])
 
-  {success: true, message: "Link success.", data: target}.to_json
+  ControllerUtil.response(true, "Link success.", target)
 end
 
 

@@ -108,7 +108,7 @@ end
 delete '/workplans/:cd' do
   taskSvc = TaskSvc.new()
   taskSvc.delete_by_cd(params[:cd])
-  {success: true, message: "Delete success", data: nil}.to_json
+  ControllerUtil.response(true, "Delete success", nil)
 end
 
 

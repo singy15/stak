@@ -6,6 +6,7 @@ require './db_setting.rb'
 Dir[File.dirname(__FILE__) + '/entities/*.rb'].each {|file| require file }
 require './services/base/base_svc.rb'
 Dir[File.dirname(__FILE__) + '/services/*.rb'].each {|file| require file }
+require './controllers/util/controller_util.rb'
 Dir[File.dirname(__FILE__) + '/controllers/*.rb'].each {|file| require file }
 
 enable :sessions
@@ -18,6 +19,7 @@ configure :development do |c|
   c.also_reload "./entities/*.rb"
   c.also_reload "./services/base/*.rb" 
   c.also_reload "./services/*.rb" 
+  c.also_reload "./controllers/util/controller_util.rb" 
   c.also_reload "./controllers/*.rb" 
 end
 

@@ -1,9 +1,6 @@
 
 // icon-button
 Vue.component('icon-button', {
-  data: function () {
-    return {}
-  },
   methods: {
     getCss : function() {
       return ["icon", this.icon];
@@ -86,10 +83,6 @@ Vue.component('toggle-checkbox', {
 
 // footer-button
 Vue.component('footer-button', {
-  data: function () { 
-    return {
-    };
-  },
   props : {
     text : String,
     id : String
