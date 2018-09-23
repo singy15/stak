@@ -12,7 +12,7 @@ class UserSvc < BaseSvc
 
   def upsert(target)
     if (target["name"] == nil) || (target["name"] == "")
-      return {success: false, message: "User name should not be blank.", data: target}.to_json
+      return ResultSet.new(target, false, "User name should not be blank.")
     end
 
     p target
@@ -34,7 +34,7 @@ class UserSvc < BaseSvc
 
     user.save()
 
-    {success: true, message: "Register success", data: user}.to_json
+    ResultSet.new(user, true, "Register success")
   end
 end
 

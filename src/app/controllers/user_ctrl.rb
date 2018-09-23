@@ -9,18 +9,20 @@ end
 
 get '/users' do
   userSvc = UserSvc.new()
-  MUser.json(userSvc.select_all_order())
+  rslt = userSvc.select_all_order()
+  ControllerUtil.response_grid(rslt.total, rslt.rows)
 end
 
 post '/users', provides: :json do
   target = JSON.parse(request.body.read)
   svc = UserSvc.new()
-  svc.upsert(target)
+  rslt = svc.upsert(target)
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 delete '/users/:cd' do
   svc = UserSvc.new()
-  svc.delete_by_cd(params[:cd])
-  {success: true, message: "Delete success", data: nil}.to_json
+  rslt = svc.delete_by_cd(params[:cd])
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 

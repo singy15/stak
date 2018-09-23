@@ -10,7 +10,8 @@ class BaseSvc
   end
 
   def select_all_order()
-    select_all().default_order
+    rows = select_all().default_order
+    ResultSetGrid.new(rows, rows.length)
   end
 
   def select_first()
@@ -19,6 +20,7 @@ class BaseSvc
 
   def delete_by_cd(cd)
     @entity.delete(cd)
+    ResultSet.new(nil, true, "Delete success.")
   end
 
   def fetch_new_cd(parent_cd)
