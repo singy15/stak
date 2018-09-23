@@ -38,8 +38,8 @@ end
 
 delete '/workplans/:cd' do
   svc = TaskSvc.new()
-  svc.delete_by_cd(params[:cd])
-  ControllerUtil.response(true, "Delete success", nil)
+  rslt = svc.delete_by_cd(params[:cd])
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 

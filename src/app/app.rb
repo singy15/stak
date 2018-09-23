@@ -5,6 +5,7 @@ require './const.rb'
 require './db_setting.rb'
 Dir[File.dirname(__FILE__) + '/entities/*.rb'].each {|file| require file }
 require './services/base/result_set.rb'
+require './services/base/result_set_grid.rb'
 require './services/base/base_svc.rb'
 Dir[File.dirname(__FILE__) + '/services/*.rb'].each {|file| require file }
 require './controllers/util/controller_util.rb'

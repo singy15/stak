@@ -18,18 +18,20 @@ end
 
 get '/tasks' do
   svc = TaskSvc.new()
-  @tasks = svc.select_by_condition(params).to_json()
+  rslt = svc.select_by_condition(params)
+  ControllerUtil.response_grid(rslt.total, rslt.rows)
 end
 
 get '/tasks/:cd' do
   svc = TaskSvc.new()
-  @tasks = TTask.json(svc.select_by_cd(params[:cd]))
+  rslt = svc.select_by_cd(params[:cd])
+  ControllerUtil.response(rslt.success, rslt.msg, JSON.parse(TTask.json(rslt.data)))
 end
 
 delete '/tasks/:cd' do
   svc = TaskSvc.new()
-  svc.delete_by_cd(params[:cd])
-  ControllerUtil.response(true, "Delete success", nil)
+  rslt = svc.delete_by_cd(params[:cd])
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 delete '/batch/tasks' do
@@ -49,21 +51,22 @@ end
 post '/tasks', provides: :json do
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
-  svc.upsert(target)
+  rslt = svc.upsert(target)
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 post '/link/task_task' do
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
-  svc.link(target["taskCdA"], target["taskCdB"], target["relType"])
-  ControllerUtil.response(true, "Link success.", target)
+  rslt = svc.link(target["taskCdA"], target["taskCdB"], target["relType"])
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 post '/unlink/task_task' do
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
-  svc.unlink(target["taskCdA"], target["taskCdB"], target["relType"])
-  ControllerUtil.response(true, "Link success.", target)
+  rslt = svc.unlink(target["taskCdA"], target["taskCdB"], target["relType"])
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 

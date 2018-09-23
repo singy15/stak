@@ -151,7 +151,8 @@ class TaskSvc < BaseSvc
     tasks = JSON.parse(tasks)
 
     total = matches_count
-    return {total: total, rows: tasks}
+    # return {total: total, rows: tasks}
+    ResultSetGrid.new(tasks, total)
   end
 
   def select_by_cd_no_json(cd)
@@ -163,7 +164,8 @@ class TaskSvc < BaseSvc
   def select_by_cd(cd)
     TTask.set_order_prm("")
     TTask.set_where_prm(nil)
-    return TTask.with_rels().find(cd)
+    # return TTask.with_rels().find(cd)
+    ResultSet.new(TTask.with_rels().find(cd), true, "")
   end
 
   def recursive_delete(children_all)
@@ -181,6 +183,7 @@ class TaskSvc < BaseSvc
     whiteboard_svc.delete_by_cd_if_exist(cd)
     TTaskTaskRel.where(task_cd_a: cd).delete_all()
     TTaskTaskRel.where(task_cd_b: cd).delete_all()
+    ResultSet.new(nil, true, "Delete success")
   end
 
   def recursive_calc_path(str, parent)
@@ -252,7 +255,8 @@ class TaskSvc < BaseSvc
         rel_type: rel_type
       )
       if(exist) 
-        return {success: false, message: "Link already exist!", data: target}.to_json
+        # return {success: false, message: "Link already exist!", data: target}.to_json
+        return ResultSet.new(target, false, "Link already exist!")
       end
 
       exist = TTaskTaskRel.find_by(
@@ -261,7 +265,8 @@ class TaskSvc < BaseSvc
         rel_type: rel_type
       )
       if(exist) 
-        return {success: false, message: "Link already exist!", data: target}.to_json
+        # return {success: false, message: "Link already exist!", data: target}.to_json
+        return ResultSet.new(target, false, "Link already exist!")
       end
 
       rel = TTaskTaskRel.new()
@@ -275,6 +280,8 @@ class TaskSvc < BaseSvc
       rel.task_cd_b = cd_a
       rel.rel_type = rel_type
       rel.save()
+
+      ResultSet.new(nil, true, "Link success")
     end
   end
 
@@ -314,6 +321,8 @@ class TaskSvc < BaseSvc
       recursive_root_parent_cd_update(task.task_cd, task.children_all)
       recursive_path_update(task.task_cd, task.children_all)
     end
+
+    ResultSet.new(nil, true, "Unlink success")
   end
 
   def set_parent_root(task_cd)
@@ -364,7 +373,8 @@ class TaskSvc < BaseSvc
 
   def upsert(target)
     if (target["solution_cd"] == nil) || (target["solution_cd"] == "")
-      return ControllerUtil.response(false, "Solution is not designated.", target)
+      # return ControllerUtil.response(false, "Solution is not designated.", target)
+      return ResultSet.new(target, false,  "Solution is not designated.")
     end
 
     p target
@@ -403,7 +413,8 @@ class TaskSvc < BaseSvc
       set_parent_root(task.task_cd)
     end
 
-    return ControllerUtil.response(true, "Register success", task)
+    # return ControllerUtil.response(true, "Register success", task)
+    return ResultSet.new(task, true, "Register success")
   end
 
   def select_workplans_by_task(hideClosed)

@@ -1,5 +1,7 @@
 
 class ResultSet
+  attr_accessor :data, :success, :msg
+
   def initialize(data, success = true, msg = "")
     @data = data
     @success = success

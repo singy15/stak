@@ -782,7 +782,7 @@
           success: function(data, dataType) { 
             //if(data.success) {
               self.multiRowSelected = false;
-              self.row = $.extend(true, {}, data);
+              self.row = $.extend(true, {}, data.data);
             //} else {
             //  messageUpdateError("Retrieve information failed");
             //}
