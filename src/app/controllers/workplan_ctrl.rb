@@ -19,21 +19,22 @@ end
 
 get '/workplans' do
   svc = TaskSvc.new()
-  rows = svc.select_workplans_by_task(true)
-  rows.to_json(:include => {:user_info => {}})
+  rslt = svc.select_workplans_by_task(true)
+  ControllerUtil.response(rslt.success, rslt.msg, JSON.parse(rslt.data.to_json(:include => {:user_info => {}})))
 end
 
 get '/workplans/with_closed' do
   svc = TaskSvc.new()
-  rows = svc.select_workplans_by_task(false)
-  rows.to_json(:include => {:user_info => {}})
+  rslt = svc.select_workplans_by_task(false)
+  ControllerUtil.response(rslt.success, rslt.msg, JSON.parse(rslt.data.to_json(:include => {:user_info => {}})))
 end
 
 
 post '/workplans', provides: :json do
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
-  svc.upsert_workplan(target)
+  rslt = svc.upsert_workplan(target)
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 delete '/workplans/:cd' do

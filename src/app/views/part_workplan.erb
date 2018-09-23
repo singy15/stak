@@ -156,8 +156,8 @@
             });
           } else {
             loadTask(function() {
-              gantt.selectTask(data.task_cd); 
-              gantt.showTask(data.task_cd); 
+              gantt.selectTask(data.data.task_cd); 
+              gantt.showTask(data.data.task_cd); 
             });
           }
         },
@@ -184,8 +184,8 @@
         data: JSON.stringify({}),
         contentType: 'charset=utf-8',
         success: function(data, dataType) { 
-          var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
-          var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
+          var st = moment(_.min(_.map(data.data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
+          var ed = moment(_.max(_.map(data.data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
           initGantt("gantt_here", getSubScale("hour"), st, ed, 18);
           loadTask();
         },
@@ -659,8 +659,8 @@
           console.log("task selecting");
         } else {
           loadTask(function() {
-            gantt.selectTask(data.task_cd); 
-            gantt.showTask(data.task_cd); 
+            gantt.selectTask(data.data.task_cd); 
+            gantt.showTask(data.data.task_cd); 
           });
           console.log("task not selecting");
         }
@@ -702,7 +702,7 @@
 
         gantt.clearAll(); 
         gantt.parse({
-          data:data,
+          data:data.data,
           links:[]
         });
         if(lastScrollPos) {
@@ -815,8 +815,8 @@
           data: JSON.stringify({}),
           contentType: 'charset=utf-8',
           success: function(data, dataType) { 
-            var st = moment(_.min(_.map(data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
-            var ed = moment(_.max(_.map(data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
+            var st = moment(_.min(_.map(data.data,function(e){return moment(e.start_date, "DD-MM-YYYY HH:mm").toDate();}))).add(-1,"days").startOf("day").toDate();
+            var ed = moment(_.max(_.map(data.data,function(e){return moment(e.end_date, "DD-MM-YYYY HH:mm").toDate();}))).add(1,"days").startOf("day").toDate();
             initGantt("gantt_here", getSubScale("hour"), st, ed, 18);
             loadTask();
           },

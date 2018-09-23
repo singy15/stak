@@ -338,7 +338,6 @@ class TaskSvc < BaseSvc
   def batch_delete(params)
     params.each do |e|
       TTask.destroy(e["task_cd"])
-      TTaskTaskRel.where(task_cd_a: e["task_cd"]).delete_all()
       TTaskTaskRel.where(task_cd_b: e["task_cd"]).delete_all()
     end
 
@@ -417,7 +416,6 @@ class TaskSvc < BaseSvc
       set_parent_root(task.task_cd)
     end
 
-    # return ControllerUtil.response(true, "Register success", task)
     return ResultSet.new(task, true, "Register success")
   end
 
@@ -441,6 +439,8 @@ class TaskSvc < BaseSvc
     sql += " order by pl.sort_order asc"
     rows = con.select_all(sql)
     rows
+
+    ResultSet.new(rows, true, "")
   end
 
   def upsert_workplan(target)
@@ -483,7 +483,7 @@ class TaskSvc < BaseSvc
       set_parent_root(task.task_cd)
     end
 
-    task.to_json()
+    ResultSet.new(task, true, "Register success.")
   end
 end
 
