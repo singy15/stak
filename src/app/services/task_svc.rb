@@ -341,6 +341,8 @@ class TaskSvc < BaseSvc
       TTaskTaskRel.where(task_cd_a: e["task_cd"]).delete_all()
       TTaskTaskRel.where(task_cd_b: e["task_cd"]).delete_all()
     end
+
+    ResultSet.new(nil, true, "Batch delete success")
   end
 
   def batch_update(target)
@@ -369,6 +371,8 @@ class TaskSvc < BaseSvc
       end
       task.save()
     end
+
+    ResultSet.new(nil, true, "Batch update success")
   end
 
   def upsert(target)

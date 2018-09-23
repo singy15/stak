@@ -37,15 +37,15 @@ end
 delete '/batch/tasks' do
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
-  svc.batch_delete(target["rows"])
-  ControllerUtil.response(true, "Delete success", target)
+  rslt = svc.batch_delete(target["rows"])
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 post '/batch/tasks' do
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
-  svc.batch_update(target)
-  ControllerUtil.response(true, "Batch update success", target)
+  rslt = svc.batch_update(target)
+  ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 post '/tasks', provides: :json do
