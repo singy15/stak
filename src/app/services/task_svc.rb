@@ -145,40 +145,13 @@ class TaskSvc < BaseSvc
     TTask.set_where_prm(cds)
     TTask.set_order_prm(order_prm)
 
-    #tasks = TTask.where("t_task.task_cd in (?)", tasks.map{|r| (r.parent_cd != "")? r.root_parent_cd : r.task_cd})
     tasks = TTask.where(task_cd: matches.map{|r| (r["root_parent_cd"] != "")? r["root_parent_cd"] : r["task_cd"]}.uniq()).cur_order()
 
-
-    
-    
-    # tasks = tasks.with_rels().order(TTask.gen_sort_prm())
-
-    # p tasks.to_sql
-
-    # if (params["rows"] != nil) && (params["page"] != nil)
-    #   total = tasks.count
-    #   tasks = tasks.offset(params["rows"].to_i() * (params["page"].to_i() - 1)).take(params["rows"].to_i)
-    # end
-  
     tasks = TTask.json(tasks)
     tasks = JSON.parse(tasks)
 
-    # total = recursive_total([],tasks)
-    # offset_ls = []
-    # cnt_ls = []
-    # tasks = pagination(cnt_ls, tasks, params["rows"].to_i, params["rows"].to_i() * (params["page"].to_i() - 1), offset_ls)
-    # p "*** offset ***"
-    # p offset_ls.map{|r| r["task_cd"]}
-    # p "*** cnt ***"
-    # p cnt_ls.map{|r| r["task_cd"]}
-
-    # end_tm = Time.now
-    # p "*** elapsed """
-    # p end_tm - start_tm
-
     total = matches_count
-    return ({total: total, rows: tasks}).to_json()
-    # return tasks.to_json()
+    return {total: total, rows: tasks}
   end
 
   def select_by_cd_no_json(cd)
@@ -190,7 +163,7 @@ class TaskSvc < BaseSvc
   def select_by_cd(cd)
     TTask.set_order_prm("")
     TTask.set_where_prm(nil)
-    return TTask.json(TTask.with_rels().find(cd))
+    return TTask.with_rels().find(cd)
   end
 
   def recursive_delete(children_all)
@@ -456,12 +429,10 @@ class TaskSvc < BaseSvc
   end
 
   def upsert_workplan(target)
-    p target
     task = TTask.where(task_cd: target["task_cd"])
 
     if(task.length == 0) 
       task = TTask.new()
-
       task["task_cd"] = fetch_new_cd(target["solution_cd"])
       task["created"] = Time.now
       task["updated"] = Time.now
@@ -472,7 +443,6 @@ class TaskSvc < BaseSvc
     end
 
     task["solution_cd"] = target["solution_cd"]
-    # task["task_type"] = "TT01TS"
     task["task_type"] = target["task_type"]
     task["name"] = target["name"]
     task["status_type"] = target["status_type"]
@@ -491,15 +461,13 @@ class TaskSvc < BaseSvc
     task["description"] = target["description"]
 
     task.save()
+    
     if(task.parent_cd != "")
       link(task.task_cd, task.parent_cd, "TR02PR")
     else
       set_parent_root(task.task_cd)
     end
 
-    {success: true, message: "Register success", data: task}.to_json
-
-    # target.to_json()
     task.to_json()
   end
 end

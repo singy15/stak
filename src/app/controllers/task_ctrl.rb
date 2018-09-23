@@ -18,12 +18,12 @@ end
 
 get '/tasks' do
   svc = TaskSvc.new()
-  @tasks = svc.select_by_condition(params)
+  @tasks = svc.select_by_condition(params).to_json()
 end
 
 get '/tasks/:cd' do
   svc = TaskSvc.new()
-  @tasks = svc.select_by_cd(params[:cd])
+  @tasks = TTask.json(svc.select_by_cd(params[:cd]))
 end
 
 delete '/tasks/:cd' do
