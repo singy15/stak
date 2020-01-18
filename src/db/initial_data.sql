@@ -57,7 +57,7 @@ INSERT INTO c_version (version) VALUES ('1');
 
 -- t_solution
 DELETE FROM t_solution;
-INSERT INTO t_solution (solution_cd,name,status_type,name) VALUES ('01','DEFAULT','SS02AC');
+INSERT INTO t_solution (solution_cd,name,status_type) VALUES ('01','DEFAULT','SS02AC');
 
 -- t_whiteboard
 DELETE FROM t_whiteboard;

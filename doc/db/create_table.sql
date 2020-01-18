@@ -275,16 +275,17 @@ create table t_task (
   , name varchar(100) not null
   , status_type varchar(6) default 'TS-NW' not null
   , description text default '' not null
-  , start_dt varchar(10) default '' not null
-  , end_dt varchar(10) default '' not null
+  , start_dt varchar(25) default '' not null
+  , end_dt varchar(25) default '' not null
   , priority_type varchar(6) default 'TP-NM' not null
   , parent_cd varchar(7) default '' not null
   , root_parent_cd varchar(7) default '' not null
   , path varchar(500) default '' not null
-  , start_date varchar(10) default '' not null
+  , start_date varchar(25) default '' not null
   , duration integer default 1 not null
   , progress numeric default 0.0 not null
   , user_cd varchar(3) default '' not null
+  , sort_order bigint default to_number(to_char(now(), 'YYMMDDHH24MISSMSUS'),'9999999999999999999') not null
   , created timestamp default now() not null
   , created_by varchar(3) default '' not null
   , updated timestamp default now() not null
