@@ -6,6 +6,8 @@ require 'active_record'
 ActiveRecord::Base.logger = Logger.new("log/sql.log", 'daily')
 
 ActiveRecord::Base.establish_connection(
+    host: 'localhost',
+    port: 5432,
     adapter: 'postgresql',  
     encoding: 'unicode', 
     database: 'stak', 
