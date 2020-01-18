@@ -96,36 +96,38 @@
     });
 
     $("#btnDelete").click(function() {
-      $.ajax({
-        type: "DELETE",
-        // url: "/workplans/" + vue.row.task_cd,
-        url: "/tasks/" + vue.row.task_cd,
-        data: JSON.stringify(vue.row),
-        contentType: 'charset=utf-8',
-        success: function(data, dataType) { 
-          // defaultUpdtSuccessCallback(data, dataType);
+      if(window.confirm("Delete task?")) {
+        $.ajax({
+          type: "DELETE",
+          // url: "/workplans/" + vue.row.task_cd,
+          url: "/tasks/" + vue.row.task_cd,
+          data: JSON.stringify(vue.row),
+          contentType: 'charset=utf-8',
+          success: function(data, dataType) { 
+            // defaultUpdtSuccessCallback(data, dataType);
 
-          // if(data.success) {
-          //   treegrid.treegrid("reload");
-          //   vue[propNameSelectedRow] = fnNewRecord();
-          // }
-          console.log("deleted");
+            // if(data.success) {
+            //   treegrid.treegrid("reload");
+            //   vue[propNameSelectedRow] = fnNewRecord();
+            // }
+            console.log("deleted");
 
-          var sPos = gantt.getScrollState(); // {x:58,y:180}
-          var posX = sPos.x;
-          var posY = sPos.y;
-          gantt.deleteTask(vue.row.task_cd);
+            var sPos = gantt.getScrollState(); // {x:58,y:180}
+            var posX = sPos.x;
+            var posY = sPos.y;
+            gantt.deleteTask(vue.row.task_cd);
 
-          loadTask(function() {
-            gantt.scrollTo(posX,posY);
-            vue.row = domain.getNewRecord();
-          });
+            loadTask(function() {
+              gantt.scrollTo(posX,posY);
+              vue.row = domain.getNewRecord();
+            });
 
 
-        },
-        // error: defaultUpdtErrorCallback,
-        dataType: "json"
-      });
+          },
+          // error: defaultUpdtErrorCallback,
+          dataType: "json"
+        });
+      }
     });
 
     $("#btnRegister").click(function() {
