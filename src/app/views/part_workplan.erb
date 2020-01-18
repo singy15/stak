@@ -748,7 +748,8 @@
       showDescriptionView : false,
       currentParentCd : "",
       hideClosed : true,
-      fixedHeight : true
+      fixedHeight : true,
+      scrollOnClick : true
     },
     watch: {
       //hideClosed: 'loadByChecked',
@@ -778,6 +779,11 @@
       },
       loadByChecked : function(toggleState) {
         this.hideClosed = toggleState;
+        loadTask();
+      },
+      loadByScrollOnClick : function(toggleState) {
+        this.scrollOnClick = toggleState;
+        gantt.config.scroll_on_click = toggleState;
         loadTask();
       },
       loadByChangeHeight : function(toggleState) {
