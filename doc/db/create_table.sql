@@ -195,6 +195,8 @@ drop table if exists m_user cascade;
 create table m_user (
   user_cd varchar(3) not null
   , name varchar(100) not null
+  , login_id varchar(100) not null
+  , password text not null
   , created timestamp default now() not null
   , created_by varchar(3) default '' not null
   , updated timestamp default now() not null

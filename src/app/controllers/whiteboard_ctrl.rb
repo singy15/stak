@@ -1,5 +1,6 @@
 
 get '/view/whiteboard' do
+  authenticate!
   if(params["whiteboard_cd"]) 
     @whiteboard_cd = params["whiteboard_cd"]
   else
@@ -20,6 +21,7 @@ get '/view/whiteboard' do
 end
 
 get '/view/whiteboard/editor' do
+  authenticate!
   if(params["whiteboard_cd"]) 
     @whiteboard_cd = params["whiteboard_cd"]
   else
@@ -29,6 +31,7 @@ get '/view/whiteboard/editor' do
 end
 
 get '/whiteboard/:cd' do
+  authenticate!
   task_svc = TaskSvc.new()
   task = task_svc.select_by_cd_no_json(params[:cd])
   if((task == nil) && (params[:cd] != ConstDefaults::DEFAULT_WHITEBOARD_CD)) 
@@ -40,6 +43,7 @@ get '/whiteboard/:cd' do
 end
 
 post '/whiteboard/:cd', provides: :json do
+  authenticate!
   svc = WhiteboardSvc.new()
   target = JSON.parse(request.body.read)
   svc.update_content(params[:cd], target["content"])
@@ -48,6 +52,7 @@ post '/whiteboard/:cd', provides: :json do
 end
 
 get '/whiteboard/:cd/exist', provides: :json do
+  authenticate!
   svc = WhiteboardSvc.new()
   is_exist = svc.select_exist_by_cd(params[:cd])
 

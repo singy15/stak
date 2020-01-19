@@ -1,5 +1,6 @@
 
 get '/view/tasks' do
+  authenticate!
   @view_title = "Tasks"
   @view_subtitle = ""
 
@@ -17,24 +18,28 @@ get '/view/tasks' do
 end
 
 get '/tasks' do
+  authenticate!
   svc = TaskSvc.new()
   rslt = svc.select_by_condition(params)
   ControllerUtil.response_grid(rslt.total, rslt.rows)
 end
 
 get '/tasks/:cd' do
+  authenticate!
   svc = TaskSvc.new()
   rslt = svc.select_by_cd(params[:cd])
   ControllerUtil.response(rslt.success, rslt.msg, JSON.parse(TTask.json(rslt.data)))
 end
 
 delete '/tasks/:cd' do
+  authenticate!
   svc = TaskSvc.new()
   rslt = svc.delete_by_cd(params[:cd])
   ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
 end
 
 delete '/batch/tasks' do
+  authenticate!
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
   rslt = svc.batch_delete(target["rows"])
@@ -42,6 +47,7 @@ delete '/batch/tasks' do
 end
 
 post '/batch/tasks' do
+  authenticate!
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
   rslt = svc.batch_update(target)
@@ -49,6 +55,7 @@ post '/batch/tasks' do
 end
 
 post '/tasks', provides: :json do
+  authenticate!
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
   rslt = svc.upsert(target)
@@ -56,6 +63,7 @@ post '/tasks', provides: :json do
 end
 
 post '/link/task_task' do
+  authenticate!
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
   rslt = svc.link(target["taskCdA"], target["taskCdB"], target["relType"])
@@ -63,6 +71,7 @@ post '/link/task_task' do
 end
 
 post '/unlink/task_task' do
+  authenticate!
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
   rslt = svc.unlink(target["taskCdA"], target["taskCdB"], target["relType"])

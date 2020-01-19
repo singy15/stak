@@ -10,6 +10,10 @@ require './services/base/base_svc.rb'
 Dir[File.dirname(__FILE__) + '/services/*.rb'].each {|file| require file }
 require './controllers/util/controller_util.rb'
 Dir[File.dirname(__FILE__) + '/controllers/*.rb'].each {|file| require file }
+require 'bcrypt'
+require_relative 'lib/authentication'
+
+helpers Authentication
 
 enable :sessions
 
@@ -25,13 +29,21 @@ configure :development do |c|
   c.also_reload "./controllers/*.rb" 
 end
 
-
 get '/' do
+  authenticate!
   @view_title = "Welcome"
   @view_subtitle = "Welcome to Stak"
   @view_content = erb :part_top_content
   erb :template
 end
 
+helpers do  
+  def logged_in?
+    !!session[:user_id]  
+  end  
 
+  # def current_user
+  #   User.find(session[:user_id])  
+  # end  
+end
 

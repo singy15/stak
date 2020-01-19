@@ -1,5 +1,12 @@
-
 get '/view/workplan' do
+  authenticate!
+
+  # if logged_in?
+  #   p "logged in"
+  # else
+  #   p "not logged in"
+  # end
+
   @view_title = "Workplan"
   @view_subtitle = ""
 
@@ -18,12 +25,14 @@ get '/view/workplan' do
 end
 
 get '/workplans' do
+  authenticate!
   svc = TaskSvc.new()
   rslt = svc.select_workplans_by_task(true)
   ControllerUtil.response(rslt.success, rslt.msg, JSON.parse(rslt.data.to_json(:include => {:user_info => {}})))
 end
 
 get '/workplans/with_closed' do
+  authenticate!
   svc = TaskSvc.new()
   rslt = svc.select_workplans_by_task(false)
   ControllerUtil.response(rslt.success, rslt.msg, JSON.parse(rslt.data.to_json(:include => {:user_info => {}})))
@@ -31,6 +40,7 @@ end
 
 
 post '/workplans', provides: :json do
+  authenticate!
   target = JSON.parse(request.body.read)
   svc = TaskSvc.new()
   rslt = svc.upsert_workplan(target)
@@ -38,6 +48,7 @@ post '/workplans', provides: :json do
 end
 
 delete '/workplans/:cd' do
+  authenticate!
   svc = TaskSvc.new()
   rslt = svc.delete_by_cd(params[:cd])
   ControllerUtil.response(rslt.success, rslt.msg, rslt.data)
