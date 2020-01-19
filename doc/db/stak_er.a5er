@@ -72,7 +72,7 @@ PName=t_whiteboard
 LName=t_whiteboard
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1400
 Top=1500
 Field="whiteboard_cd","whiteboard_cd","*task_cd","NOT NULL",0,"","",$FFFFFFFF,""
@@ -82,7 +82,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20180908223020
-Position="Main",1400,1500
+Position="MAIN",1400,1500
 
 [Entity]
 PName=c_version
@@ -573,11 +573,13 @@ Left=1400
 Top=150
 Field="user_cd","user_cd","*user_cd","NOT NULL",0,"","",$FFFFFFFF,""
 Field="name","name","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="login_id","login_id","*gen_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="password","password","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20180318132830
-Position="MAIN",1400,150,282,65
+ModifiedDateTime=20200119140535
+Position="MAIN",1400,150,282,116
 
 [Entity]
 PName=m_tag
@@ -671,12 +673,13 @@ Field="start_date","start_date","*gen_gantt_date_str","NOT NULL",,"\q\q","",$FFF
 Field="duration","duration","*gen_gantt_duration","NOT NULL",,"1","",$FFFFFFFF,""
 Field="progress","progress","*gen_gantt_progress","NOT NULL",,"0.0","",$FFFFFFFF,""
 Field="user_cd","user_cd","*user_cd","NOT NULL",,"\q\q","",$FFFFFFFF,""
+Field="sort_order","sort_order","bigint","NOT NULL",," to_number(to_char(now(), \qYYMMDDHH24MISSMSUS\q),\q9999999999999999999\q)","",$FFFFFFFF,""
 Index==1,solution_cd,task_cd
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20180901121728
-Position="MAIN",1400,750,364,431
+ModifiedDateTime=20200119140400
+Position="MAIN",1400,750,364,454
 
 [Entity]
 PName=t_solution
