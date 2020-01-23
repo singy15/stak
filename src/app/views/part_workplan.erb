@@ -690,6 +690,9 @@
   });
 
   function loadTask(postLoad) {
+    // Save vertical scroll position
+    var scrollTop = $(document).scrollTop();
+
     $.ajax({
       type: "GET",
       url: (vue.hideClosed)? "/workplans" : "/workplans/with_closed",
@@ -720,6 +723,9 @@
         if(postLoad) {
           postLoad();
         }
+
+        // Restore scroll position
+        window.scrollTo(0,scrollTop);
       },
       // error: defaultUpdtErrorCallback,
       dataType: "json"
